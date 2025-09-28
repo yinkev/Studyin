@@ -25,6 +25,7 @@
     "page": 15,
     "figure": "Fig 2-6",
     "bbox": [85, 240, 320, 520],
+    "cropPath": "content/evidence/upper-limb-oms1/brachial-artery-injury/brachial-artery-injury.png",
     "citation": "Orthopedic Trauma Essentials, 2024"
   },
   "tags": ["trauma", "vascular"],
@@ -33,4 +34,3 @@
   "author_ids": ["author.ortho"],
   "reviewer_ids": ["reviewer.vascular"]
 }
-

@@ -25,6 +25,7 @@
     "page": 11,
     "figure": "Fig 1-5",
     "bbox": [125, 210, 360, 500],
+    "cropPath": "content/evidence/upper-limb-oms1/shoulder-suprascapular-entrapment/shoulder-suprascapular-entrapment.png",
     "citation": "Sports Shoulder Review, 2023"
   },
   "tags": ["orthopedics", "sports"],
@@ -33,4 +34,3 @@
   "author_ids": ["author.ortho"],
   "reviewer_ids": ["reviewer.msk"]
 }
-

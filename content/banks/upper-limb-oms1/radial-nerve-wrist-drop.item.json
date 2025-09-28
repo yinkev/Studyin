@@ -25,12 +25,12 @@
     "page": 28,
     "figure": "Fig 3-7",
     "bbox": [90, 210, 330, 500],
+    "cropPath": "content/evidence/upper-limb-oms1/radial-nerve-wrist-drop/radial-nerve-wrist-drop.png",
     "citation": "Moore KL, Clinically Oriented Anatomy, 8e"
   },
   "tags": ["neurology", "clinical"],
-  "status": "draft",
+  "status": "review",
   "rubric_score": 2.5,
   "author_ids": ["author.primary"],
   "reviewer_ids": ["reviewer.neuro"]
 }
-

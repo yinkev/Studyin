@@ -25,6 +25,7 @@
     "page": 18,
     "figure": "Fig 4-2",
     "bbox": [110, 210, 350, 500],
+    "cropPath": "content/evidence/upper-limb-oms1/rotator-cuff-tear-night-pain/rotator-cuff-tear-night-pain.png",
     "citation": "Orthopedic Clinic Review, 2023"
   },
   "tags": ["orthopedics", "msk"],
@@ -33,4 +34,3 @@
   "author_ids": ["author.ortho"],
   "reviewer_ids": ["reviewer.msk"]
 }
-

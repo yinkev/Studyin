@@ -53,9 +53,10 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - schema_version alignment
   - ABCDE choices with unique text
   - per-choice rationales (correct + distractors)
-  - evidence includes `file`, `page`, and `bbox` or `cropPath`
+  - evidence includes `file`, `page`, and by default `bbox` or `cropPath`
   - LO IDs exist in `config/los.json`
   - published items must have `rubric_score ≥ 2.7`
+  - To relax evidence during setup: run with `REQUIRE_EVIDENCE_CROP=0` to allow citation‑only (must include `citation` or `source_url`)
 - `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `app/public/analytics/latest.json`.
 
 ## Next Steps

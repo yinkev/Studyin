@@ -33,6 +33,7 @@ export const evidenceRefSchema = z.object({
     .optional(),
   cropPath: z.string().min(1).optional(),
   citation: z.string().min(1).optional(),
+  source_url: z.string().url().optional(),
   dpi: z.number().positive().optional(),
   rotation: z.enum(['0', '90', '180', '270']).transform(Number).optional()
 });
@@ -56,10 +57,7 @@ export const itemSchema = z.object({
   los: z.array(z.string().min(1)).nonempty(),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   bloom: z.enum(['remember', 'understand', 'apply', 'analyze', 'evaluate']),
-  evidence: evidenceRefSchema.refine(
-    (evidence) => Boolean(evidence.bbox) || Boolean(evidence.cropPath),
-    'evidence requires bbox or cropPath'
-  ),
+  evidence: evidenceRefSchema,
   tags: z.array(z.string().min(1)).optional(),
   status: z.enum(['draft', 'review', 'published']),
   rubric_score: z.number().min(0).max(3).optional(),

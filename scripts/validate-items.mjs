@@ -18,6 +18,7 @@ const BANK_DIR = path.join(ROOT, 'content', 'banks', 'upper-limb-oms1');
 const BLUEPRINT_PATH = path.join(ROOT, 'config', 'blueprint.json');
 const LOS_PATH = path.join(ROOT, 'config', 'los.json');
 const TARGET_FORM_LENGTH = Number.parseInt(process.env.VALIDATION_FORM_LENGTH ?? '30', 10);
+const REQUIRE_EVIDENCE_CROP = process.env.REQUIRE_EVIDENCE_CROP !== '0';
 
 async function readJson(filePath) {
   const content = await fs.readFile(filePath, 'utf8');
@@ -103,8 +104,14 @@ async function main() {
         itemErrors.push('published item must have rubric_score ≥ 2.7');
       }
 
-      if (!parsed.evidence.bbox && !parsed.evidence.cropPath) {
-        itemErrors.push('evidence requires bbox or cropPath (unexpected)');
+      if (REQUIRE_EVIDENCE_CROP) {
+        if (!parsed.evidence.bbox && !parsed.evidence.cropPath) {
+          itemErrors.push('evidence requires bbox or cropPath (set REQUIRE_EVIDENCE_CROP=0 to relax)');
+        }
+      } else {
+        if (!parsed.evidence.citation && !parsed.evidence.source_url) {
+          itemErrors.push('evidence requires at least a citation or source_url when REQUIRE_EVIDENCE_CROP=0');
+        }
       }
 
       if (itemErrors.length) {

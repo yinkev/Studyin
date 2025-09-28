@@ -25,12 +25,12 @@
     "page": 12,
     "figure": "Fig 2-1",
     "bbox": [110, 240, 360, 520],
+    "cropPath": "content/evidence/upper-limb-oms1/median-nerve-carpal-tunnel/median-nerve-carpal-tunnel.png",
     "citation": "Hand Clinics Review, 2022"
   },
   "tags": ["neurology", "clinical"],
-  "status": "draft",
+  "status": "review",
   "rubric_score": 2.5,
   "author_ids": ["author.primary"],
   "reviewer_ids": ["reviewer.neuro"]
 }
-

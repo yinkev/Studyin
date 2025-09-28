@@ -73,5 +73,9 @@ Keep this SOP current as tooling evolves. Changes require DocScribe + ReleaseMan
 
 - **Evidence checklist (per item)**
   - Crop stored under `content/evidence/<bank>/<item>/<asset>` (tracked by Git LFS).
-  - Record `{file, page, figure?, bbox?|cropPath?, citation}`; prefer `cropPath` to pre-generated AVIF/WebP + PNG fallback.
+  - Record `{file, page, figure?, bbox?|cropPath?, citation, source_url?}`; prefer `cropPath` to pre-generated AVIF/WebP + PNG fallback.
   - Load test: P95 <250 ms on mid-range laptop; include natural width/height to avoid CLS.
+
+- **Setup mode (optional)**
+  - During early authoring you may relax crops by running the validator with `REQUIRE_EVIDENCE_CROP=0 npm run validate:items`.
+  - In this mode, each item must include `citation` or `source_url` and the source `file`/`page`. Re‑enable crops before publishing.

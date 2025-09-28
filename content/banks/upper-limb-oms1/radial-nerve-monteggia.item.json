@@ -25,6 +25,7 @@
     "page": 21,
     "figure": "Fig 4-3",
     "bbox": [120, 210, 360, 510],
+    "cropPath": "content/evidence/upper-limb-oms1/radial-nerve-monteggia/radial-nerve-monteggia.png",
     "citation": "Forearm Fracture Complications, 2023"
   },
   "tags": ["trauma", "neurology"],
@@ -33,4 +34,3 @@
   "author_ids": ["author.ortho"],
   "reviewer_ids": ["reviewer.neuro"]
 }
-

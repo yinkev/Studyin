@@ -25,6 +25,7 @@
     "page": 25,
     "figure": "Fig 6-1",
     "bbox": [120, 200, 360, 480],
+    "cropPath": "content/evidence/upper-limb-oms1/ulnar-nerve-handlebar-palsy/ulnar-nerve-handlebar-palsy.png",
     "citation": "Cycling Neuropathy Review, 2020"
   },
   "tags": ["neurology", "overuse"],
@@ -33,4 +34,3 @@
   "author_ids": ["author.primary"],
   "reviewer_ids": ["reviewer.neuro"]
 }
-

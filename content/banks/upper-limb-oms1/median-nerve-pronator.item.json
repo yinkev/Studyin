@@ -25,6 +25,7 @@
     "page": 9,
     "figure": "Fig 1-4",
     "bbox": [120, 220, 360, 520],
+    "cropPath": "content/evidence/upper-limb-oms1/median-nerve-pronator/median-nerve-pronator.png",
     "citation": "Hand Clinics Review, 2022"
   },
   "tags": ["neurology", "overuse"],
@@ -33,4 +34,3 @@
   "author_ids": ["author.primary"],
   "reviewer_ids": ["reviewer.neuro"]
 }
-

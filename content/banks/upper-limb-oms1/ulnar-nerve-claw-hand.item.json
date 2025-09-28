@@ -25,6 +25,7 @@
     "page": 32,
     "figure": "Fig 4-2",
     "bbox": [120, 220, 340, 510],
+    "cropPath": "content/evidence/upper-limb-oms1/ulnar-nerve-claw-hand/claw-hand.png",
     "citation": "Moore KL, Clinically Oriented Anatomy, 8e"
   },
   "tags": ["neurology", "clinical"],
