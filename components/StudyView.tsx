@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
 
@@ -170,11 +169,9 @@ export function StudyView({ items, analytics }: StudyViewProps) {
           {showEvidence ? (
             current.evidence?.dataUri ? (
               <figure className="space-y-2">
-                <Image
+                <img
                   src={current.evidence.dataUri}
                   alt={current.evidence.citation ?? current.id}
-                  width={360}
-                  height={360}
                   className="w-full rounded-md border border-slate-200 object-contain"
                 />
                 <figcaption className="text-xs text-slate-500">
