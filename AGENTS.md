@@ -1,9 +1,9 @@
-# Agent SOPs — OMS-1 Upper Limb Study Arcade
+# Studyin Agent SOPs — OMS-1 Upper Limb Module
 
 ## Roles & Responsibilities
 
-- **ItemSmith (Codex)** — Draft and revise MCQs (A–E), ensure per-choice rationales, align with blueprint & LO taxonomy, attach evidence, run `npm run validate:items` before submitting.
-- **EvidenceCurator** — Produce crops/PDF references (`content/evidence/**`), record page/figure/bbox/citation, verify crop loads <250 ms and dimensions stored.
+- **ItemSmith (Codex)** — Draft and revise MCQs (A–E) for Studyin, ensure per-choice rationales, align with blueprint & LO taxonomy, attach evidence, run `npm run validate:items` before submitting.
+- **EvidenceCurator** — Produce crops/PDF references (`content/evidence/**`), record page/figure/bbox/citation, verify crop loads <250 ms and dimensions stored (`cropPath` preferred, AVIF/WebP + fallback).
 - **ValidatorFixer** — Resolve validator errors without altering clinical meaning; maintain schema_version, evidence integrity, and rubric ≥2.7 for published items.
 - **AnalyticsEngineer** — Maintain deterministic engines (`scripts/lib`), keep `scripts/analyze.mjs` outputs aligned with rubric metrics (TTM, ELG/min, confusion, speed-accuracy).
 - **UIBuilder** — Implement Study/Exam/Drill/Summary flows (Next.js + Tailwind + shadcn/ui) with keyboard paths and “Why this next” transparency.
@@ -11,8 +11,8 @@
 - **PerformanceTuner** — Guard budgets (TTI <2s, item render <100 ms, evidence <250 ms, CLS <0.1). Instrument Web Vitals.
 - **DrillPlanner** — Build playlists from analytics (confusion edges, spacing deficits); ensure drills end on mastery/fatigue heuristics.
 - **QA-Proctor** — Validate exam realism: blueprint satisfied, evidence locked, deferred feedback, deterministic scoring.
-- **ReleaseManager** — Own GitHub Flow, PR previews (Vercel), changelog, and rubric score ≥90 with ★ categories ≥2.7.
-- **DocScribe** — Keep README, AGENTS.md, rubric docs, and changelog accurate.
+- **ReleaseManager** — Own GitHub Flow, PR previews (Vercel), Conventional Commits, changelog, and rubric score ≥90 with ★ categories ≥2.7.
+- **DocScribe** — Keep README, AGENTS.md, rubric docs, prompts, and changelog accurate.
 - **DataSteward** — Ensure telemetry (`data/events.ndjson`) is pseudonymous, export-ready, and schema_version aligned.
 
 ## Commands & Checks
@@ -56,4 +56,22 @@ Optional (when Next.js scaffold exists): `npm run dev`, `npm run build`.
 - **Governance ★**: Validator gate, versioned content, immutable logs for published items.
 
 Keep this SOP current as tooling evolves. Changes require DocScribe + ReleaseManager sign-off.
+- **Model usage**
+  - Use `gpt-5-codex-high` for any repo-aware work (code edits, scripts, items, analytics, CI, prompts).
+  - Use `gpt-5-high` for open-ended ideation, narrative copy, or UX explorations without repo changes.
 
+- **Git workflow (Conventional Commits)**
+  - Stage: `git add <paths>` (scope specific paths; avoid `git add .` unless intentional).
+  - Review staging: `git status -sb`.
+  - Commit: `git commit -m "feat(scope): summary"` (e.g., `feat(items): add radial nerve set`).
+  - Push via GitHub Flow (feature branch → PR → review → merge → deploy).
+
+- **Item status lifecycle**
+  - `draft` → authored; awaiting SME review.
+  - `review` → SME/ValidatorFixer sign-off in progress; evidence attached.
+  - `published` → rubric ≥2.7, validator green, evidence latency checked.
+
+- **Evidence checklist (per item)**
+  - Crop stored under `content/evidence/<bank>/<item>/<asset>` (tracked by Git LFS).
+  - Record `{file, page, figure?, bbox?|cropPath?, citation}`; prefer `cropPath` to pre-generated AVIF/WebP + PNG fallback.
+  - Load test: P95 <250 ms on mid-range laptop; include natural width/height to avoid CLS.

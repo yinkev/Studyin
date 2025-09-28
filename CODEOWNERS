@@ -1,0 +1,9 @@
+# Studyin ownership map
+# Paths map to agents / SMEs for required review.
+
+/content/ upper-limb-itemsmith @kyin @studyin-items
+/scripts/ @kyin @studyin-analytics
+/app/ @kyin @studyin-ui
+/config/ @kyin
+AGENTS.md @kyin
+README.md @kyin

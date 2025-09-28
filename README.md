@@ -1,6 +1,6 @@
 # OMS-1 Upper Limb Study Arcade (Skeleton)
 
-Deterministic, evidence-first scaffold for an OMS-1 upper limb study arcade. This repo seeds the content/analytics pipeline so we can add the Next.js PWA UI later without rework.
+Deterministic, evidence-first scaffold for Studyin’s OMS-1 upper limb module. This repo seeds the content/analytics pipeline so we can add the Next.js PWA UI later without rework.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ npm test                 # Run engine smoke tests (Vitest)
 npm run dev
 ```
 
-Requirements: Node 20.14.x LTS.
+Requirements: Node 20.14.x LTS (set via `.nvmrc` soon). Install Git LFS for evidence assets.
 
 ## Repository Layout
 
@@ -39,6 +39,13 @@ AGENTS.md                  # Agent SOPs, rubric gates, workflow
 
 Engine behavior is covered by `npm test` smoke tests. Update these modules before wiring into the UI.
 
+## Working With Codex & Git
+
+- Use `gpt-5-codex-high` for repo-aware tasks (code, items, analytics). Switch to `gpt-5-high` only for narrative ideation.
+- Stage intentionally: `git add <path>`; review via `git status -sb`; commit with Conventional Commits (`feat(scope): summary`).
+- Follow GitHub Flow: feature branch → PR → review → merge → deploy.
+- See `AGENTS.md` for role responsibilities, SOPs, and evidence checklists.
+
 ## Data & Validation Pipeline
 
 - `scripts/lib/schema.mjs` defines shared Zod schemas for items, blueprint, LOS, events.
@@ -53,10 +60,10 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 
 ## Next Steps
 
-1. Flesh out item bank and evidence assets (Git LFS for PDFs/crops).
-2. Expand analytics calculations (TTM, ELG/min, confusion graph) once events accumulate.
-3. Scaffold the Next.js App Router UI (Study, Exam, Drills, Summary) consuming `latest.json`.
-4. Add CI (Lighthouse, Playwright + axe, validator) enforcing rubric budgets.
+1. Attach evidence crops (`content/evidence/**`) and mark vetted items as `review`.
+2. Expand analytics calculations (TTM, ELG/min, confusion graph) with richer telemetry.
+3. Scaffold Next.js App Router UI (Study, Exam, Drills, Summary) consuming `latest.json`.
+4. Add CI (tests, validate, axe, Lighthouse) enforcing rubric budgets; publish rubric score on PRs.
+5. Add CODEOWNERS, PR template, and workflow automation for Studyin release discipline.
 
 Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs.
-
