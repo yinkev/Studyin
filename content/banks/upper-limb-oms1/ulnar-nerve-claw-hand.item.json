@@ -26,11 +26,12 @@
     "figure": "Fig 4-2",
     "bbox": [120, 220, 340, 510],
     "cropPath": "content/evidence/upper-limb-oms1/ulnar-nerve-claw-hand/claw-hand.png",
-    "citation": "Moore KL, Clinically Oriented Anatomy, 8e"
+    "citation": "Moore KL, Clinically Oriented Anatomy, 8e",
+    "source_url": "https://radiopaedia.org/articles/ulnar-nerve-lesion"
   },
   "tags": ["neurology", "clinical"],
-  "status": "review",
-  "rubric_score": 2.8,
+  "status": "published",
+  "rubric_score": 2.9,
   "author_ids": ["author.primary"],
   "reviewer_ids": ["reviewer.neuro"]
 }

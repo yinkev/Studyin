@@ -22,9 +22,7 @@ yarn-error.log*
 .vscode/*
 !.vscode/settings.json
 
-# Local data / outputs
-data/events.ndjson
-public/analytics/latest.json
+# Local data / outputs (commit analytics + events for deterministic demos)
 
 # Env files
 .env

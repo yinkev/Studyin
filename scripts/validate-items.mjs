@@ -128,7 +128,8 @@ async function main() {
     }
 
     const publishedItems = parsedItems.filter((item) => item.status === 'published');
-    const examPool = publishedItems.length ? publishedItems : parsedItems;
+    const examPool = publishedItems.length >= TARGET_FORM_LENGTH ? publishedItems : parsedItems;
+    const poolLabel = examPool === publishedItems ? 'published' : 'all';
     const blueprintFeasible =
       Number.isInteger(TARGET_FORM_LENGTH) &&
       TARGET_FORM_LENGTH > 0 &&
@@ -168,7 +169,7 @@ async function main() {
         errors.push({
           file: 'blueprint-preflight',
           messages: [
-            `Blueprint infeasible for form length ${TARGET_FORM_LENGTH} using ${publishedItems.length ? 'published' : 'all'} items`,
+            `Blueprint infeasible for form length ${TARGET_FORM_LENGTH} using ${poolLabel} items`,
             'Deficits:',
             ...deficits
           ]
@@ -179,8 +180,13 @@ async function main() {
     if (!errors.length) {
       console.log(`✓ ${itemFiles.length} items validated`);
       console.log(
-        `Blueprint '${blueprint.id}' weights tracked (${Object.keys(blueprint.weights).length} LOs)`
+        `Blueprint '${blueprint.id}' weights tracked (${Object.keys(blueprint.weights).length} LOs) using ${poolLabel} items`
       );
+      if (poolLabel !== 'published' && publishedItems.length) {
+        console.log(
+          `⚠️ Only ${publishedItems.length} published items available (< ${TARGET_FORM_LENGTH}); preflight fell back to all statuses.`
+        );
+      }
       const statusCounts = summaries.reduce((acc, item) => {
         acc[item.status] = (acc[item.status] ?? 0) + 1;
         return acc;

@@ -2,7 +2,7 @@
 
 Deterministic, evidence-first scaffold for Studyin modules. It ships with an OMS-1 upper-limb sample bank today, but the prompts, CI, and agents are module-agnostic so you can retarget new systems without retooling.
 
-UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + Radix UI primitives (wrapped under `components/ui/radix`) with light shadcn-style styling helpers.
+UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + Radix UI primitives (wrapped under `components/ui/radix`) with light shadcn-style styling helpers. Exam mode now includes a 30-minute timer, blueprint coverage meter, and Radix dialogs/tooltips across Study, Exam, and Drill flows.
 
 ## Quick Start
 
@@ -102,15 +102,15 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - LO IDs exist in `config/los.json`
   - published items must have `rubric_score ≥ 2.7`
   - To relax evidence during setup: run with `REQUIRE_EVIDENCE_CROP=0` to allow citation‑only (must include `citation` or `source_url`)
-- `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `public/analytics/latest.json`.
+- `npm run analyze` reads `data/events.ndjson` (if present) and writes analytics (TTM, ELG/min with success rates, confusion edges, NFD flags) to `public/analytics/latest.json`.
 - `npm run dev` auto-opens the app in your default browser (set `DEV_URL` to override) — use `npm run dev:start` to run without auto-opening.
 
 ## Next Steps
 
-1. Attach evidence crops (`content/evidence/**`) and mark vetted items as `review`.
-2. Expand analytics calculations (TTM, ELG/min, confusion graph) with richer telemetry.
-3. Scaffold Next.js App Router UI (Study, Exam, Drills, Summary) consuming `latest.json`.
-4. Add CI (tests, validate, axe, Lighthouse) enforcing rubric budgets; publish rubric score on PRs.
-5. Add CODEOWNERS, PR template, and workflow automation for Studyin release discipline.
+1. Add a downloadable exam review export (PDF/CSV) bundling incorrect items, evidence citations, and LO mastery trends.
+2. Wire the spacing engine into Study mode so TTM deltas schedule the next deterministic item.
+3. Extend the analytics pipeline with learner cohort segmentation (keyboard-only vs. mixed) and persist the breakdown in `public/analytics/latest.json`.
+4. Instrument Web Vitals in the app shell and document the measurement/CI workflow.
+5. Harden the validator to fail on stale `source_url` responses and codify the evidence latency budget.
 
 Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs.

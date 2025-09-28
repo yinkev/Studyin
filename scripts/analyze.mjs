@@ -137,6 +137,7 @@ function summarize(attempts) {
         attempts: metrics.attempts,
         current_accuracy: Number(accuracy.toFixed(2)),
         projected_minutes_to_mastery: projectedMinutes,
+        avg_duration_seconds: Number(avgDurationSec.toFixed(1)),
         overdue
       };
     })
@@ -161,6 +162,7 @@ function summarize(attempts) {
         lo_ids: associatedLos,
         projected_mastery_gain: Number(projectedGain.toFixed(2)),
         estimated_minutes: Number(avgMinutes.toFixed(2)),
+        success_rate: metrics.attempts ? Number((metrics.correct / metrics.attempts).toFixed(2)) : 0,
         score,
         reason: avgDeficitMinutes > 0 ? 'Mastery deficit' : 'Reinforce recent success'
       });

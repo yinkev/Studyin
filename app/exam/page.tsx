@@ -1,8 +1,9 @@
+import { loadBlueprint } from '../../lib/getBlueprint';
 import { loadStudyItems } from '../../lib/getItems';
 import { ExamView } from '../../components/ExamView';
 
 export default async function ExamPage() {
-  const items = await loadStudyItems();
-  return <ExamView items={items} length={20} />;
+  const [items, blueprint] = await Promise.all([loadStudyItems(), loadBlueprint()]);
+  return <ExamView items={items} length={20} blueprint={blueprint} />;
 }
 

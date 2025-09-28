@@ -59,7 +59,8 @@ export function ConfusionBar({ analytics, top = 8 }: { analytics: AnalyticsSumma
       .call((g) => g.selectAll('text').attr('font', CHART_FONT).attr('fill', CHART_AXIS_COLOR))
       .call((g) => g.selectAll('path,line').attr('stroke', CHART_AXIS_COLOR));
 
-    g.selectAll('rect')
+    const bars = g
+      .selectAll('rect')
       .data(edges)
       .enter()
       .append('rect')
@@ -69,6 +70,8 @@ export function ConfusionBar({ analytics, top = 8 }: { analytics: AnalyticsSumma
       .attr('height', y.bandwidth())
       .attr('rx', 6)
       .attr('fill', CHART_WARNING);
+
+    bars.append('title').text((d) => `${cleanLabel(d.lo_id)} · ${cleanLabel(d.item_id)} · choice ${d.choice} — ${d.count} misses`);
 
     g.selectAll('text.value')
       .data(edges)
@@ -83,7 +86,11 @@ export function ConfusionBar({ analytics, top = 8 }: { analytics: AnalyticsSumma
   }, [analytics, top]);
 
   return (
-    <ChartCard title="Top confusion edges" description="Most common incorrect choice clusters">
+    <ChartCard
+      title="Top confusion edges"
+      description="Most common incorrect choice clusters"
+      helpText="Identifies LO × item × distractor combinations with the highest miss counts to guide remediation."
+    >
       <svg ref={ref} width={720} height={260} role="img" aria-label="Top confusion edges" />
     </ChartCard>
   );

@@ -16,6 +16,7 @@ export interface AnalyticsSummary {
     attempts: number;
     current_accuracy: number;
     projected_minutes_to_mastery: number;
+    avg_duration_seconds: number;
     overdue: boolean;
   }>;
   elg_per_min: Array<{
@@ -23,6 +24,7 @@ export interface AnalyticsSummary {
     lo_ids: string[];
     projected_mastery_gain: number;
     estimated_minutes: number;
+    success_rate: number;
     reason: string;
   }>;
   confusion_edges: Array<{

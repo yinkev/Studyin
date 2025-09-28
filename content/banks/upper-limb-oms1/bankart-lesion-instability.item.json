@@ -26,11 +26,12 @@
     "figure": "Fig 6-3",
     "bbox": [130, 210, 370, 500],
     "cropPath": "content/evidence/upper-limb-oms1/bankart-lesion-instability/bankart-lesion-instability.png",
-    "citation": "Shoulder Surgery Atlas, 2023"
+    "citation": "Shoulder Surgery Atlas, 2023",
+    "source_url": "https://www.orthobullets.com/shoulder-and-elbow/3058/bankart-lesion"
   },
   "tags": ["orthopedics", "sports"],
-  "status": "draft",
-  "rubric_score": 2.6,
+  "status": "review",
+  "rubric_score": 2.8,
   "author_ids": ["author.ortho"],
   "reviewer_ids": ["reviewer.msk"]
 }

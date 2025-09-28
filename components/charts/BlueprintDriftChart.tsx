@@ -73,11 +73,11 @@ export function BlueprintDriftChart({ analytics, weights }: { analytics: Analyti
       .attr('class', 'group')
       .attr('transform', (d) => `translate(${x0(d.lo_id)},0)`);
 
-    groups
+    const rects = groups
       .selectAll('rect')
       .data((d) => [
-        { key: 'target', value: d.target },
-        { key: 'practice', value: d.practice }
+        { key: 'target', value: d.target, lo: d.lo_id },
+        { key: 'practice', value: d.practice, lo: d.lo_id }
       ])
       .enter()
       .append('rect')
@@ -87,6 +87,11 @@ export function BlueprintDriftChart({ analytics, weights }: { analytics: Analyti
       .attr('height', (d) => innerH - y(d.value))
       .attr('rx', 6)
       .attr('fill', (d) => color(d.key));
+
+    rects.append('title').text((d) => {
+      const label = d.key === 'target' ? 'Blueprint target' : 'Observed practice';
+      return `${d.lo} — ${label}: ${d.value.toFixed(1)}%`;
+    });
 
     groups
       .selectAll('text.value')
@@ -128,7 +133,11 @@ export function BlueprintDriftChart({ analytics, weights }: { analytics: Analyti
   }, [data]);
 
   return (
-    <ChartCard title="Blueprint drift" description="Compare target LO mix against observed practice">
+    <ChartCard
+      title="Blueprint drift"
+      description="Compare target LO mix against observed practice"
+      helpText="Highlights learning objective coverage drift by comparing blueprint weights to recent practice allocation."
+    >
       <svg ref={ref} width={720} height={320} role="img" aria-label="Blueprint drift chart" />
     </ChartCard>
   );

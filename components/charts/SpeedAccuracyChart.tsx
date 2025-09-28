@@ -30,6 +30,7 @@ export function SpeedAccuracyChart({ analytics }: { analytics: AnalyticsSummary 
       { label: labels[2], value: sa.fast_right },
       { label: labels[3], value: sa.slow_right }
     ];
+    const total = data.reduce((sum, entry) => sum + entry.value, 0);
 
     const yMax = d3.max(data, (d) => d.value) || 1;
     const x = d3.scaleBand().domain(labels as unknown as string[]).range([0, innerW]).padding(0.25);
@@ -60,7 +61,8 @@ export function SpeedAccuracyChart({ analytics }: { analytics: AnalyticsSummary 
       .call((g) => g.selectAll('text').attr('font', CHART_FONT).attr('fill', CHART_AXIS_COLOR))
       .call((g) => g.selectAll('path,line').attr('stroke', CHART_AXIS_COLOR));
 
-    g.selectAll('rect')
+    const bars = g
+      .selectAll('rect')
       .data(data)
       .enter()
       .append('rect')
@@ -70,6 +72,11 @@ export function SpeedAccuracyChart({ analytics }: { analytics: AnalyticsSummary 
       .attr('height', (d) => innerH - y(d.value))
       .attr('rx', 6)
       .attr('fill', (_, i) => colors[i]);
+
+    bars.append('title').text((d) => {
+      const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : '0.0';
+      return `${d.label}: ${d.value} attempts (${pct}%)`;
+    });
 
     g.selectAll('text.value')
       .data(data)
@@ -84,7 +91,11 @@ export function SpeedAccuracyChart({ analytics }: { analytics: AnalyticsSummary 
   }, [analytics]);
 
   return (
-    <ChartCard title="Speed × Accuracy" description="Distribution of attempts by tempo and correctness">
+    <ChartCard
+      title="Speed × Accuracy"
+      description="Distribution of attempts by tempo and correctness"
+      helpText="Classifies attempts by response time (≤45s fast) and correctness to highlight speed-accuracy tradeoffs."
+    >
       <svg ref={ref} width={600} height={280} role="img" aria-label="Speed and accuracy chart" />
     </ChartCard>
   );

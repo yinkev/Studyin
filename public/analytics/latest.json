@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2025-09-28T12:21:42.350Z",
+  "has_events": true,
+  "totals": {
+    "attempts": 14,
+    "learners": 4
+  },
+  "ttm_per_lo": [
+    {
+      "lo_id": "lo.vascular",
+      "attempts": 2,
+      "current_accuracy": 0.5,
+      "projected_minutes_to_mastery": 3.17,
+      "avg_duration_seconds": 63.5,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.shoulder-pathology",
+      "attempts": 3,
+      "current_accuracy": 0.67,
+      "projected_minutes_to_mastery": 1.91,
+      "avg_duration_seconds": 57.3,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.median-nerve",
+      "attempts": 3,
+      "current_accuracy": 0.67,
+      "projected_minutes_to_mastery": 1.87,
+      "avg_duration_seconds": 56,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.radial-nerve",
+      "attempts": 5,
+      "current_accuracy": 0.6,
+      "projected_minutes_to_mastery": 1.73,
+      "avg_duration_seconds": 52,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.ulnar-nerve",
+      "attempts": 1,
+      "current_accuracy": 1,
+      "projected_minutes_to_mastery": 0,
+      "avg_duration_seconds": 65,
+      "overdue": true
+    }
+  ],
+  "elg_per_min": [
+    {
+      "item_id": "item.radial.wrist-drop",
+      "lo_ids": [
+        "lo.radial-nerve"
+      ],
+      "projected_mastery_gain": 0.12,
+      "estimated_minutes": 0.63,
+      "success_rate": 1,
+      "reason": "Mastery deficit"
+    },
+    {
+      "item_id": "item.radial.brachioradialis-reflex",
+      "lo_ids": [
+        "lo.radial-nerve"
+      ],
+      "projected_mastery_gain": 0.12,
+      "estimated_minutes": 0.83,
+      "success_rate": 0.5,
+      "reason": "Mastery deficit"
+    },
+    {
+      "item_id": "item.shoulder.suprascapular-entrapment",
+      "lo_ids": [
+        "lo.shoulder-pathology"
+      ],
+      "projected_mastery_gain": 0.12,
+      "estimated_minutes": 0.87,
+      "success_rate": 0,
+      "reason": "Mastery deficit"
+    }
+  ],
+  "confusion_edges": [
+    {
+      "lo_id": "lo.radial-nerve",
+      "item_id": "item.radial.monteggia-palsy",
+      "choice": "B",
+      "count": 1
+    },
+    {
+      "lo_id": "lo.vascular",
+      "item_id": "item.vascular.subclavian-steal",
+      "choice": "B",
+      "count": 1
+    },
+    {
+      "lo_id": "lo.radial-nerve",
+      "item_id": "item.radial.brachioradialis-reflex",
+      "choice": "D",
+      "count": 1
+    },
+    {
+      "lo_id": "lo.median-nerve",
+      "item_id": "item.median.carpal-tunnel",
+      "choice": "B",
+      "count": 1
+    },
+    {
+      "lo_id": "lo.shoulder-pathology",
+      "item_id": "item.shoulder.suprascapular-entrapment",
+      "choice": "C",
+      "count": 1
+    }
+  ],
+  "speed_accuracy": {
+    "fast_wrong": 0,
+    "slow_wrong": 5,
+    "fast_right": 1,
+    "slow_right": 8
+  },
+  "nfd_summary": []
+}

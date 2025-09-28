@@ -61,7 +61,8 @@ export function TTMBarChart({ analytics }: { analytics: AnalyticsSummary | null 
       .call((g) => g.selectAll('text').attr('font', CHART_FONT).attr('fill', CHART_AXIS_COLOR))
       .call((g) => g.selectAll('path,line').attr('stroke', CHART_AXIS_COLOR));
 
-    g.selectAll('rect')
+    const bars = g
+      .selectAll('rect')
       .data(data)
       .enter()
       .append('rect')
@@ -71,6 +72,10 @@ export function TTMBarChart({ analytics }: { analytics: AnalyticsSummary | null 
       .attr('height', y.bandwidth())
       .attr('rx', 8)
       .attr('fill', CHART_PRIMARY);
+
+    bars.append('title').text((d) =>
+      `${cleanLabel(d.lo_id)} • ${formatMinutes(d.projected_minutes_to_mastery)} remaining · ${d.attempts} attempts · ${(d.current_accuracy * 100).toFixed(0)}% accuracy`
+    );
 
     g.selectAll('text.value')
       .data(data)
@@ -85,7 +90,11 @@ export function TTMBarChart({ analytics }: { analytics: AnalyticsSummary | null 
   }, [analytics]);
 
   return (
-    <ChartCard title="Projected minutes to mastery" description="LOs ordered by remaining study time">
+    <ChartCard
+      title="Projected minutes to mastery"
+      description="LOs ordered by remaining study time"
+      helpText="Time-to-mastery (TTM) blends accuracy, spacing, and duration to prioritize learning objectives."
+    >
       <svg ref={ref} width={720} height={280} role="img" aria-label="Projected minutes to mastery per LO" />
     </ChartCard>
   );
