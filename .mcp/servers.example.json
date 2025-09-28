@@ -2,7 +2,7 @@
   "servers": {
     "codex-mcp": {
       "command": "npx",
-      "args": ["codex-mcp-server", "--workspace", "/Users/kyin/Projects/Studyin"],
+      "args": ["codex-mcp-server", "--workspace", "/path/to/repo"],
       "transport": "stdio",
       "env": {
         "ALLOW_SHELL": "true"
