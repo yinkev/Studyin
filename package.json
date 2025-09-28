@@ -11,27 +11,25 @@
     "dev:open": "wait-on http://localhost:3000 && node scripts/tools/open-browser.mjs",
     "build": "next build",
     "start": "next start",
-    "test": "vitest --run --exclude tests/e2e/**",
-    "e2e": "playwright test",
+    "test": "vitest --run",
     "ci:lh": "lhci autorun",
-    "score:rubric": "node scripts/score-rubric.mjs"
+    "score:rubric": "node scripts/score-rubric.mjs",
+    "pm:pulse": "node scripts/tools/pm-pulse.mjs"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
-    "d3": "^7.9.0",
-    "next": "^15.0.0",
-    "openai": "^4.57.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "d3": "^7.9.0",
     "lucide-react": "^0.446.0",
+    "next": "^15.0.0",
+    "openai": "^4.57.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.9.1",
     "@lhci/cli": "^0.12.0",
-    "@playwright/test": "^1.48.2",
     "@types/node": "^20.12.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

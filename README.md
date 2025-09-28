@@ -49,8 +49,9 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 
 ## Tests & CI
 
-- Unit: `npm test` (Vitest). E2E a11y: `npm run e2e` (requires running server).
-- CI runs: validate → unit → analyze → build → Playwright+axe → Lighthouse CI.
+- Unit: `npm test` (Vitest).
+- Manual/MCP a11y: use Chrome DevTools MCP or axe browser extension while `npm run dev` is running.
+- CI runs: validate → unit → analyze → build → axe scan (manual/MCP) → Lighthouse CI.
 
 ## Agents & Prompts
 
@@ -59,6 +60,16 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - `itemsmith.md` — author MCQs
   - `validator-fixer.md` — fix validator failures
   - `studyin-pm.md` — project manager agent
+
+## MCP Tooling (Context7, Codex MCP, Chrome DevTools MCP)
+
+- **Context7 + Codex MCP**: configure your MCP client (e.g., Cursor, VS Code, or Context7 desktop) to point at `scripts/codex/` prompts. These prompts assume repo context; set the working directory to the repository root before invoking.
+- **Chrome DevTools MCP**: launch with `npm run dev` (auto-opens browser) and attach the Chrome DevTools MCP to audit accessibility or performance. The AccessibilityAuditor agent can leverage Chrome DevTools MCP to run axe scans interactively.
+- **Usage pattern**:
+  1. Generate a context window in your MCP client (files open in editor or via `PLAN.md`).
+  2. Run the desired prompt (planner / PM / itemsmith) and supply recent diffs or questions.
+  3. For quick a11y/perf checks, attach Chrome DevTools MCP and run lighthouse/axe there, then record results in PLAN.md or the PR.
+
 
 ## Working With Codex & Git
 

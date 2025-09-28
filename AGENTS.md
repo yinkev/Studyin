@@ -7,7 +7,7 @@
 - **ValidatorFixer** — Resolve validator errors without altering clinical meaning; maintain schema_version, evidence integrity, and rubric ≥2.7 for published items.
 - **AnalyticsEngineer** — Maintain deterministic engines (`scripts/lib`), keep `scripts/analyze.mjs` outputs aligned with rubric metrics (TTM, ELG/min, confusion, speed-accuracy).
 - **UIBuilder** — Implement Study/Exam/Drill/Summary flows (Next.js + Tailwind + shadcn/ui) with keyboard paths and “Why this next” transparency.
-- **AccessibilityAuditor** — Run Playwright + axe and manual keyboard walkthrough; enforce WCAG 2.2 AA, focus-visible, target-size, and zero critical issues.
+- **AccessibilityAuditor** — Run axe (browser extension or MCP) and manual keyboard walkthrough; enforce WCAG 2.2 AA, focus-visible, target-size, and zero critical issues.
 - **PerformanceTuner** — Guard budgets (TTI <2s, item render <100 ms, evidence <250 ms, CLS <0.1). Instrument Web Vitals.
 - **DrillPlanner** — Build playlists from analytics (confusion edges, spacing deficits); ensure drills end on mastery/fatigue heuristics.
 - **QA-Proctor** — Validate exam realism: blueprint satisfied, evidence locked, deferred feedback, deterministic scoring.
@@ -31,7 +31,7 @@ npm run analyze         # Generate public/analytics/latest.json
 npm test                # Run Vitest engine smoke tests
 ```
 
-Optional (when Next.js scaffold exists): `npm run dev`, `npm run build`.
+Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run build`, `npm run ci:lh`, `npm run pm:pulse`.
 
 ## Acceptance Gates
 
