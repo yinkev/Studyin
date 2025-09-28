@@ -1,9 +1,10 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { SCHEMA_VERSIONS, attemptEventSchema, sessionEventSchema } from '../../scripts/lib/schema.mjs';
+import { SCHEMA_VERSIONS, attemptEventSchema, sessionEventSchema, lessonEventSchema } from '../../scripts/lib/schema.mjs';
 
 type AttemptEvent = ReturnType<typeof attemptEventSchema.parse>;
 type SessionEvent = ReturnType<typeof sessionEventSchema.parse>;
+type LessonEvent = ReturnType<typeof lessonEventSchema.parse>;
 
 const DEFAULT_EVENTS_PATH = path.join(process.cwd(), 'data', 'events.ndjson');
 const RATE_LIMIT_WINDOW_MS = Number.parseInt(process.env.INGEST_WINDOW_MS ?? '60000', 10);
@@ -90,6 +91,14 @@ export function parseSessionEvent(payload: unknown): SessionEvent {
   return data;
 }
 
+export function parseLessonEvent(payload: unknown): LessonEvent {
+  const data = lessonEventSchema.parse(payload);
+  if (data.schema_version !== SCHEMA_VERSIONS.lessonEvent) {
+    throw new Error(`schema_version mismatch: expected ${SCHEMA_VERSIONS.lessonEvent}`);
+  }
+  return data;
+}
+
 export async function appendAttempt(event: AttemptEvent, filePath = DEFAULT_EVENTS_PATH): Promise<void> {
   const useSupabase = process.env.USE_SUPABASE_INGEST === '1' || process.env.USE_SUPABASE_INGEST?.toLowerCase() === 'true';
   if (useSupabase) {
@@ -111,6 +120,15 @@ export async function appendSession(event: SessionEvent, filePath = DEFAULT_EVEN
     if (!client) throw new Error('Supabase ingest enabled but client not available');
     await insertSessionRow(client, event);
     return;
+  }
+  await ensureEventsPath(filePath);
+  await fs.appendFile(filePath, JSON.stringify(event) + '\n', 'utf8');
+}
+
+export async function appendLesson(event: LessonEvent, filePath = DEFAULT_EVENTS_PATH): Promise<void> {
+  const useSupabase = process.env.USE_SUPABASE_INGEST === '1' || process.env.USE_SUPABASE_INGEST?.toLowerCase() === 'true';
+  if (useSupabase) {
+    // For now, lesson events are stored only in NDJSON; add DB sink later.
   }
   await ensureEventsPath(filePath);
   await fs.appendFile(filePath, JSON.stringify(event) + '\n', 'utf8');

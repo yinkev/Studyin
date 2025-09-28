@@ -6,7 +6,7 @@ import { Stats } from '../components/marketing/Stats';
 export default async function Page() {
   const analytics = await loadAnalyticsSummary();
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <Hero />
       <Stats analytics={analytics} />
       <Features />

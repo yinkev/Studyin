@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.hand.neurovascular-supply",
+  "lo_id": "lo.hand.neurovascular-supply",
+  "title": "Median, Ulnar, and Radial Pathways",
+  "summary": "Trace the three major nerves and arteries through the hand, linking surface landmarks to sensory maps and anastomoses.",
+  "high_yield": [
+    "Median nerve: recurrent motor branch + common digital nerves; emphasize carpal tunnel course.",
+    "Ulnar nerve and artery: Guyon’s canal, superficial vs. deep branches—connect to handlebar palsy.",
+    "Radial artery dives through anatomical snuffbox into deep palmar arch; radial nerve splits superficial (sensory) vs. deep (PIN)."
+  ],
+  "pitfalls": [
+    "Students forget the palmar cutaneous branch of median nerve bypasses the tunnel—call it out.",
+    "Clarify the ulnar nerve innervates most intrinsic muscles (deep branch) to avoid underestimating deficits."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 6,
+      "narration": "Draw the median nerve entering the carpal tunnel, splitting into recurrent motor and digital branches with sensory map overlay.",
+      "visual": "Palmar view with yellow tracing, shaded sensory distribution, callout for palmar cutaneous branch."
+    },
+    {
+      "beat": 1,
+      "duration_s": 6,
+      "narration": "Layer on the ulnar nerve and artery through Guyon’s canal, branching into superficial sensory and deep motor pathways.",
+      "visual": "Medial wrist inset showing canal boundaries; animations for superficial vs. deep arches."
+    },
+    {
+      "beat": 2,
+      "duration_s": 6,
+      "narration": "Conclude with radial artery through the snuffbox forming deep palmar arch; add radial nerve superficial branch sensory map.",
+      "visual": "Dorsolateral view with artery loop and nerve sensory shading over dorsal thumb/index."
+    }
+  ]
+}

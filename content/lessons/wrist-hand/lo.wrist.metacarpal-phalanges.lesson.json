@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.wrist.metacarpal-phalanges",
+  "lo_id": "lo.wrist.metacarpal-phalanges",
+  "title": "Line Up Metacarpals and Phalanges",
+  "summary": "Use a distal-to-proximal sweep of the ray to spotlight landmark features and why they matter for splinting and fracture descriptions.",
+  "high_yield": [
+    "Distinguish metacarpal bases (articulate with carpals) from heads (MCP knuckles).",
+    "Label the phalanx shaft vs. head vs. base so fracture nomenclature clicks.",
+    "3rd metacarpal styloid is a wrist alignment landmark; include it visually."
+  ],
+  "pitfalls": [
+    "Learners mix up phalanx numbering (proximal/middle/distal). Use color coding per segment.",
+    "Thumb only has two phalanges—call it out during the intro sweep."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 4,
+      "narration": "Zoom into the third ray, labeling metacarpal base, shaft, head, then proximal/middle/distal phalanges.",
+      "visual": "Highlight the 3rd ray with gradient; pop-up labels per segment."
+    },
+    {
+      "beat": 1,
+      "duration_s": 4,
+      "narration": "Pan to the thumb ray to reinforce the two-phalange structure.",
+      "visual": "Thumb ray glow with text 'No middle phalanx' and icon."
+    },
+    {
+      "beat": 2,
+      "duration_s": 6,
+      "narration": "Overlay common fracture callouts—Boxer’s (5th MC neck) and mallet finger (distal phalanx).",
+      "visual": "Animated brackets pointing to 5th metacarpal head and distal phalanx, with short text tags."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.wrist.radiocarpal-midcarpal",
+  "lo_id": "lo.wrist.radiocarpal-midcarpal",
+  "title": "Radiocarpal vs. Midcarpal Motion",
+  "summary": "Contrast the proximal radiocarpal condylar joint with the plane-like midcarpal joints, tying each to the arcs of flexion-extension and radial-ulnar deviation.",
+  "high_yield": [
+    "Radiocarpal joint primarily handles flexion-extension initiation and absorbs 80% of axial load.",
+    "Midcarpal joint fine-tunes radial/ulnar deviation—show the alternating concave/convex surfaces.",
+    "Mention closed-packed positions (extension + radial deviation) for stability questions."
+  ],
+  "pitfalls": [
+    "Students blur the two joint contributions; use dual gauges showing % contribution to motion arcs.",
+    "Avoid calling midcarpal joints hinge—reiterate plane/gliding nature."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 5,
+      "narration": "Display radiocarpal joint surfaces with flexion-extension arc gauge (60° vs. 35°).",
+      "visual": "Animated arc meter overlay, color-coded radius-to-scaphoid/lunate interface."
+    },
+    {
+      "beat": 1,
+      "duration_s": 5,
+      "narration": "Slide to midcarpal row, showing trapezium-trapezoid vs. capitate-hamate articulations gliding.",
+      "visual": "Top-down view with gliding arrows illustrating lateral vs. medial compartments."
+    },
+    {
+      "beat": 2,
+      "duration_s": 6,
+      "narration": "Split screen: left flexion/extension (radiocarpal heavy), right radial/ulnar deviation (midcarpal assist).",
+      "visual": "Two gauge animations with % contributions labeled (Radiocarpal 60% flexion, Midcarpal 60% radial dev)."
+    }
+  ]
+}

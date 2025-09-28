@@ -81,10 +81,17 @@ export function ConfusionGraph({ analytics }: ConfusionGraphProps) {
   }
 
   return (
-    <div className="h-96 w-full rounded-lg border border-slate-200 bg-white">
-      <ReactFlow nodes={nodes} edges={edges} fitView fitViewOptions={{ padding: 0.2 }} proOptions={{ hideAttribution: true }}>
+    <div className="h-96 w-full rounded-lg border border-slate-200 bg-white shadow-sm">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        proOptions={{ hideAttribution: true }}
+        style={{ fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, sans-serif' }}
+      >
         <Background gap={24} color="#e2e8f0" />
-        <MiniMap pannable zoomable nodeStrokeColor="#0f172a" nodeColor="#e2e8f0" nodeBorderRadius={4} />
+        <MiniMap pannable zoomable nodeStrokeColor="#0f172a" nodeColor="#f8fafc" nodeBorderRadius={6} />
         <Controls showInteractive={false} />
       </ReactFlow>
     </div>

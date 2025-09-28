@@ -59,9 +59,9 @@ export function SessionFlow({ attempts }: SessionFlowProps) {
   }, [attempts]);
 
   return (
-    <div className="h-80 w-full rounded-lg border border-slate-200 bg-white">
-      <ReactFlow nodes={nodes} edges={edges} fitView proOptions={{ hideAttribution: true }}>
-        <Background gap={24} color="#e2e8f0" />
+    <div className="h-80 w-full rounded-lg border border-slate-200 bg-white shadow-sm">
+      <ReactFlow nodes={nodes} edges={edges} fitView proOptions={{ hideAttribution: true }} style={{ fontFamily: 'Inter, system-ui' }}>
+        <Background gap={24} color="#f1f5f9" />
         <Controls showInteractive={false} />
       </ReactFlow>
     </div>

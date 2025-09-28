@@ -95,7 +95,11 @@ export function StudyView({ items, analytics }: StudyViewProps) {
   }, [current, handleNext, handlePrev, handleSelect]);
 
   if (!current) {
-    return <p className="text-slate-600">No study items available. Add JSON under <code>content/banks/upper-limb-oms1</code>.</p>;
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-12 text-center text-slate-200">
+        <p>No study items available. Add <code>*.item.json</code> under <code>content/banks/&lt;module&gt;</code> or set `SCOPE_DIRS`.</p>
+      </div>
+    );
   }
 
   const letters = ['A', 'B', 'C', 'D', 'E'] as const;
@@ -106,33 +110,31 @@ export function StudyView({ items, analytics }: StudyViewProps) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Study Mode</h1>
-          <p className="text-sm text-slate-500">
-            Keyboard: 1-5 to answer · N/P arrows for next/prev · E toggle evidence
-          </p>
+          <h1 className="text-2xl font-semibold text-white">Practice</h1>
+          <p className="text-sm text-slate-300">Keyboard: 1–5 answer · N/P arrows for navigation · E toggle evidence</p>
         </div>
         <Popover>
-          <PopoverTrigger className="flex max-w-xs flex-col gap-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-left text-sm text-slate-700 shadow-sm transition hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Why this next</span>
-            <span className="line-clamp-2 text-sm text-slate-700">{whyNext}</span>
+          <PopoverTrigger className="flex max-w-xs flex-col gap-1 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-left text-sm text-slate-100 shadow-lg shadow-slate-900/20 transition hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-slate-300">Why this next</span>
+            <span className="line-clamp-2 text-sm text-white/90">{whyNext}</span>
           </PopoverTrigger>
-          <PopoverContent className="w-96 space-y-2">
-            <h3 className="text-sm font-semibold text-slate-900">Focus rationale</h3>
-            <p className="text-sm text-slate-600">{whyNext}</p>
-            <p className="text-xs text-slate-400">Keyboard: Activate with Enter/Space, close with Escape.</p>
+          <PopoverContent className="w-96 space-y-2 border-white/20 bg-slate-900/90 text-slate-100">
+            <h3 className="text-sm font-semibold text-white">Focus rationale</h3>
+            <p className="text-sm text-slate-200">{whyNext}</p>
+            <p className="text-xs text-slate-400">Keyboard: Enter/Space to open · Escape to close.</p>
           </PopoverContent>
         </Popover>
       </header>
 
       <article className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <section className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between text-sm text-slate-500">
+        <section className="space-y-5 rounded-3xl border border-white/10 bg-slate-950/50 p-6 shadow-xl shadow-slate-900/20">
+          <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-slate-400">
             <span>
-              #{index + 1} • Difficulty {current.difficulty} • LOs: {current.los.join(', ')}
+              #{index + 1} · Difficulty {current.difficulty} · LOs: {current.los.join(', ')}
             </span>
-            <span className="font-mono text-xs text-slate-400">{current.id}</span>
+            <span className="font-mono text-[11px] text-slate-500">{current.id}</span>
           </div>
-          <h2 className="text-lg font-semibold text-slate-900">{current.stem}</h2>
+          <h2 className="text-xl font-semibold leading-relaxed text-white">{current.stem}</h2>
 
           <div className="space-y-3">
             {letters.map((letter, idx) => {
@@ -144,24 +146,24 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                 <button
                   key={letter}
                   onClick={() => handleSelect(letter)}
-                  className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left transition ${
+                  className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition ${
                     isSelected
                       ? isCorrect
-                        ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                        : 'border-rose-400 bg-rose-50 text-rose-900'
-                      : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-300'
+                        ? 'border-emerald-400/70 bg-emerald-500/10 text-emerald-100'
+                        : 'border-rose-500/70 bg-rose-500/10 text-rose-100'
+                      : 'border-white/10 bg-white/5 text-slate-100 hover:border-white/20 hover:bg-white/10'
                   }`}
                 >
-                  <span className="mt-1 rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-slate-500">
+                  <span className="mt-1 rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold text-slate-300">
                     {idx + 1}
                   </span>
-                  <div>
+                  <div className="space-y-1">
                     <p className="font-medium">{letter}. {choice}</p>
                     {feedback.correctShown && letter === current.key && (
-                      <p className="mt-1 text-sm text-emerald-700">{current.rationale_correct}</p>
+                      <p className="text-sm text-emerald-200/90">{current.rationale_correct}</p>
                     )}
                     {feedback.correctShown && isSelected && letter !== current.key && (
-                      <p className="mt-1 text-sm text-rose-700">
+                      <p className="text-sm text-rose-200/90">
                         {current.rationale_distractors?.[letter] ?? 'Review the underlying anatomy.'}
                       </p>
                     )}
@@ -171,44 +173,44 @@ export function StudyView({ items, analytics }: StudyViewProps) {
             })}
           </div>
 
-          <div className="flex items-center justify-between pt-2 text-sm text-slate-500">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm text-slate-300">
             <div className="space-x-2">
-              <button onClick={handlePrev} className="rounded border border-slate-200 px-3 py-1 hover:border-slate-300">
+              <button onClick={handlePrev} className="rounded-lg border border-white/20 px-3 py-1 text-slate-200 hover:border-white/40">
                 ← Prev
               </button>
-              <button onClick={handleNext} className="rounded border border-slate-200 px-3 py-1 hover:border-slate-300">
+              <button onClick={handleNext} className="rounded-lg border border-white/20 px-3 py-1 text-slate-200 hover:border-white/40">
                 Next →
               </button>
             </div>
             {feedback.correctShown && (
-              <span className={`font-semibold ${isCorrect ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <span className={`font-semibold ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
                 {isCorrect ? 'Correct' : `Correct answer: ${current.key}`}
               </span>
             )}
           </div>
         </section>
 
-        <aside className="space-y-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <aside className="space-y-4 rounded-3xl border border-white/10 bg-slate-950/40 p-5 shadow-xl shadow-slate-900/20">
           <Dialog open={evidenceOpen} onOpenChange={setEvidenceOpen}>
             <header className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900">Evidence</h3>
+              <h3 className="text-sm font-semibold text-white">Evidence</h3>
               <DialogTrigger asChild>
-                <button className="text-xs uppercase tracking-wide text-slate-500 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <button className="text-[10px] uppercase tracking-[0.3em] text-slate-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70">
                   {evidenceOpen ? 'Close (E)' : 'View (E)'}
                 </button>
               </DialogTrigger>
             </header>
-            <div className="space-y-2 text-xs text-slate-500">
+            <div className="space-y-2 text-xs text-slate-300">
               <p>{current.evidence?.citation ?? 'Evidence crop pending review.'}</p>
               <p>
                 Source: {current.evidence?.file ?? 'source PDF'}
                 {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
               </p>
             </div>
-            <DialogContent>
+            <DialogContent className="border-white/20 bg-slate-900/90 text-slate-100">
               <DialogHeader>
                 <DialogTitle>Evidence for {current.id}</DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-slate-300">
                   {current.evidence?.citation ?? 'Review the attached primary source.'}
                 </DialogDescription>
               </DialogHeader>
@@ -217,16 +219,16 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                   <img
                     src={current.evidence.dataUri}
                     alt={current.evidence.citation ?? current.id}
-                    className="w-full rounded-md border border-slate-200 object-contain"
+                    className="w-full rounded-lg border border-white/10 object-contain"
                     loading="lazy"
                   />
-                  <figcaption className="text-xs text-slate-500">
+                  <figcaption className="text-xs text-slate-400">
                     {current.evidence?.file ?? 'source.pdf'}
                     {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
                   </figcaption>
                 </figure>
               ) : (
-                <p className="rounded border border-dashed border-slate-300 bg-slate-50 p-3 text-sm text-slate-600">
+                <p className="rounded-lg border border-dashed border-white/20 bg-white/5 p-3 text-sm text-slate-200">
                   Evidence crop not available. Refer to {current.evidence?.file ?? 'source PDF'}
                   {current.evidence?.page ? ` (page ${current.evidence.page})` : ''}.
                 </p>
@@ -236,12 +238,12 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                   href={current.evidence.source_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded border border-slate-200 px-3 py-1 text-xs text-slate-600 hover:border-slate-300"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-3 py-1 text-xs text-slate-200 hover:border-white/40"
                 >
                   View source URL
                 </a>
               )}
-              <p className="text-xs text-slate-400">Keyboard: Press Escape to close. Shortcut E toggles this dialog.</p>
+              <p className="text-xs text-slate-500">Keyboard: Press Escape to close. Shortcut E toggles this dialog.</p>
             </DialogContent>
           </Dialog>
           <VisuallyHidden>

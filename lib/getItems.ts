@@ -23,7 +23,42 @@ export interface StudyItem {
   };
 }
 
-const BANK_DIR = path.join(process.cwd(), 'content', 'banks', 'upper-limb-oms1');
+const DEFAULT_BANK_ROOT = path.join(process.cwd(), 'content', 'banks');
+
+function resolveFromRoot(targetPath: string) {
+  const root = process.cwd();
+  return path.isAbsolute(targetPath) ? targetPath : path.join(root, targetPath);
+}
+
+function getScopes(): string[] {
+  const input = process.env.SCOPE_DIRS ?? '';
+  if (!input) return [DEFAULT_BANK_ROOT];
+  return input
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map(resolveFromRoot);
+}
+
+async function walkForItems(dir: string, out: string[]): Promise<void> {
+  let entries: (string | undefined)[] = [];
+  try {
+    entries = await fs.readdir(dir);
+  } catch {
+    return;
+  }
+  for (const name of entries) {
+    if (!name) continue;
+    const p = path.join(dir, name);
+    try {
+      const stat = await fs.stat(p);
+      if (stat.isDirectory()) await walkForItems(p, out);
+      else if (stat.isFile() && name.endsWith('.item.json')) out.push(p);
+    } catch {
+      // ignore
+    }
+  }
+}
 
 async function loadEvidenceData(cropPath?: string): Promise<string | undefined> {
   if (!cropPath) return undefined;
@@ -39,10 +74,15 @@ async function loadEvidenceData(cropPath?: string): Promise<string | undefined> 
 }
 
 export async function loadStudyItems(): Promise<StudyItem[]> {
-  const files = (await fs.readdir(BANK_DIR)).filter((file) => file.endsWith('.item.json')).sort();
+  const scopes = getScopes();
+  const files: string[] = [];
+  for (const scope of scopes) {
+    await walkForItems(scope, files);
+  }
+  files.sort((a, b) => a.localeCompare(b));
   const items: StudyItem[] = [];
-  for (const file of files) {
-    const raw = await fs.readFile(path.join(BANK_DIR, file), 'utf8');
+  for (const filePath of files) {
+    const raw = await fs.readFile(filePath, 'utf8');
     const json = JSON.parse(raw);
     const evidence = json.evidence ?? {};
     const dataUri = await loadEvidenceData(evidence.cropPath);

@@ -3,21 +3,22 @@ import { Button } from '../ui/button';
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-8 md:p-12">
-      <div className="relative z-10 max-w-3xl space-y-4 animate-fade-up">
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
-          Learn faster with evidence‑first practice.
+    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-sky-500/20 via-blue-500/10 to-fuchsia-500/10 p-10 shadow-2xl backdrop-blur">
+      <div className="relative z-10 max-w-3xl space-y-5 animate-fade-up">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-100">Local-first mastery engine</p>
+        <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
+          Learn faster with evidence‑anchored practice and transparent temporal RAG.
         </h1>
-        <p className="text-lg leading-relaxed text-slate-600">
-          Studyin brings OMS‑1 Upper Limb mastery into focus with deterministic exams, per‑choice rationales, and analytics that tell you exactly what to do next.
+        <p className="text-base leading-relaxed text-slate-100/80">
+          Studyin keeps blueprint weights, Elo-lite mastery, and evidence crops deterministic. Author lessons with the Codex CLI, publish MCQs with validator gates, and surface “why this next” backed by analytics.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
-          <Link href="/study"><Button size="lg">Start studying</Button></Link>
-          <Link href="/exam"><Button size="lg" variant="outline">Try an exam</Button></Link>
-          <Link href="/drills"><Button size="lg" variant="outline">See drills</Button></Link>
+          <Link href="/study"><Button size="lg" className="bg-white text-slate-900 hover:bg-slate-200">Start studying</Button></Link>
+          <Link href="/summary"><Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10">View analytics</Button></Link>
+          <Link href="/docs"><Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10">Read SOP</Button></Link>
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(40%_30%_at_70%_10%,rgba(59,130,246,0.15),transparent)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(65%_65%_at_100%_0%,rgba(104,211,245,0.25),transparent_60%)]" />
     </section>
   );
 }

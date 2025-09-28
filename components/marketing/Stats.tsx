@@ -5,20 +5,24 @@ export function Stats({ analytics }: { analytics: AnalyticsSummary | null }) {
   const learners = analytics?.totals.learners ?? 0;
   const recs = analytics?.elg_per_min.length ?? 0;
   return (
-    <section className="grid gap-4 sm:grid-cols-3">
-      <div className="rounded-lg border border-slate-200 bg-white p-5 text-center">
-        <p className="text-3xl font-bold text-slate-900">{attempts}</p>
-        <p className="text-xs uppercase tracking-wide text-slate-500">Attempts</p>
-      </div>
-      <div className="rounded-lg border border-slate-200 bg-white p-5 text-center">
-        <p className="text-3xl font-bold text-slate-900">{learners}</p>
-        <p className="text-xs uppercase tracking-wide text-slate-500">Learners</p>
-      </div>
-      <div className="rounded-lg border border-slate-200 bg-white p-5 text-center">
-        <p className="text-3xl font-bold text-slate-900">{recs}</p>
-        <p className="text-xs uppercase tracking-wide text-slate-500">ELG/min Recs</p>
-      </div>
+    <section className="grid gap-4 md:grid-cols-3">
+      {[
+        { label: 'Attempts', value: attempts, sub: 'Captured in NDJSON or Supabase' },
+        { label: 'Learners', value: learners, sub: 'Pseudonymous, schema_version 1.0.0' },
+        { label: 'ELG/min recs', value: recs, sub: 'Deterministic recommendations ready' }
+      ].map((stat) => (
+        <div
+          key={stat.label}
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-left shadow-xl"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(80%_120%_at_0%_0%,rgba(148,163,255,0.25),transparent)]" />
+          <div className="relative z-10">
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-300">{stat.label}</p>
+            <p className="mt-3 text-4xl font-semibold text-white">{stat.value}</p>
+            <p className="mt-2 text-xs text-slate-300">{stat.sub}</p>
+          </div>
+        </div>
+      ))}
     </section>
   );
 }
-

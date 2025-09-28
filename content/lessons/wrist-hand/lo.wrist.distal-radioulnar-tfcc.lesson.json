@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.wrist.distal-radioulnar-tfcc",
+  "lo_id": "lo.wrist.distal-radioulnar-tfcc",
+  "title": "Stabilizers of the Distal Radioulnar Joint",
+  "summary": "Walk through the DRUJ surfaces, then overlay the triangular fibrocartilage complex to show how pronation-supination stays stable.",
+  "high_yield": [
+    "DRUJ is a pivot joint between ulnar head and radial notch—state this before adding soft tissue.",
+    "TFCC spans radius to ulna + triquetrum/pisiform, acting as a load-bearing articular disc.",
+    "Highlight dorsal vs. volar radioulnar ligaments to tie into instability exams."
+  ],
+  "pitfalls": [
+    "Many forget the TFCC also supports the ulnocarpal compartment—include a quick overlay to reinforce.",
+    "Avoid suggesting the ulna touches carpal bones directly; emphasize disc interposition."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 5,
+      "narration": "Show radius and ulna distal ends with the sigmoid notch receiving the ulnar head.",
+      "visual": "3D rotate of distal forearm highlighting articulating surfaces."
+    },
+    {
+      "beat": 1,
+      "duration_s": 6,
+      "narration": "Layer in the TFCC as a purple disc with volar/dorsal radioulnar ligaments wrapping around.",
+      "visual": "Semi-transparent disc drawn between bones; ligaments animated as straps."
+    },
+    {
+      "beat": 2,
+      "duration_s": 5,
+      "narration": "Simulate pronation/supination with the TFCC maintaining congruency; annotate clinical tests (piano key).",
+      "visual": "Animated rotation with tooltip 'Piano key sign' pointing to ulnar head."
+    }
+  ]
+}
