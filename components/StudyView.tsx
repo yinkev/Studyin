@@ -12,6 +12,8 @@ import {
   DialogTrigger
 } from './ui/radix/dialog';
 import { VisuallyHidden } from './ui/radix/visually-hidden';
+import { RadioGroup, RadioGroupItem } from './ui/radix/radio-group';
+import { cn } from './ui/utils';
 
 interface StudyViewProps {
   items: StudyItem[];
@@ -134,42 +136,63 @@ export function StudyView({ items, analytics }: StudyViewProps) {
           </div>
           <h2 className="text-lg font-semibold text-slate-900">{current.stem}</h2>
 
-          <div className="space-y-3">
+          <RadioGroup
+            value={selected ?? undefined}
+            onValueChange={(value) => handleSelect(value as (typeof letters)[number])}
+            aria-label="Study mode answer choices"
+          >
             {letters.map((letter, idx) => {
               const choice = current.choices[letter];
               if (!choice) return null;
-              const isSelected = selected === letter;
               const showCorrect = feedback.correctShown && letter === current.key;
+              const isSelected = selected === letter;
+              const choiceId = `study-${current.id}-${letter}`;
+              const baseClasses = 'flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left transition focus:outline-none';
+              const uncheckedClasses = 'border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-300';
+              const correctClasses = 'border-emerald-400 bg-emerald-50 text-emerald-900';
+              const incorrectClasses = 'border-rose-400 bg-rose-50 text-rose-900';
+              const stateClasses = feedback.correctShown
+                ? letter === current.key
+                  ? correctClasses
+                  : isSelected
+                    ? incorrectClasses
+                    : uncheckedClasses
+                : isSelected
+                  ? 'border-slate-300 bg-white text-slate-900'
+                  : uncheckedClasses;
               return (
-                <button
-                  key={letter}
-                  onClick={() => handleSelect(letter)}
-                  className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left transition ${
-                    isSelected
-                      ? isCorrect
-                        ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                        : 'border-rose-400 bg-rose-50 text-rose-900'
-                      : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-300'
-                  }`}
-                >
-                  <span className="mt-1 rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-slate-500">
-                    {idx + 1}
-                  </span>
-                  <div>
-                    <p className="font-medium">{letter}. {choice}</p>
-                    {feedback.correctShown && letter === current.key && (
-                      <p className="mt-1 text-sm text-emerald-700">{current.rationale_correct}</p>
+                <div key={letter} className="relative">
+                  <RadioGroupItem id={choiceId} value={letter} className="peer sr-only" />
+                  <label
+                    htmlFor={choiceId}
+                    className={cn(
+                      baseClasses,
+                      stateClasses,
+                      'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                      'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2'
                     )}
-                    {feedback.correctShown && isSelected && letter !== current.key && (
-                      <p className="mt-1 text-sm text-rose-700">
-                        {current.rationale_distractors?.[letter] ?? 'Review the underlying anatomy.'}
+                  >
+                    <span className="mt-1 rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-slate-500">
+                      {idx + 1}
+                    </span>
+                    <div>
+                      <p className="font-medium">
+                        {letter}. {choice}
                       </p>
-                    )}
-                  </div>
-                </button>
+                      {feedback.correctShown && letter === current.key && (
+                        <p className="mt-1 text-sm text-emerald-700">{current.rationale_correct}</p>
+                      )}
+                      {feedback.correctShown && isSelected && letter !== current.key && (
+                        <p className="mt-1 text-sm text-rose-700">
+                          {current.rationale_distractors?.[letter] ?? 'Review the underlying anatomy.'}
+                        </p>
+                      )}
+                    </div>
+                  </label>
+                </div>
               );
             })}
-          </div>
+          </RadioGroup>
 
           <div className="flex items-center justify-between pt-2 text-sm text-slate-500">
             <div className="space-x-2">
