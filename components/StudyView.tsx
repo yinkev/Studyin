@@ -115,7 +115,7 @@ export function StudyView({ items, analytics }: StudyViewProps) {
         </div>
         <Popover>
           <PopoverTrigger className="flex max-w-xs flex-col gap-1 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-left text-sm text-slate-100 shadow-lg shadow-slate-900/20 transition hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-slate-300">Why this next</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Why this next</span>
             <span className="line-clamp-2 text-sm text-white/90">{whyNext}</span>
           </PopoverTrigger>
           <PopoverContent className="w-96 space-y-2 border-white/20 bg-slate-900/90 text-slate-100">
@@ -128,11 +128,24 @@ export function StudyView({ items, analytics }: StudyViewProps) {
 
       <article className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <section className="space-y-5 rounded-3xl border border-white/10 bg-slate-950/50 p-6 shadow-xl shadow-slate-900/20">
-          <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-slate-400">
-            <span>
-              #{index + 1} · Difficulty {current.difficulty} · LOs: {current.los.join(', ')}
-            </span>
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <div className="inline-flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                #{index + 1} / {items.length}
+              </span>
+              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-medium capitalize text-slate-300">
+                Difficulty {current.difficulty}
+              </span>
+              {current.los.map((lo) => (
+                <span key={lo} className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+                  {lo}
+                </span>
+              ))}
+            </div>
             <span className="font-mono text-[11px] text-slate-500">{current.id}</span>
+          </div>
+          <div className="h-1 w-full rounded bg-white/5">
+            <div className="h-1 rounded bg-sky-500/70" style={{ width: `${Math.round(((index + 1) / items.length) * 100)}%` }} />
           </div>
           <h2 className="text-xl font-semibold leading-relaxed text-white">{current.stem}</h2>
 
@@ -195,7 +208,7 @@ export function StudyView({ items, analytics }: StudyViewProps) {
             <header className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">Evidence</h3>
               <DialogTrigger asChild>
-                <button className="text-[10px] uppercase tracking-[0.3em] text-slate-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70">
+                <button className="text-[10px] uppercase tracking-wide text-slate-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70">
                   {evidenceOpen ? 'Close (E)' : 'View (E)'}
                 </button>
               </DialogTrigger>

@@ -38,7 +38,7 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Lesson blueprint</p>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Lesson blueprint</p>
           <h2 className="text-xl font-semibold text-white">{current.title}</h2>
           <p className="text-sm text-slate-300">LO: {current.lo_id}</p>
         </div>

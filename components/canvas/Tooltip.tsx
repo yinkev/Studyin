@@ -24,7 +24,7 @@ export function Tooltip({ x, y, children }: { x: number; y: number; children: Re
         side="top"
         align="start"
         sideOffset={0}
-        className="pointer-events-none fixed z-50 rounded-md border border-border bg-white px-2 py-1 text-xs text-foreground shadow"
+        className="pointer-events-none fixed z-50 rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs text-slate-100 shadow"
         style={{
           left: `${x + 12}px`,
           top: `${y + 12}px`,

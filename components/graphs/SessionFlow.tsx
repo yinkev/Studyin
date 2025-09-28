@@ -17,7 +17,7 @@ interface SessionFlowProps {
 
 export function SessionFlow({ attempts }: SessionFlowProps) {
   if (!attempts.length) {
-    return <p className="text-sm text-slate-500">No recent attempts.</p>;
+    return <p className="text-sm text-slate-300/80">No recent attempts.</p>;
   }
   const sessions = new Map<string, AttemptNode[]>();
   attempts.forEach((attempt) => {
@@ -59,9 +59,9 @@ export function SessionFlow({ attempts }: SessionFlowProps) {
   }, [attempts]);
 
   return (
-    <div className="h-80 w-full rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div className="h-80 w-full rounded-xl border border-white/10 bg-white/5 shadow">
       <ReactFlow nodes={nodes} edges={edges} fitView proOptions={{ hideAttribution: true }} style={{ fontFamily: 'Inter, system-ui' }}>
-        <Background gap={24} color="#f1f5f9" />
+        <Background gap={24} color="#334155" />
         <Controls showInteractive={false} />
       </ReactFlow>
     </div>

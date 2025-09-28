@@ -52,11 +52,11 @@ export default async function SummaryPage() {
     <section className="space-y-8 text-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Operational analytics</p>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Operational analytics</p>
           <h1 className="text-3xl font-semibold text-white">Summary</h1>
         </div>
         {rubric && (
-          <div className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] ${rubric.overall_pass ? 'border-emerald-400/40 text-emerald-200' : 'border-amber-400/40 text-amber-200'}`}>
+          <div className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide ${rubric.overall_pass ? 'border-emerald-400/40 text-emerald-200' : 'border-amber-400/40 text-amber-200'}`}>
             Rubric {rubric.overall_score.toFixed(1)} / {rubric.threshold}
           </div>
         )}
@@ -68,7 +68,7 @@ export default async function SummaryPage() {
             {rubric ? (
               <div className="flex items-center justify-between">
                 <span>Rubric score</span>
-                <span className={`rounded-full px-3 py-1 text-sm font-semibold uppercase tracking-[0.25em] ${rubric.overall_pass ? 'bg-emerald-500/20 text-emerald-200' : 'bg-amber-500/20 text-amber-200'}`}>
+                <span className={`rounded-full px-3 py-1 text-sm font-semibold uppercase tracking-wide ${rubric.overall_pass ? 'bg-emerald-500/20 text-emerald-200' : 'bg-amber-500/20 text-amber-200'}`}>
                   {rubric.overall_score.toFixed(1)} / {rubric.threshold}
                 </span>
               </div>

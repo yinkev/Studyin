@@ -33,7 +33,7 @@ export function StudyTabs({ items, lessons, analytics }: StudyTabsProps) {
     <Tabs defaultValue="learn" className="space-y-6 text-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Mastery cockpit</p>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Mastery cockpit</p>
           <h1 className="text-3xl font-semibold text-white">Study</h1>
         </div>
         <TabsList className="bg-white/10">

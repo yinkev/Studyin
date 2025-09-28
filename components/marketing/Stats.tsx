@@ -17,7 +17,7 @@ export function Stats({ analytics }: { analytics: AnalyticsSummary | null }) {
         >
           <div className="absolute inset-0 bg-[radial-gradient(80%_120%_at_0%_0%,rgba(148,163,255,0.25),transparent)]" />
           <div className="relative z-10">
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-300">{stat.label}</p>
+            <p className="text-xs uppercase tracking-wide text-slate-300/90">{stat.label}</p>
             <p className="mt-3 text-4xl font-semibold text-white">{stat.value}</p>
             <p className="mt-2 text-xs text-slate-300">{stat.sub}</p>
           </div>

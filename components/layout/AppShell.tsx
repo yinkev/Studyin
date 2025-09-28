@@ -19,6 +19,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
       <div className="grid min-h-screen lg:grid-cols-[260px_1fr]">
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded-md focus:bg-white/10 focus:px-3 focus:py-2 focus:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/70">Skip to content</a>
         <aside className="hidden border-r border-white/10 bg-black/40 lg:flex">
           <div className="flex w-full flex-col gap-6 px-6 py-8">
             <div>
@@ -69,6 +70,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <span className="text-lg font-semibold text-white">Local-first authoring cockpit</span>
               </div>
               <div className="flex items-center gap-2">
+                <span
+                  data-ui-stamp
+                  className="rounded-full border border-fuchsia-400/30 bg-fuchsia-500/15 px-2 py-0.5 text-[10px] font-semibold text-fuchsia-200 shadow"
+                  title="UI stamp"
+                >
+                  UI v1
+                </span>
                 <Link href="/study">
                   <Button size="sm" variant="outline" className="border-white/30 text-slate-100 hover:bg-white/10">
                     Jump to study
@@ -82,7 +90,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
             </div>
           </header>
-          <main className="flex-1 overflow-y-auto bg-gradient-to-b from-white/5 to-slate-900/60">
+          <main id="main" className="flex-1 overflow-y-auto bg-gradient-to-b from-white/5 to-slate-900/60">
             <div className="mx-auto w-full max-w-6xl px-4 py-10 lg:px-8">
               <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md lg:p-10">
                 <div className="space-y-8 text-slate-50">
@@ -102,4 +110,3 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-

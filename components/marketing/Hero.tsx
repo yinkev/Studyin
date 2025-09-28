@@ -5,7 +5,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-sky-500/20 via-blue-500/10 to-fuchsia-500/10 p-10 shadow-2xl backdrop-blur">
       <div className="relative z-10 max-w-3xl space-y-5 animate-fade-up">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-100">Local-first mastery engine</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-sky-100/90">Local-first mastery engine</p>
         <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
           Learn faster with evidence‑anchored practice and transparent temporal RAG.
         </h1>
