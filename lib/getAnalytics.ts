@@ -43,6 +43,20 @@ export interface AnalyticsSummary {
     pick_rate: number;
     attempts: number;
   }>;
+  item_recommendations: Array<{
+    item_id: string;
+    lo_ids: string[];
+    attempts: number;
+    accuracy: number;
+    avg_duration_seconds: number;
+    last_attempt_ts: number | null;
+    projected_minutes_to_mastery: number;
+    overdue_lo_ids: string[];
+    reason: string;
+    reason_type: 'spacing' | 'mastery_deficit' | 'elg' | 'recency' | 'accuracy' | 'momentum';
+    score: number;
+    elg_rank: number | null;
+  }>;
 }
 
 export async function loadAnalyticsSummary(): Promise<AnalyticsSummary | null> {

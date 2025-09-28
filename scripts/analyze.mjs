@@ -5,7 +5,8 @@ import process from 'process';
 import { fileURLToPath } from 'url';
 import { parseNdjsonLine, attemptEventSchema } from './lib/schema.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const CURRENT_FILE = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(CURRENT_FILE);
 const ROOT = path.resolve(__dirname, '..');
 const DATA_PATH = path.join(ROOT, 'data', 'events.ndjson');
 const OUTPUT_PATH = path.join(ROOT, 'public', 'analytics', 'latest.json');
@@ -43,7 +44,7 @@ function wilsonUpperBound(successes, trials, z = 1.96) {
   return (centre + margin) / denominator;
 }
 
-function summarize(attempts) {
+export function summarize(attempts) {
   const now = Date.now();
   if (!attempts.length) {
     return {
@@ -60,7 +61,8 @@ function summarize(attempts) {
         fast_right: 0,
         slow_right: 0
       },
-      nfd_summary: []
+      nfd_summary: [],
+      item_recommendations: []
     };
   }
 
@@ -103,13 +105,17 @@ function summarize(attempts) {
         attempts: 0,
         correct: 0,
         durationTotal: 0,
-        choiceCounts: new Map()
+        choiceCounts: new Map(),
+        loIds: new Set(),
+        lastAttemptTs: 0
       };
     item.attempts += 1;
     item.durationTotal += durationSeconds;
     if (attempt.correct) item.correct += 1;
     const key = attempt.choice;
     item.choiceCounts.set(key, (item.choiceCounts.get(key) ?? 0) + 1);
+    attempt.lo_ids.forEach((loId) => item.loIds.add(loId));
+    item.lastAttemptTs = Math.max(item.lastAttemptTs, attempt.ts_submit);
     itemMetrics.set(attempt.item_id, item);
 
     if (!attempt.correct) {
@@ -146,7 +152,7 @@ function summarize(attempts) {
   for (const [itemId, metrics] of itemMetrics.entries()) {
     const avgDurationSec = metrics.attempts ? metrics.durationTotal / metrics.attempts : 60;
     const avgMinutes = avgDurationSec / 60;
-    const associatedLos = attempts.find((attempt) => attempt.item_id === itemId)?.lo_ids ?? [];
+    const associatedLos = Array.from(metrics.loIds ?? []);
     const loDeficits = associatedLos
       .map((loId) => ttm_per_lo.find((entry) => entry.lo_id === loId)?.projected_minutes_to_mastery ?? 0)
       .filter((minutes) => minutes > 0);
@@ -208,8 +214,86 @@ function summarize(attempts) {
     elg_per_min,
     confusion_edges,
     speed_accuracy: speedBuckets,
-    nfd_summary
+    nfd_summary,
+    item_recommendations: buildItemRecommendations({
+      itemMetrics,
+      ttm_per_lo,
+      elg_per_min,
+      now
+    })
   };
+}
+
+function buildItemRecommendations({ itemMetrics, ttm_per_lo, elg_per_min, now }) {
+  const loStats = new Map(ttm_per_lo.map((entry) => [entry.lo_id, entry]));
+  const elgMap = new Map(elg_per_min.map((entry, index) => [entry.item_id, { ...entry, rank: index }]));
+
+  const recommendations = [];
+  const dayMs = 1000 * 60 * 60 * 24;
+
+  for (const [itemId, metrics] of itemMetrics.entries()) {
+    const loIds = Array.from(metrics.loIds ?? []);
+    const loEntries = loIds
+      .map((loId) => loStats.get(loId))
+      .filter(Boolean)
+      .sort((a, b) => b.projected_minutes_to_mastery - a.projected_minutes_to_mastery);
+    const overdueLos = loEntries.filter((entry) => entry.overdue).map((entry) => entry.lo_id);
+    const topDeficit = loEntries[0] ?? null;
+    const elgEntry = elgMap.get(itemId) ?? null;
+
+    const attempts = metrics.attempts;
+    const accuracy = attempts ? metrics.correct / attempts : 0;
+    const avgDurationSeconds = attempts ? metrics.durationTotal / attempts : 0;
+    const incorrectRate = 1 - accuracy;
+    const lastAttemptTs = metrics.lastAttemptTs || null;
+    const staleDays = lastAttemptTs ? (now - lastAttemptTs) / dayMs : null;
+
+    let reasonType = 'momentum';
+    let reason = 'Keep momentum — balanced practice.';
+
+    if (overdueLos.length > 0) {
+      reasonType = 'spacing';
+      reason = `Spacing overdue: ${overdueLos.join(', ')}`;
+    } else if (topDeficit && topDeficit.projected_minutes_to_mastery > 0) {
+      reasonType = 'mastery_deficit';
+      reason = `Mastery gap in ${topDeficit.lo_id}: ~${topDeficit.projected_minutes_to_mastery} min to target`;
+    } else if (elgEntry) {
+      reasonType = 'elg';
+      reason = `${elgEntry.reason}. Δ ${(elgEntry.projected_mastery_gain * 100).toFixed(0)}% in ${elgEntry.estimated_minutes.toFixed(
+        1
+      )} min.`;
+    } else if (staleDays !== null && staleDays >= 3) {
+      reasonType = 'recency';
+      reason = `Spacing refresh — ${Math.round(staleDays)}d since last attempt.`;
+    } else if (incorrectRate > 0.4) {
+      reasonType = 'accuracy';
+      reason = `Reinforce accuracy: ${(accuracy * 100).toFixed(0)}% correct so far.`;
+    }
+
+    const score =
+      overdueLos.length * 5 +
+      (topDeficit ? topDeficit.projected_minutes_to_mastery / 5 : 0) +
+      incorrectRate * 3 +
+      (elgEntry ? 2 - elgEntry.rank * 0.2 : 0) +
+      (staleDays !== null ? Math.min(1.5, staleDays / 2) : 0.5);
+
+    recommendations.push({
+      item_id: itemId,
+      lo_ids: loIds,
+      attempts,
+      accuracy: Number(accuracy.toFixed(3)),
+      avg_duration_seconds: Number(avgDurationSeconds.toFixed(2)),
+      last_attempt_ts: lastAttemptTs,
+      projected_minutes_to_mastery: topDeficit ? Number(topDeficit.projected_minutes_to_mastery.toFixed(2)) : 0,
+      overdue_lo_ids: overdueLos,
+      reason,
+      reason_type: reasonType,
+      score: Number(score.toFixed(3)),
+      elg_rank: elgEntry ? elgEntry.rank : null
+    });
+  }
+
+  return recommendations.sort((a, b) => b.score - a.score);
 }
 
 async function main() {
@@ -225,4 +309,6 @@ async function main() {
   }
 }
 
-await main();
+if (process.argv[1] === CURRENT_FILE) {
+  await main();
+}

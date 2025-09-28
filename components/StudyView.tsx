@@ -25,6 +25,10 @@ interface ChoiceFeedback {
 
 function getWhyThisNext(itemId: string, itemLOs: string[], analytics: AnalyticsSummary | null): string {
   if (!analytics) return 'Focus on mastery — keep practicing.';
+  const recommendation = analytics.item_recommendations?.find((rec) => rec.item_id === itemId);
+  if (recommendation) {
+    return recommendation.reason;
+  }
   // Spacing: if any LO is overdue
   const overdue = (analytics.ttm_per_lo || []).filter((t) => itemLOs.includes(t.lo_id) && t.overdue);
   if (overdue.length > 0) {

@@ -102,7 +102,9 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - LO IDs exist in `config/los.json`
   - published items must have `rubric_score ≥ 2.7`
   - To relax evidence during setup: run with `REQUIRE_EVIDENCE_CROP=0` to allow citation‑only (must include `citation` or `source_url`)
-- `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `public/analytics/latest.json`.
+- `npm run analyze` reads `data/events.ndjson` (if present) and writes analytics to `public/analytics/latest.json`, including LO
+  projections, confusion edges, ELG/min, and item-level recommendations with reason types (spacing, mastery deficit, ELG boost,
+  recency, accuracy, or general momentum).
 - `npm run dev` auto-opens the app in your default browser (set `DEV_URL` to override) — use `npm run dev:start` to run without auto-opening.
 
 ## Next Steps
