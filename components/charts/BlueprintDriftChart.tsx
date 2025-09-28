@@ -3,13 +3,11 @@
 import * as d3 from 'd3';
 import { useEffect, useMemo, useRef } from 'react';
 import type { AnalyticsSummary } from '../../lib/getAnalytics';
-import blueprint from '../../config/blueprint.json';
 
-export function BlueprintDriftChart({ analytics }: { analytics: AnalyticsSummary | null }) {
+export function BlueprintDriftChart({ analytics, weights }: { analytics: AnalyticsSummary | null; weights: Record<string, number> }) {
   const ref = useRef<SVGSVGElement | null>(null);
 
   const data = useMemo(() => {
-    const weights: Record<string, number> = (blueprint as any).weights || {};
     const loAttempts: Record<string, number> = {};
     (analytics?.ttm_per_lo || []).forEach((d) => {
       loAttempts[d.lo_id] = d.attempts || 0;
@@ -100,4 +98,3 @@ export function BlueprintDriftChart({ analytics }: { analytics: AnalyticsSummary
     </figure>
   );
 }
-
