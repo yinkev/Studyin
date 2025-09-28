@@ -23,6 +23,7 @@
 
 ## To‑Do
 
+- UI: finish Radix adoption across Study/Exam/Drill views; audit focus traps and keyboard paths after tooltip/dialog refactor.
 - Evidence: replace placeholder crops with real assets; add `source_url`; flip items to `review`/`published`.
 - Analytics: enrich `data/events.ndjson`, rerun analyze, iterate chart formats & tooltips.
 - Exam polish: add timer + blueprint meter; lock evidence; post‑submit score.

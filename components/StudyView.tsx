@@ -2,6 +2,16 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/radix/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from './ui/radix/dialog';
+import { VisuallyHidden } from './ui/radix/visually-hidden';
 
 interface StudyViewProps {
   items: StudyItem[];
@@ -39,7 +49,7 @@ function getWhyThisNext(itemId: string, itemLOs: string[], analytics: AnalyticsS
 export function StudyView({ items, analytics }: StudyViewProps) {
   const [index, setIndex] = useState(0);
   const [feedback, setFeedback] = useState<ChoiceFeedback>({ correctShown: false });
-  const [showEvidence, setShowEvidence] = useState(true);
+  const [evidenceOpen, setEvidenceOpen] = useState(false);
 
   const current = items[index];
   const whyNext = useMemo(() => getWhyThisNext(current?.id ?? '', current?.los ?? [], analytics), [current?.id, current?.los, analytics]);
@@ -54,11 +64,13 @@ export function StudyView({ items, analytics }: StudyViewProps) {
 
   const handleNext = useCallback(() => {
     setFeedback({ correctShown: false });
+    setEvidenceOpen(false);
     setIndex((prev) => (prev + 1) % items.length);
   }, [items.length]);
 
   const handlePrev = useCallback(() => {
     setFeedback({ correctShown: false });
+    setEvidenceOpen(false);
     setIndex((prev) => (prev - 1 + items.length) % items.length);
   }, [items.length]);
 
@@ -71,7 +83,7 @@ export function StudyView({ items, analytics }: StudyViewProps) {
       } else if (key === 'ArrowLeft' || key === 'p') {
         handlePrev();
       } else if (key === 'e' || key === 'E') {
-        setShowEvidence((prev) => !prev);
+        setEvidenceOpen((prev) => !prev);
       } else if (/^[1-5]$/.test(key)) {
         const idx = Number(key) - 1;
         const choice = (['A', 'B', 'C', 'D', 'E'] as const)[idx];
@@ -99,9 +111,17 @@ export function StudyView({ items, analytics }: StudyViewProps) {
             Keyboard: 1-5 to answer · N/P arrows for next/prev · E toggle evidence
           </p>
         </div>
-        <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700">
-          {whyNext}
-        </div>
+        <Popover>
+          <PopoverTrigger className="flex max-w-xs flex-col gap-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-left text-sm text-slate-700 shadow-sm transition hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Why this next</span>
+            <span className="line-clamp-2 text-sm text-slate-700">{whyNext}</span>
+          </PopoverTrigger>
+          <PopoverContent className="w-96 space-y-2">
+            <h3 className="text-sm font-semibold text-slate-900">Focus rationale</h3>
+            <p className="text-sm text-slate-600">{whyNext}</p>
+            <p className="text-xs text-slate-400">Keyboard: Activate with Enter/Space, close with Escape.</p>
+          </PopoverContent>
+        </Popover>
       </header>
 
       <article className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
@@ -169,47 +189,64 @@ export function StudyView({ items, analytics }: StudyViewProps) {
         </section>
 
         <aside className="space-y-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <header className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900">Evidence</h3>
-            <button
-              onClick={() => setShowEvidence((prev) => !prev)}
-              className="text-xs uppercase tracking-wide text-slate-500 hover:text-slate-700"
-            >
-              {showEvidence ? 'Hide (E)' : 'Show (E)'}
-            </button>
-          </header>
-
-          {showEvidence ? (
-            current.evidence?.dataUri ? (
-              <figure className="space-y-2">
-                <img
-                  src={current.evidence.dataUri}
-                  alt={current.evidence.citation ?? current.id}
-                  className="w-full rounded-md border border-slate-200 object-contain"
-                />
-                <figcaption className="text-xs text-slate-500">
-                  {current.evidence.citation ?? 'Private study material'}
-                </figcaption>
-              </figure>
-            ) : (
-              <p className="rounded border border-dashed border-slate-300 bg-slate-50 p-3 text-xs text-slate-500">
-                Evidence crop not available. Refer to {current.evidence?.file ?? 'source PDF'} (page {current.evidence?.page}).
+          <Dialog open={evidenceOpen} onOpenChange={setEvidenceOpen}>
+            <header className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-900">Evidence</h3>
+              <DialogTrigger asChild>
+                <button className="text-xs uppercase tracking-wide text-slate-500 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  {evidenceOpen ? 'Close (E)' : 'View (E)'}
+                </button>
+              </DialogTrigger>
+            </header>
+            <div className="space-y-2 text-xs text-slate-500">
+              <p>{current.evidence?.citation ?? 'Evidence crop pending review.'}</p>
+              <p>
+                Source: {current.evidence?.file ?? 'source PDF'}
+                {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
               </p>
-            )
-          ) : (
-            <p className="text-xs text-slate-500">Evidence hidden.</p>
-          )}
-
-          {current.evidence?.source_url && (
-            <a
-              href={current.evidence.source_url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded border border-slate-200 px-3 py-1 text-xs text-slate-600 hover:border-slate-300"
-            >
-              View source URL
-            </a>
-          )}
+            </div>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Evidence for {current.id}</DialogTitle>
+                <DialogDescription>
+                  {current.evidence?.citation ?? 'Review the attached primary source.'}
+                </DialogDescription>
+              </DialogHeader>
+              {current.evidence?.dataUri ? (
+                <figure className="space-y-3">
+                  <img
+                    src={current.evidence.dataUri}
+                    alt={current.evidence.citation ?? current.id}
+                    className="w-full rounded-md border border-slate-200 object-contain"
+                    loading="lazy"
+                  />
+                  <figcaption className="text-xs text-slate-500">
+                    {current.evidence?.file ?? 'source.pdf'}
+                    {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
+                  </figcaption>
+                </figure>
+              ) : (
+                <p className="rounded border border-dashed border-slate-300 bg-slate-50 p-3 text-sm text-slate-600">
+                  Evidence crop not available. Refer to {current.evidence?.file ?? 'source PDF'}
+                  {current.evidence?.page ? ` (page ${current.evidence.page})` : ''}.
+                </p>
+              )}
+              {current.evidence?.source_url && (
+                <a
+                  href={current.evidence.source_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded border border-slate-200 px-3 py-1 text-xs text-slate-600 hover:border-slate-300"
+                >
+                  View source URL
+                </a>
+              )}
+              <p className="text-xs text-slate-400">Keyboard: Press Escape to close. Shortcut E toggles this dialog.</p>
+            </DialogContent>
+          </Dialog>
+          <VisuallyHidden>
+            <span>Press the E key to toggle the evidence dialog.</span>
+          </VisuallyHidden>
         </aside>
       </article>
     </div>

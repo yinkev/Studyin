@@ -6,7 +6,7 @@
 - **EvidenceCurator** — Produce crops/PDF references (`content/evidence/**`), record page/figure/bbox/citation, verify crop loads <250 ms and dimensions stored (`cropPath` preferred, AVIF/WebP + fallback).
 - **ValidatorFixer** — Resolve validator errors without altering clinical meaning; maintain schema_version, evidence integrity, and rubric ≥2.7 for published items.
 - **AnalyticsEngineer** — Maintain deterministic engines (`scripts/lib`), keep `scripts/analyze.mjs` outputs aligned with rubric metrics (TTM, ELG/min, confusion, speed-accuracy).
-- **UIBuilder** — Implement Study/Exam/Drill/Summary flows (Next.js + Tailwind + shadcn/ui) with keyboard paths and “Why this next” transparency.
+- **UIBuilder** — Implement Study/Exam/Drill/Summary flows (Next.js + Tailwind + Radix UI wrappers with shadcn patterns) with keyboard paths and “Why this next” transparency.
 - **AccessibilityAuditor** — Run axe (browser extension or MCP) and manual keyboard walkthrough; enforce WCAG 2.2 AA, focus-visible, target-size, and zero critical issues.
 - **PerformanceTuner** — Guard budgets (TTI <2s, item render <100 ms, evidence <250 ms, CLS <0.1). Instrument Web Vitals.
 - **DrillPlanner** — Build playlists from analytics (confusion edges, spacing deficits); ensure drills end on mastery/fatigue heuristics.

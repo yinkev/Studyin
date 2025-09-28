@@ -1,19 +1,38 @@
 'use client';
 
-import React from 'react';
-import { cn } from '../ui/utils';
+import * as React from 'react';
+import { Tooltip as TooltipRoot, TooltipContent, TooltipTrigger } from '../ui/radix/tooltip';
 
 export function Tooltip({ x, y, children }: { x: number; y: number; children: React.ReactNode }) {
   return (
-    <div
-      className={cn(
-        'pointer-events-none fixed z-50 rounded-md border border-border bg-white px-2 py-1 text-xs text-foreground shadow'
-      )}
-      style={{ left: x + 12, top: y + 12 }}
-      role="tooltip"
-    >
-      {children}
-    </div>
+    <TooltipRoot open>
+      <TooltipTrigger asChild>
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: 1,
+            height: 1,
+            pointerEvents: 'none'
+          }}
+        />
+      </TooltipTrigger>
+      <TooltipContent
+        forceMount
+        side="top"
+        align="start"
+        sideOffset={0}
+        className="pointer-events-none fixed z-50 rounded-md border border-border bg-white px-2 py-1 text-xs text-foreground shadow"
+        style={{
+          left: `${x + 12}px`,
+          top: `${y + 12}px`,
+          transform: 'none'
+        }}
+      >
+        {children}
+      </TooltipContent>
+    </TooltipRoot>
   );
 }
-
