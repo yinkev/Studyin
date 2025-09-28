@@ -29,6 +29,9 @@ jobs:
       - name: Run analyze
         run: npm run analyze
 
+      - name: Build Next.js app
+        run: npm run build
+
       # Axe, Lighthouse, Playwright placeholders (CI environment requirements TBD)
       - name: Axe accessibility check (placeholder)
         run: echo "TODO: integrate Playwright + axe"
