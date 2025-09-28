@@ -7,10 +7,10 @@ Deterministic, evidence-first scaffold for Studyin’s OMS-1 upper limb module. 
 ```bash
 npm install
 npm run validate:items   # Validate sample bank (A–E gate)
-npm run analyze          # Generate app/public/analytics/latest.json
+npm run analyze          # Generate public/analytics/latest.json
 npm test                 # Run engine smoke tests (Vitest)
 
-# Placeholder until the Next.js app is added
+# Dev server (auto opens http://localhost:3000)
 npm run dev
 ```
 
@@ -57,7 +57,8 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - LO IDs exist in `config/los.json`
   - published items must have `rubric_score ≥ 2.7`
   - To relax evidence during setup: run with `REQUIRE_EVIDENCE_CROP=0` to allow citation‑only (must include `citation` or `source_url`)
-- `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `app/public/analytics/latest.json`.
+- `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `public/analytics/latest.json`.
+- `npm run dev` auto-opens the app in your default browser (set `DEV_URL` to override) — use `npm run dev:start` to run without auto-opening.
 
 ## Next Steps
 
