@@ -15,6 +15,13 @@
 - **DocScribe** — Keep README, AGENTS.md, rubric docs, prompts, and changelog accurate.
 - **DataSteward** — Ensure telemetry (`data/events.ndjson`) is pseudonymous, export-ready, and schema_version aligned.
 
+### New: ProjectManager (Studyin PM)
+- Drives execution and cadence. Keeps the plan current, raises risks, and enforces gates.
+- Maintains `PLAN.md` (milestones + To‑Do) and updates it after merges.
+- Coordinates agents, triages tickets, and curates the backlog.
+- Weekly pulse: run `npm run score:rubric`, attach `public/analytics/rubric-score.json` to the tracking issue, and call out any ★ < 2.8.
+- Verifies CI (validate/test/analyze/e2e/Light­house) and escalates regressions.
+
 ## Commands & Checks
 
 ```bash

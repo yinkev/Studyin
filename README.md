@@ -29,6 +29,7 @@ scripts/validate-items.mjs # Validator CLI gate (Zod-based)
 scripts/analyze.mjs        # Analytics pipeline → latest.json
 tests/                     # Vitest smoke tests for engines
 AGENTS.md                  # Agent SOPs, rubric gates, workflow
+PLAN.md                    # Current milestones, To‑Dos, cadence
 ```
 
 ## Deterministic Engines (stubs)
@@ -38,6 +39,26 @@ AGENTS.md                  # Agent SOPs, rubric gates, workflow
 - `scripts/lib/blueprint.mjs` — Feasibility checks and greedy form builder.
 
 Engine behavior is covered by `npm test` smoke tests. Update these modules before wiring into the UI.
+
+## Evidence Tooling
+
+- Generate (OpenAI): `node scripts/tools/generate-image.mjs --prompt "ulnar nerve diagram" --out content/evidence/.../img.png`
+- Fetch: `node scripts/tools/fetch-evidence.mjs --url https://... --out content/evidence/.../img.png`
+- Link to item: `node scripts/tools/link-evidence.mjs --id item.ulnar.claw-hand --path content/evidence/.../img.png --review`
+- Relax evidence during setup: `REQUIRE_EVIDENCE_CROP=0 npm run validate:items` (requires `citation` or `source_url`).
+
+## Tests & CI
+
+- Unit: `npm test` (Vitest). E2E a11y: `npm run e2e` (requires running server).
+- CI runs: validate → unit → analyze → build → Playwright+axe → Lighthouse CI.
+
+## Agents & Prompts
+
+- See `scripts/codex/` for prompts:
+  - `studyin-planner.md` — planning agent
+  - `itemsmith.md` — author MCQs
+  - `validator-fixer.md` — fix validator failures
+  - `studyin-pm.md` — project manager agent
 
 ## Working With Codex & Git
 

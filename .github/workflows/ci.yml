@@ -32,6 +32,17 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
+      - name: Rubric score (non-blocking)
+        run: npm run score:rubric || true
+
+      - name: Upload analytics artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: analytics-outputs
+          path: |
+            public/analytics/latest.json
+            public/analytics/rubric-score.json
+
       - name: Start app for E2E
         run: |
           npm run start &
