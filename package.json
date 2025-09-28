@@ -11,7 +11,7 @@
     "dev:open": "wait-on http://localhost:3000 && node scripts/tools/open-browser.mjs",
     "build": "next build",
     "start": "next start",
-    "test": "vitest",
+    "test": "vitest --run --exclude tests/e2e/**",
     "e2e": "playwright test",
     "ci:lh": "lhci autorun",
     "score:rubric": "node scripts/score-rubric.mjs"
