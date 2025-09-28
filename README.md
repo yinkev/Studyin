@@ -63,12 +63,19 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 
 ## MCP Tooling (Context7, Codex MCP, Chrome DevTools MCP)
 
-- **Context7 + Codex MCP**: configure your MCP client (e.g., Cursor, VS Code, or Context7 desktop) to point at `scripts/codex/` prompts. These prompts assume repo context; set the working directory to the repository root before invoking.
-- **Chrome DevTools MCP**: launch with `npm run dev` (auto-opens browser) and attach the Chrome DevTools MCP to audit accessibility or performance. The AccessibilityAuditor agent can leverage Chrome DevTools MCP to run axe scans interactively.
+- **Context7 + Codex MCP**: configure your MCP client (Cursor, Context7 desktop, VS Code MCP) to point at `scripts/codex/` prompts. Set the working directory to the repo root.
+- **Chrome DevTools MCP**: run `npm run dev` (auto-opens http://localhost:3000) and start Chrome with `--remote-debugging-port=9222`. Attach the DevTools MCP to audit accessibility/perf.
 - **Usage pattern**:
-  1. Generate a context window in your MCP client (files open in editor or via `PLAN.md`).
-  2. Run the desired prompt (planner / PM / itemsmith) and supply recent diffs or questions.
-  3. For quick a11y/perf checks, attach Chrome DevTools MCP and run lighthouse/axe there, then record results in PLAN.md or the PR.
+  1. Generate a context window in your MCP client (open files or load `PLAN.md`).
+  2. Run a prompt (planner / PM / itemsmith / validator) with recent diffs or questions.
+  3. For quick a11y/perf checks, use Chrome DevTools MCP or the axe extension, then note results in PLAN.md or the PR.
+
+### Quick setup
+1. Copy `.mcp/servers.example.json` to your MCP servers config (often `~/.config/mcp/servers.json`).
+2. Adjust the Studyin path if the repo lives elsewhere.
+3. Ensure `codex-mcp-server` and `chrome-devtools-mcp` CLIs are available (via `npm install -g` or `npx`).
+4. Start `npm run dev`. Launch Chrome: `open -a "Google Chrome" --args --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-mcp` (macOS example).
+5. Reload Context7; confirm tools like `fs.readFile`, `git.diff`, `navigate`, `lighthouse`, `axe` are listed.
 
 
 ## Working With Codex & Git

@@ -8,9 +8,9 @@
 - Analyzer + rubric scorer
 
 2) UI core — IN PROGRESS
-- Landing, Study, Exam, Drills, Summary
-- Charts (D3) + Canvas TTM
-- A11y keyboard paths, evidence panel
+- Landing, Study, Exam, Drills, Summary (baseline complete; continue polish)
+- Charts (D3 + canvas) with tooltips/gridlines — DONE
+- A11y keyboard paths, evidence panel — DONE / monitor regressions
 
 3) Analytics & Drills — IN PROGRESS
 - Refine TTM/ELG/min definitions
@@ -26,7 +26,7 @@
 - Evidence: replace placeholder crops with real assets; add `source_url`; flip items to `review`/`published`.
 - Analytics: enrich `data/events.ndjson`, rerun analyze, iterate chart formats & tooltips.
 - Exam polish: add timer + blueprint meter; lock evidence; post‑submit score.
-- Summary polish: Canvas confusion graph (optional), D3 tooltips, consistent legends.
+- Summary polish: optional canvas confusion graph; add chart tooltips/legends if analytics grow.
 - CI: raise Lighthouse thresholds once stable; make axe fail on “serious+”.
 - Docs: keep README/AGENTS/PLAN current; add screenshots to PR template.
 
@@ -34,4 +34,3 @@
 - Daily: sync PLAN status; triage issues; verify CI on latest PRs.
 - Weekly: run `npm run score:rubric` and publish the snapshot.
 - Release: gates green (validator, a11y, perf, rubric); evidence latency spot‑check; blueprint preflight passes.
-

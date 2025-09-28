@@ -1,0 +1,25 @@
+{
+  "servers": {
+    "codex-mcp": {
+      "command": "npx",
+      "args": ["codex-mcp-server", "--workspace", "/Users/kyin/Projects/Studyin"],
+      "transport": "stdio",
+      "env": {
+        "ALLOW_SHELL": "true"
+      },
+      "enabled": true
+    },
+    "chrome-devtools-mcp": {
+      "command": "npx",
+      "args": [
+        "chrome-devtools-mcp",
+        "--target",
+        "http://localhost:3000",
+        "--chrome-port",
+        "9222"
+      ],
+      "transport": "stdio",
+      "enabled": true
+    }
+  }
+}
