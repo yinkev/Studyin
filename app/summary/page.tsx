@@ -29,26 +29,27 @@ export default async function SummaryPage() {
     <section className="space-y-6">
       <h1 className="text-2xl font-semibold text-slate-900">Summary</h1>
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="text-sm font-medium">Release readiness</CardHeader>
-          <CardContent className="space-y-2 text-sm">
+        <Card className="h-full">
+          <CardHeader className="text-sm font-semibold text-slate-900">Release readiness</CardHeader>
+          <CardContent className="space-y-4 text-sm">
             {rubric ? (
               <div className="flex items-center justify-between">
                 <span>Rubric score</span>
-                <span className={`rounded px-2 py-1 font-semibold ${rubric.overall_pass ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                <span className={`rounded px-3 py-1 text-sm font-semibold ${rubric.overall_pass ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
                   {rubric.overall_score.toFixed(1)} / {rubric.threshold}
                 </span>
               </div>
             ) : (
-              <p className="text-slate-500">Run <code>npm run score:rubric</code> to generate a score.</p>
+              <p className="text-muted-foreground">Run <code>npm run score:rubric</code> to generate a score.</p>
             )}
+            <p className="text-xs text-muted-foreground">Critical gates must stay green — rerun rubric scoring before each release.</p>
           </CardContent>
         </Card>
+        <BlueprintDriftChart analytics={analytics} weights={blueprint?.weights ?? {}} />
         <TTMBarChart analytics={analytics} />
         <SpeedAccuracyChart analytics={analytics} />
         <ConfusionBar analytics={analytics} />
         <ConfusionForce analytics={analytics} />
-        <BlueprintDriftChart analytics={analytics} weights={blueprint?.weights ?? {}} />
         <TTMBarCanvas analytics={analytics} />
       </div>
     </section>

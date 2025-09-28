@@ -3,6 +3,8 @@
 import * as d3 from 'd3';
 import { useEffect, useRef } from 'react';
 import type { AnalyticsSummary } from '../../lib/getAnalytics';
+import { ChartCard } from './ChartCard';
+import { CHART_AXIS_COLOR, CHART_FONT, CHART_GRID_COLOR, CHART_PRIMARY, cleanLabel, formatMinutes, truncate } from './chartUtils';
 
 export function TTMBarChart({ analytics }: { analytics: AnalyticsSummary | null }) {
   const ref = useRef<SVGSVGElement | null>(null);
@@ -11,45 +13,53 @@ export function TTMBarChart({ analytics }: { analytics: AnalyticsSummary | null 
     const svg = d3.select(ref.current);
     svg.selectAll('*').remove();
 
-    const data = (analytics?.ttm_per_lo || []).slice().sort((a, b) => d3.descending(a.projected_minutes_to_mastery, b.projected_minutes_to_mastery));
+    const data = (analytics?.ttm_per_lo || [])
+      .slice()
+      .sort((a, b) => d3.descending(a.projected_minutes_to_mastery, b.projected_minutes_to_mastery));
     if (data.length === 0) {
-      svg.append('text').text('No TTM data').attr('x', 8).attr('y', 16).attr('fill', '#64748b');
+      svg.append('text').text('No TTM data yet').attr('x', 12).attr('y', 20).attr('fill', CHART_AXIS_COLOR).attr('font', CHART_FONT);
       return;
     }
 
-    const width = Number(svg.attr('width')) || 600;
-    const height = Number(svg.attr('height')) || Math.max(160, data.length * 28 + 30);
+    const width = Number(svg.attr('width')) || 720;
+    const height = Number(svg.attr('height')) || Math.max(220, data.length * 34 + 40);
     svg.attr('width', width).attr('height', height);
 
-    const margin = { top: 10, right: 20, bottom: 24, left: 140 };
+    const margin = { top: 12, right: 24, bottom: 40, left: 160 };
     const innerW = width - margin.left - margin.right;
     const innerH = height - margin.top - margin.bottom;
 
-    const x = d3
-      .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.projected_minutes_to_mastery)!])
-      .nice()
-      .range([0, innerW]);
-
-    const y = d3
-      .scaleBand<string>()
-      .domain(data.map((d) => d.lo_id))
-      .range([0, innerH])
-      .padding(0.15);
+    const x = d3.scaleLinear().domain([0, d3.max(data, (d) => d.projected_minutes_to_mastery) || 1]).nice().range([0, innerW]);
+    const y = d3.scaleBand<string>().domain(data.map((d) => d.lo_id)).range([0, innerH]).padding(0.2);
 
     const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
     g.append('g')
-      .attr('transform', `translate(0,${innerH})`)
-      .call(d3.axisBottom(x).ticks(5))
-      .selectAll('text')
-      .attr('font-size', 10);
+      .attr('stroke', CHART_GRID_COLOR)
+      .selectAll('line')
+      .data(x.ticks(5))
+      .enter()
+      .append('line')
+      .attr('x1', (d) => x(d))
+      .attr('x2', (d) => x(d))
+      .attr('y1', 0)
+      .attr('y2', innerH);
+
+    const axisBottom = d3.axisBottom(x).ticks(5).tickFormat((d) => formatMinutes(Number(d)));
+    const axisLeft = d3
+      .axisLeft(y)
+      .tickFormat((d) => truncate(cleanLabel(String(d)), 22));
 
     g.append('g')
-      .call(d3.axisLeft(y))
-      .selectAll('text')
-      .attr('font-size', 11)
-      .attr('fill', '#0f172a');
+      .attr('transform', `translate(0,${innerH})`)
+      .call(axisBottom)
+      .call((g) => g.selectAll('text').attr('font', CHART_FONT).attr('fill', CHART_AXIS_COLOR))
+      .call((g) => g.selectAll('path,line').attr('stroke', CHART_AXIS_COLOR));
+
+    g.append('g')
+      .call(axisLeft)
+      .call((g) => g.selectAll('text').attr('font', CHART_FONT).attr('fill', CHART_AXIS_COLOR))
+      .call((g) => g.selectAll('path,line').attr('stroke', CHART_AXIS_COLOR));
 
     g.selectAll('rect')
       .data(data)
@@ -59,26 +69,25 @@ export function TTMBarChart({ analytics }: { analytics: AnalyticsSummary | null 
       .attr('y', (d) => y(d.lo_id)!)
       .attr('width', (d) => x(d.projected_minutes_to_mastery))
       .attr('height', y.bandwidth())
-      .attr('fill', '#0ea5e9');
+      .attr('rx', 8)
+      .attr('fill', CHART_PRIMARY);
 
     g.selectAll('text.value')
       .data(data)
       .enter()
       .append('text')
-      .attr('class', 'value')
-      .attr('x', (d) => x(d.projected_minutes_to_mastery) + 6)
+      .attr('x', (d) => x(d.projected_minutes_to_mastery) + 8)
       .attr('y', (d) => (y(d.lo_id)! + y.bandwidth() / 2))
       .attr('alignment-baseline', 'middle')
-      .attr('font-size', 11)
-      .attr('fill', '#475569')
-      .text((d) => `${d.projected_minutes_to_mastery}m`);
+      .attr('font', CHART_FONT)
+      .attr('fill', '#1f2937')
+      .text((d) => formatMinutes(d.projected_minutes_to_mastery));
   }, [analytics]);
 
   return (
-    <figure className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <figcaption className="mb-2 text-sm font-medium text-slate-700">Projected minutes to mastery per LO</figcaption>
-      <svg ref={ref} width={720} height={260} role="img" aria-label="Projected minutes to mastery per LO" />
-    </figure>
+    <ChartCard title="Projected minutes to mastery" description="LOs ordered by remaining study time">
+      <svg ref={ref} width={720} height={280} role="img" aria-label="Projected minutes to mastery per LO" />
+    </ChartCard>
   );
 }
 
