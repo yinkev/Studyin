@@ -4,6 +4,9 @@ node_modules/
 out/
 dist/
 coverage/
+.lighthouseci/
+.next_server.log
+.server_pid
 
 # Logs and diagnostics
 *.log

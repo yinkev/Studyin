@@ -1,6 +1,6 @@
-# OMS-1 Upper Limb Study Arcade (Skeleton)
+# Studyin Module Arcade (Skeleton)
 
-Deterministic, evidence-first scaffold for Studyin’s OMS-1 upper limb module. This repo seeds the content/analytics pipeline so we can add the Next.js PWA UI later without rework.
+Deterministic, evidence-first scaffold for Studyin modules. It ships with an OMS-1 upper-limb sample bank today, but the prompts, CI, and agents are module-agnostic so you can retarget new systems without retooling.
 
 ## Quick Start
 
@@ -58,7 +58,9 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 ## Agents & Prompts
 
 - See `scripts/codex/` for prompts:
-  - `studyin-planner.md` — planning agent
+  - `studyin-planner.md` — planning agent (consumes MODULE inputs)
+  - `prd-writer.md` — world-class PRD author with internal rubric
+  - `implementation-writer.md` — translates PRD into deterministic IMPLEMENTATION.md
   - `itemsmith.md` — author MCQs
   - `validator-fixer.md` — fix validator failures
   - `studyin-pm.md` — project manager agent
