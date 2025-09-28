@@ -13,14 +13,27 @@ interface ChoiceFeedback {
   correctShown: boolean;
 }
 
-function getWhyThisNext(itemId: string, analytics: AnalyticsSummary | null): string {
-  if (!analytics || analytics.elg_per_min.length === 0) return 'Focus on mastery — keep practicing.';
-  const match = analytics.elg_per_min.find((entry) => entry.item_id === itemId);
-  if (match) {
-    return `${match.reason}. Δ mastery ${(match.projected_mastery_gain * 100).toFixed(0)}% in ${match.estimated_minutes.toFixed(1)} min.`;
+function getWhyThisNext(itemId: string, itemLOs: string[], analytics: AnalyticsSummary | null): string {
+  if (!analytics) return 'Focus on mastery — keep practicing.';
+  // Spacing: if any LO is overdue
+  const overdue = (analytics.ttm_per_lo || []).filter((t) => itemLOs.includes(t.lo_id) && t.overdue);
+  if (overdue.length > 0) {
+    return `Spacing overdue: ${overdue.map((o) => o.lo_id).join(', ')}`;
   }
-  const fallback = analytics.elg_per_min[0];
-  return `Next best: ${fallback.item_id} — ${fallback.reason}.`;
+  // Mastery deficit: highest projected minutes among item LOs
+  const deficits = (analytics.ttm_per_lo || [])
+    .filter((t) => itemLOs.includes(t.lo_id))
+    .sort((a, b) => b.projected_minutes_to_mastery - a.projected_minutes_to_mastery);
+  if (deficits.length > 0 && deficits[0].projected_minutes_to_mastery > 0) {
+    const top = deficits[0];
+    return `Mastery deficit in ${top.lo_id}: ~${top.projected_minutes_to_mastery} min to target`;
+  }
+  // ELG/min fallback
+  if (analytics.elg_per_min.length > 0) {
+    const match = analytics.elg_per_min.find((e) => e.item_id === itemId) || analytics.elg_per_min[0];
+    return `${match.reason}. Δ ${(match.projected_mastery_gain * 100).toFixed(0)}% in ${match.estimated_minutes.toFixed(1)} min.`;
+  }
+  return 'Keep momentum — balanced practice.';
 }
 
 export function StudyView({ items, analytics }: StudyViewProps) {
@@ -29,7 +42,7 @@ export function StudyView({ items, analytics }: StudyViewProps) {
   const [showEvidence, setShowEvidence] = useState(true);
 
   const current = items[index];
-  const whyNext = useMemo(() => getWhyThisNext(current?.id ?? '', analytics), [current?.id, analytics]);
+  const whyNext = useMemo(() => getWhyThisNext(current?.id ?? '', current?.los ?? [], analytics), [current?.id, current?.los, analytics]);
 
   const handleSelect = useCallback(
     (choice: 'A' | 'B' | 'C' | 'D' | 'E') => {
