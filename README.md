@@ -30,6 +30,7 @@ scripts/analyze.mjs        # Analytics pipeline → latest.json
 tests/                     # Vitest smoke tests for engines
 AGENTS.md                  # Agent SOPs, rubric gates, workflow
 PLAN.md                    # Current milestones, To‑Dos, cadence
+.lighthouserc.json         # CI Lighthouse thresholds and budgets
 ```
 
 ## Deterministic Engines (stubs)
@@ -51,7 +52,8 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 
 - Unit: `npm test` (Vitest).
 - Manual/MCP a11y: use Chrome DevTools MCP or axe browser extension while `npm run dev` is running.
-- CI runs: validate → unit → analyze → build → axe scan (manual/MCP) → Lighthouse CI.
+- CI runs: validate → unit → analyze → build → axe CI (serious+ blockers) → Lighthouse CI (per `.lighthouserc.json`).
+- CI helpers: `npm run ci:axe`, `npm run ci:lh` (requires `npm run build` or a running server).
 
 ## Agents & Prompts
 

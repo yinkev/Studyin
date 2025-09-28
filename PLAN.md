@@ -27,7 +27,7 @@
 - Analytics: enrich `data/events.ndjson`, rerun analyze, iterate chart formats & tooltips.
 - Exam polish: add timer + blueprint meter; lock evidence; post‑submit score.
 - Summary polish: optional canvas confusion graph; add chart tooltips/legends if analytics grow.
-- CI: raise Lighthouse thresholds once stable; make axe fail on “serious+”.
+- CI: monitor Lighthouse thresholds (perf ≥0.75, a11y ≥0.9) and tighten over time; keep axe serious+ gating green.
 - Docs: keep README/AGENTS/PLAN current; add screenshots to PR template.
 
 ## Cadence

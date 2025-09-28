@@ -12,6 +12,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest --run",
+    "ci:axe": "axe --exit http://localhost:3000",
     "ci:lh": "lhci autorun",
     "score:rubric": "node scripts/score-rubric.mjs",
     "pm:pulse": "node scripts/tools/pm-pulse.mjs"
@@ -29,20 +30,21 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@axe-core/cli": "^4.9.1",
     "@lhci/cli": "^0.12.0",
     "@types/node": "^20.12.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
+    "npm-run-all": "^4.1.5",
+    "open": "^9.1.0",
     "postcss": "^8.4.38",
+    "tailwind-merge": "^2.5.2",
     "tailwindcss": "^3.4.9",
     "tailwindcss-animate": "^1.0.7",
-    "tailwind-merge": "^2.5.2",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0",
-    "wait-on": "^7.2.0",
-    "open": "^9.1.0",
-    "npm-run-all": "^4.1.5"
+    "wait-on": "^7.2.0"
   },
   "engines": {
     "node": ">=20.14.0 <21"

@@ -1,4 +1,4 @@
-# Studyin Agent SOPs — OMS-1 Upper Limb Module
+# Studyin Agent SOPs — Module-Agnostic
 
 ## Roles & Responsibilities
 
@@ -21,6 +21,29 @@
 - Coordinates agents, triages tickets, and curates the backlog.
 - Weekly pulse: run `npm run score:rubric`, attach `public/analytics/rubric-score.json` to the tracking issue, and call out any ★ < 2.8.
 - Verifies CI (validate/test/analyze/e2e/Light­house) and escalates regressions.
+
+## Module Inputs (dynamic)
+- MODULE: free‑text module name (e.g., "OMS‑1 Upper Limb", "Physiology — Cardiac").
+- SYSTEM/SECTION: optional taxonomy labels for filtering.
+- BLUEPRINT_PATH: path to the module’s blueprint if available.
+- SCOPE_DIRS: directories in repo to scan (defaults to project root).
+- METRICS_SOURCE: analytics path (default `public/analytics/latest.json`).
+- ACCEPTANCE_GATES: optional overrides; otherwise use gates in this SOP.
+
+### New: PRD Architect (Agent)
+- Owns authoring a comprehensive `PRD.md` for any significant feature or module update.
+- Inputs: blueprint, analytics (`public/analytics/latest.json`), rubric docs, README, PLAN.md, relevant code paths.
+- Delivers: user problem, goals/non‑goals, personas & scenarios, functional + non‑functional requirements, acceptance gates (A11y/Perf/Validator), metrics, rollout & risks.
+- Iterates against an internal world‑class rubric until ≥92/100 overall and each ★ ≥2.9; then outputs the final `PRD.md` (single artifact, no scratch notes).
+- Cites exact repo files/lines for all constraints and budgets (e.g., `scripts/analyze.mjs:42`).
+- Consumes Module Inputs; do not hard‑code module names.
+
+### New: Implementation Strategist (Agent)
+- Owns authoring `IMPLEMENTATION.md` translating PRD into a concrete, testable plan.
+- Delivers: architecture overview, interfaces, data model, file‑by‑file changes, migrations, tests (unit/e2e/perf), observability, security/privacy, a11y/perf work, rollout/backout, timeline & owners, risk register.
+- Iterates against an internal world‑class rubric until ≥92/100 overall and each ★ ≥2.9; then outputs the final `IMPLEMENTATION.md` (single artifact).
+- References acceptance gates and keeps changes deterministic (no runtime LLM calls).
+- Consumes Module Inputs; do not hard‑code module names.
 
 ## Commands & Checks
 
@@ -49,6 +72,18 @@ Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run buil
 - Attach analytics delta or evidence links when relevant; supply proof of blueprint feasibility if exam changes.
 - If using external scaffolds (Claudable), tag PR with `eject-from-claudable` and ensure sandbox code not shipped.
 - Document schema changes in README + change log; bump `schema_version` fields as needed.
+
+## Planning Orchestration
+
+- The StudyinPlanner coordinates the following on any new epic or significant change:
+  1) Provide Module Inputs (MODULE, SYSTEM/SECTION, SCOPE_DIRS, BLUEPRINT_PATH, METRICS_SOURCE).
+  2) Invoke PRD Architect to draft `PRD.md` → self‑score → iterate to exceed rubric gates.
+  3) Invoke Implementation Strategist to draft `IMPLEMENTATION.md` informed by the PRD → self‑score → iterate.
+  4) ProjectManager reviews rubric scores; blocks merge until both artifacts ≥92/100 and ★ ≥2.9 and align with Acceptance Gates.
+  5) Commit artifacts on a feature branch; link in `PLAN.md` milestones. Do not ship without both documents present and validated.
+
+Notes
+- Use Context7 MCP for up‑to‑date library documentation when drafting code‑adjacent sections; cite sources. If Context7 cannot supply material, explicitly note gaps and rely on in‑repo evidence.
 
 ## Rubric Snapshot (critical metrics)
 
