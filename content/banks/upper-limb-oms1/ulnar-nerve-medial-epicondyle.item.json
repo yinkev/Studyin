@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.ulnar.medial-epicondyle",
+  "stem": "A 12-year-old falls from a tree and sustains a fracture of the medial epicondyle. On exam, he has numbness in the little finger and difficulty flexing the distal interphalangeal joint of digit 5. Which muscle is weak due to the nerve injury?",
+  "choices": {
+    "A": "Flexor digitorum profundus medial half",
+    "B": "Flexor digitorum superficialis",
+    "C": "Extensor digitorum",
+    "D": "Abductor pollicis brevis",
+    "E": "Pronator quadratus"
+  },
+  "key": "A",
+  "rationale_correct": "Medial epicondyle fractures can injure the ulnar nerve proximal to the wrist, weakening the medial half of flexor digitorum profundus responsible for DIP flexion of digit 5.",
+  "rationale_distractors": {
+    "B": "Flexor digitorum superficialis is median innervated and flexes PIP joints, not the DIP.",
+    "C": "Extensor digitorum is radial innervated and extends the digits rather than flexing them.",
+    "D": "Abductor pollicis brevis is median innervated and relates to thumb abduction.",
+    "E": "Pronator quadratus is innervated by the anterior interosseous nerve (median)." 
+  },
+  "los": ["lo.ulnar-nerve"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "pediatric-elbow-injuries.pdf",
+    "page": 19,
+    "figure": "Fig 3-1",
+    "bbox": [110, 210, 340, 490],
+    "citation": "Pediatric Elbow Injuries, 2024"
+  },
+  "tags": ["pediatrics", "trauma"],
+  "status": "draft",
+  "rubric_score": 2.4,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

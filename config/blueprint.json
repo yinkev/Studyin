@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "id": "oms1-upper-limb",
+  "weights": {
+    "lo.ulnar-nerve": 0.28,
+    "lo.radial-nerve": 0.24,
+    "lo.median-nerve": 0.24,
+    "lo.shoulder-pathology": 0.14,
+    "lo.vascular": 0.10
+  }
+}
+

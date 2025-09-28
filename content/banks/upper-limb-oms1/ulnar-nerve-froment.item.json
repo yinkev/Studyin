@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.ulnar.froment-sign",
+  "stem": "During follow-up for chronic cubital tunnel syndrome, a patient is asked to grasp a sheet of paper between the thumb and index finger. The thumb flexes at the interphalangeal joint to maintain grip. Which muscle weakness best explains this finding?",
+  "choices": {
+    "A": "Adductor pollicis",
+    "B": "Flexor pollicis longus",
+    "C": "Abductor pollicis brevis",
+    "D": "Extensor pollicis longus",
+    "E": "Opponens pollicis"
+  },
+  "key": "A",
+  "rationale_correct": "Froment sign indicates weakness of the ulnar-innervated adductor pollicis, forcing compensatory flexion by the median-innervated flexor pollicis longus.",
+  "rationale_distractors": {
+    "B": "Flexor pollicis longus flexes the thumb IP joint and is median innervated; it overacts rather than weakens.",
+    "C": "Abductor pollicis brevis is median innervated and affects thumb abduction, not adduction grip strength.",
+    "D": "Extensor pollicis longus extends the thumb; dysfunction would prevent extension, not cause Froment sign.",
+    "E": "Opponens pollicis controls thumb opposition and is median innervated." 
+  },
+  "los": ["lo.ulnar-nerve"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "ulnar-nerve-entrapment.pdf",
+    "page": 18,
+    "figure": "Fig 5-3",
+    "bbox": [100, 200, 340, 510],
+    "citation": "Hand Clinics Review, 2021"
+  },
+  "tags": ["neurology", "physical-exam"],
+  "status": "draft",
+  "rubric_score": 2.4,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

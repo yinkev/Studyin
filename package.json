@@ -1,0 +1,22 @@
+{
+  "name": "oms1-upper-limb-arcade",
+  "version": "0.1.0",
+  "description": "Evidence-first, deterministic study arcade scaffold for OMS-1 upper limb",
+  "type": "module",
+  "scripts": {
+    "validate:items": "node scripts/validate-items.mjs",
+    "analyze": "node scripts/analyze.mjs",
+    "dev": "echo \"Dev server pending Next.js scaffold\"",
+    "test": "vitest",
+    "score:rubric": "node scripts/score-rubric.mjs"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=20.14.0 <21"
+  }
+}

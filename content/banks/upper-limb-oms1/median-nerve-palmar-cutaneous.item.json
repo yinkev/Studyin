@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.median.palmar-cutaneous",
+  "stem": "A patient with advanced carpal tunnel syndrome has numbness in digits 1–3 but intact sensation over the thenar eminence. Which branch explains the preserved skin sensation?",
+  "choices": {
+    "A": "Palmar cutaneous branch of the median nerve",
+    "B": "Superficial branch of the radial nerve",
+    "C": "Palmar branch of the ulnar nerve",
+    "D": "Lateral antebrachial cutaneous nerve",
+    "E": "Medial antebrachial cutaneous nerve"
+  },
+  "key": "A",
+  "rationale_correct": "The palmar cutaneous branch of the median nerve arises proximal to the carpal tunnel and remains outside it, preserving sensation over the thenar eminence despite tunnel compression.",
+  "rationale_distractors": {
+    "B": "The superficial radial branch supplies the dorsolateral thumb.",
+    "C": "The palmar ulnar branch innervates the hypothenar skin.",
+    "D": "The lateral antebrachial cutaneous nerve supplies the lateral forearm.",
+    "E": "The medial antebrachial cutaneous nerve supplies medial forearm skin." 
+  },
+  "los": ["lo.median-nerve"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "median-nerve-entrapment.pdf",
+    "page": 6,
+    "figure": "Fig 1-2",
+    "bbox": [120, 210, 350, 480],
+    "citation": "Hand Clinics Review, 2022"
+  },
+  "tags": ["neurology", "anatomy"],
+  "status": "draft",
+  "rubric_score": 2.3,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

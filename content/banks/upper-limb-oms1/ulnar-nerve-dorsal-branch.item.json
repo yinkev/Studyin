@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.ulnar.dorsal-branch",
+  "stem": "A patient with laceration 5 cm proximal to the wrist on the ulnar side has numbness over the dorsum of the ring and little fingers but intact hypothenar strength. Which nerve branch was transected?",
+  "choices": {
+    "A": "Dorsal cutaneous branch of the ulnar nerve",
+    "B": "Deep motor branch of the ulnar nerve",
+    "C": "Palmar cutaneous branch of the median nerve",
+    "D": "Posterior interosseous nerve",
+    "E": "Lateral antebrachial cutaneous nerve"
+  },
+  "key": "A",
+  "rationale_correct": "A proximal ulnar laceration spared the motor branch but transected the dorsal cutaneous branch, causing dorsal ring and little finger numbness with preserved hypothenar function.",
+  "rationale_distractors": {
+    "B": "Deep motor branch injury would weaken hypothenar muscles.",
+    "C": "Median palmar cutaneous branch supplies the central palm, not dorsal digits.",
+    "D": "Posterior interosseous nerve involves dorsal forearm motor function.",
+    "E": "Lateral antebrachial cutaneous nerve supplies lateral forearm sensation." 
+  },
+  "los": ["lo.ulnar-nerve"],
+  "difficulty": "medium",
+  "bloom": "analyze",
+  "evidence": {
+    "file": "hand-trauma-manual.pdf",
+    "page": 28,
+    "figure": "Fig 5-2",
+    "bbox": [120, 210, 360, 500],
+    "citation": "Hand Trauma Manual, 2023"
+  },
+  "tags": ["neurology", "trauma"],
+  "status": "draft",
+  "rubric_score": 2.3,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.radial.monteggia-palsy",
+  "stem": "Following a Monteggia fracture-dislocation, a patient cannot extend the metacarpophalangeal joints but can extend the wrist. Sensation over the dorsum of the hand is preserved. Which branch is injured?",
+  "choices": {
+    "A": "Posterior interosseous nerve",
+    "B": "Radial nerve in the spiral groove",
+    "C": "Superficial branch of the radial nerve",
+    "D": "Deep branch at the supinator exit",
+    "E": "Anterior interosseous nerve"
+  },
+  "key": "A",
+  "rationale_correct": "Monteggia injuries often damage the posterior interosseous nerve, leading to finger drop while sparing wrist extension and cutaneous sensation.",
+  "rationale_distractors": {
+    "B": "Spiral groove lesions cause wrist drop and sensory loss in the first web space.",
+    "C": "Superficial branch lesions produce sensory symptoms only.",
+    "D": "Deep branch injury distal to the supinator is equivalent to posterior interosseous nerve involvement; the key deficit is finger extension loss without wrist drop.",
+    "E": "Anterior interosseous nerve is a median branch causing flexion deficits." 
+  },
+  "los": ["lo.radial-nerve"],
+  "difficulty": "medium",
+  "bloom": "analyze",
+  "evidence": {
+    "file": "forearm-fracture-complications.pdf",
+    "page": 21,
+    "figure": "Fig 4-3",
+    "bbox": [120, 210, 360, 510],
+    "citation": "Forearm Fracture Complications, 2023"
+  },
+  "tags": ["trauma", "neurology"],
+  "status": "draft",
+  "rubric_score": 2.4,
+  "author_ids": ["author.ortho"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

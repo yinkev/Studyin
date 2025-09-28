@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "categories": [
+    {
+      "id": "err.ulnar-vs-median",
+      "label": "Ulnar vs median confusion",
+      "description": "Learner conflates claw hand (ulnar) with ape hand (median).",
+      "related_choices": ["ulnar", "median"]
+    },
+    {
+      "id": "err.radial-high-vs-low",
+      "label": "High vs low radial lesion",
+      "description": "Difficulty distinguishing spiral groove vs posterior interosseous injuries.",
+      "related_choices": ["radial-high", "radial-low"]
+    },
+    {
+      "id": "err.vascular-vs-neuro",
+      "label": "Vascular vs neuro compromise",
+      "description": "Confuses ischemic signs with nerve palsy presentations."
+    }
+  ]
+}
+

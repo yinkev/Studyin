@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.shoulder.anterior-dislocation",
+  "stem": "A 36-year-old patient presents after a fall with an abducted, externally rotated shoulder. After reduction, which finding would signal injury to the axillary nerve?",
+  "choices": {
+    "A": "Weakness of wrist extension",
+    "B": "Loss of sensation over the lateral shoulder",
+    "C": "Absent radial pulse with elbow flexed",
+    "D": "Inability to pronate the forearm",
+    "E": "Loss of finger flexion in digits 2 and 3"
+  },
+  "key": "B",
+  "rationale_correct": "The axillary nerve innervates the deltoid and provides sensation over the regimental badge area; numbness there indicates axillary nerve injury from anterior dislocation.",
+  "rationale_distractors": {
+    "A": "Wrist extension is radial nerve dependent and reflects spiral groove or posterior interosseous lesions.",
+    "C": "Radial pulse changes suggest vascular compromise rather than axillary nerve damage.",
+    "D": "Pronation relies on median nerve innervation of pronator teres/quadratus.",
+    "E": "Loss of finger flexion in digits 2 and 3 suggests median nerve compromise."
+  },
+  "los": ["lo.shoulder-pathology", "lo.vascular"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "shoulder-emergency-management.pdf",
+    "page": 14,
+    "bbox": [80, 150, 310, 420],
+    "citation": "Emergency Orthopedics Review, 2023"
+  },
+  "tags": ["trauma", "msk"],
+  "status": "review",
+  "rubric_score": 2.9,
+  "author_ids": ["author.ortho"],
+  "reviewer_ids": ["reviewer.msk"]
+}
+

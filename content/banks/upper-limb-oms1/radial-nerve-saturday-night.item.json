@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.radial.saturday-night",
+  "stem": "A partygoer awakens after sleeping with his arm over the back of a chair. He has wrist drop, decreased sensation over the dorsal first web space, but preserved strength in elbow extension. Where is the lesion most likely located?",
+  "choices": {
+    "A": "Radial nerve in the spiral groove",
+    "B": "Posterior cord of the brachial plexus",
+    "C": "Radial nerve in the axilla",
+    "D": "Posterior interosseous branch",
+    "E": "Deep branch within the supinator"
+  },
+  "key": "A",
+  "rationale_correct": "Compression in the spiral groove causes wrist drop and dorsal hand numbness while sparing triceps function because branches to the long head leave proximally.",
+  "rationale_distractors": {
+    "B": "Posterior cord injury would cause more global deficits, including axillary nerve involvement.",
+    "C": "Axillary compression affects triceps function leading to weak elbow extension.",
+    "D": "Posterior interosseous lesions are motor only and spare sensation.",
+    "E": "Deep branch entrapment within supinator yields posterior interosseous syndrome without sensory loss." 
+  },
+  "los": ["lo.radial-nerve"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "upper-limb-nerve-lesions.pdf",
+    "page": 24,
+    "figure": "Fig 3-3",
+    "bbox": [100, 200, 350, 500],
+    "citation": "Moore KL, Clinically Oriented Anatomy, 8e"
+  },
+  "tags": ["neurology", "compression"],
+  "status": "draft",
+  "rubric_score": 2.3,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

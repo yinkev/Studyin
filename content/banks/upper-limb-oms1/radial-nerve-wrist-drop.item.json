@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.radial.wrist-drop",
+  "stem": "A 45-year-old construction worker presents with wrist drop after falling asleep with his arm draped over a park bench. Which additional deficit best localizes the lesion to the radial nerve within the spiral groove?",
+  "choices": {
+    "A": "Weakness of elbow flexion with biceps wasting",
+    "B": "Loss of finger abduction in digits 4 and 5",
+    "C": "Sensory loss over the dorsal first web space",
+    "D": "Inability to pronate the forearm",
+    "E": "Thenar eminence atrophy with loss of thumb opposition"
+  },
+  "key": "C",
+  "rationale_correct": "Compression of the radial nerve in the spiral groove produces wrist drop with accompanying sensory loss in the dorsal first web space supplied by the superficial radial branch.",
+  "rationale_distractors": {
+    "A": "Biceps weakness suggests musculocutaneous nerve involvement from a more proximal brachial plexus lesion.",
+    "B": "Finger abduction relies on ulnar-innervated interossei, not the radial nerve.",
+    "D": "Pronation depends on the median nerve via pronator teres and pronator quadratus.",
+    "E": "Thenar atrophy and thumb opposition loss indicate median nerve injury at the carpal tunnel." 
+  },
+  "los": ["lo.radial-nerve"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "upper-limb-nerve-lesions.pdf",
+    "page": 28,
+    "figure": "Fig 3-7",
+    "bbox": [90, 210, 330, 500],
+    "citation": "Moore KL, Clinically Oriented Anatomy, 8e"
+  },
+  "tags": ["neurology", "clinical"],
+  "status": "draft",
+  "rubric_score": 2.5,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

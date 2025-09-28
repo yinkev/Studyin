@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.radial.high-lesion",
+  "stem": "A patient sustains a midshaft humeral fracture requiring immobilization. Two weeks later, he develops wrist drop, loss of finger extension, and diminished elbow extension strength. Sensation is reduced over the posterior arm and forearm. Where is the most likely site of radial nerve injury?",
+  "choices": {
+    "A": "Axilla at the triangular interval",
+    "B": "Supinator canal (posterior interosseous nerve)",
+    "C": "Radial tunnel proximal to supinator",
+    "D": "Superficial radial nerve in the snuffbox",
+    "E": "Spiral groove of the humerus"
+  },
+  "key": "A",
+  "rationale_correct": "Combined triceps weakness with sensory loss over posterior arm/forearm indicates a high radial nerve injury in the axilla/triangular interval, proximal to branches to the triceps and cutaneous nerves.",
+  "rationale_distractors": {
+    "B": "Posterior interosseous lesions cause motor deficits distal to the elbow without sensory loss or triceps weakness.",
+    "C": "Radial tunnel syndrome spares triceps and cutaneous branches, causing pain more than sensory loss.",
+    "D": "Superficial radial lesions produce isolated dorsal hand sensory changes without motor deficits.",
+    "E": "Spiral groove injuries typically spare triceps strength because branches to the long head depart proximally." 
+  },
+  "los": ["lo.radial-nerve"],
+  "difficulty": "hard",
+  "bloom": "analyze",
+  "evidence": {
+    "file": "upper-limb-nerve-lesions.pdf",
+    "page": 26,
+    "figure": "Fig 3-5",
+    "bbox": [95, 230, 350, 520],
+    "citation": "Moore KL, Clinically Oriented Anatomy, 8e"
+  },
+  "tags": ["neurology", "trauma"],
+  "status": "draft",
+  "rubric_score": 2.6,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.ulnar.claw-hand",
+  "stem": "A 28-year-old medical student develops weakness of finger abduction after suffering a laceration at the wrist. Which finding best confirms an ulnar nerve injury at Guyon's canal?",
+  "choices": {
+    "A": "Loss of thumb opposition with thenar wasting",
+    "B": "Inability to flex the distal interphalangeal joint of the index finger",
+    "C": "Loss of cutaneous sensation over the lateral dorsum of the hand",
+    "D": "Hyperextension at the metacarpophalangeal joints of digits 4 and 5 with flexion at the interphalangeal joints",
+    "E": "Weakness in forearm supination"
+  },
+  "key": "D",
+  "rationale_correct": "Clawing of digits 4 and 5 (MCP hyperextension with IP flexion) reflects lumbrical and interosseous weakness specific to distal ulnar nerve lesions at the wrist.",
+  "rationale_distractors": {
+    "A": "Thumb opposition loss points to a median nerve lesion affecting the recurrent branch.",
+    "B": "Flexion at the DIP of the index finger depends on the anterior interosseous branch of the median nerve.",
+    "C": "Lateral dorsal hand sensation is supplied by the superficial branch of the radial nerve.",
+    "E": "Supination is maintained by the radial nerve (supinator, biceps)."
+  },
+  "los": ["lo.ulnar-nerve"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "upper-limb-nerve-lesions.pdf",
+    "page": 32,
+    "figure": "Fig 4-2",
+    "bbox": [120, 220, 340, 510],
+    "citation": "Moore KL, Clinically Oriented Anatomy, 8e"
+  },
+  "tags": ["neurology", "clinical"],
+  "status": "review",
+  "rubric_score": 2.8,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}

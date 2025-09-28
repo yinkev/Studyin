@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.median.lumbrical-sign",
+  "stem": "When a patient grips a pen, the index finger remains extended at the interphalangeal joints while the middle finger flexes normally. Tinel sign at the wrist is positive. Which muscle is weak due to this neuropathy?",
+  "choices": {
+    "A": "First lumbrical",
+    "B": "Fourth lumbrical",
+    "C": "Interossei of digits 2 and 3",
+    "D": "Flexor digitorum profundus to digit 4",
+    "E": "Extensor indicis"
+  },
+  "key": "A",
+  "rationale_correct": "Carpal tunnel syndrome impairs the median-innervated first lumbrical, reducing flexion of the index finger at the MCP with IP extension control during pinch.",
+  "rationale_distractors": {
+    "B": "The fourth lumbrical is ulnar innervated and controls the ring finger.",
+    "C": "Interossei are ulnar innervated and primarily abduct/adduct digits.",
+    "D": "FDP to digit 4 is ulnar innervated distal to the wrist.",
+    "E": "Extensor indicis is radial innervated and would cause extension weakness, not flexion collapse." 
+  },
+  "los": ["lo.median-nerve"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "median-nerve-entrapment.pdf",
+    "page": 14,
+    "figure": "Fig 2-4",
+    "bbox": [130, 200, 360, 500],
+    "citation": "Hand Clinics Review, 2022"
+  },
+  "tags": ["neurology", "physical-exam"],
+  "status": "draft",
+  "rubric_score": 2.4,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.shoulder.rotator-cuff-night-pain",
+  "stem": "A 60-year-old painter reports progressive night pain and weakness with shoulder abduction. On exam, passive range is full, but active abduction beyond 90° is painful and weak. Drop-arm test is positive. Which tendon is most likely torn?",
+  "choices": {
+    "A": "Supraspinatus",
+    "B": "Infraspinatus",
+    "C": "Subscapularis",
+    "D": "Teres minor",
+    "E": "Long head of biceps"
+  },
+  "key": "A",
+  "rationale_correct": "A full-thickness supraspinatus tear causes painful arc, night pain, and drop-arm sign due to loss of initial abduction strength.",
+  "rationale_distractors": {
+    "B": "Infraspinatus tears mainly impair external rotation rather than abduction.",
+    "C": "Subscapularis injury affects internal rotation strength.",
+    "D": "Teres minor assists external rotation, not the drop-arm mechanism.",
+    "E": "Long head biceps tendinopathy causes anterior shoulder pain but preserves drop-arm testing." 
+  },
+  "los": ["lo.shoulder-pathology"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "shoulder-imaging-guide.pdf",
+    "page": 18,
+    "figure": "Fig 4-2",
+    "bbox": [110, 210, 350, 500],
+    "citation": "Orthopedic Clinic Review, 2023"
+  },
+  "tags": ["orthopedics", "msk"],
+  "status": "draft",
+  "rubric_score": 2.4,
+  "author_ids": ["author.ortho"],
+  "reviewer_ids": ["reviewer.msk"]
+}
+

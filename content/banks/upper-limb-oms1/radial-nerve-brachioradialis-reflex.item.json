@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.radial.brachioradialis-reflex",
+  "stem": "Following an intramuscular injection in the lateral upper arm, a patient has diminished brachioradialis reflex and weakness in wrist extension but intact triceps strength. Which nerve fibers were likely injured?",
+  "choices": {
+    "A": "Radial nerve fibers innervating the posterior compartment of the forearm",
+    "B": "Posterior cord fibers to the axillary nerve",
+    "C": "Musculocutaneous nerve fibers to the lateral forearm",
+    "D": "Median nerve fibers to pronator teres",
+    "E": "Ulnar nerve fibers to flexor carpi ulnaris"
+  },
+  "key": "A",
+  "rationale_correct": "Injury distal to the triceps branches compromises radial nerve fibers supplying brachioradialis and wrist extensors while sparing triceps, indicating radial involvement in the lateral arm.",
+  "rationale_distractors": {
+    "B": "Axillary nerve injury would weaken deltoid and teres minor rather than wrist extensors.",
+    "C": "Musculocutaneous nerve lesions affect elbow flexion (biceps) and lateral forearm sensation, not wrist extension.",
+    "D": "Median nerve injury impairs pronation and thenar function.",
+    "E": "Ulnar nerve lesions cause ulnar-sided flexion weakness and intrinsic hand deficits." 
+  },
+  "los": ["lo.radial-nerve"],
+  "difficulty": "medium",
+  "bloom": "analyze",
+  "evidence": {
+    "file": "nerve-injection-injuries.pdf",
+    "page": 7,
+    "figure": "Fig 1-2",
+    "bbox": [115, 220, 360, 500],
+    "citation": "Peripheral Nerve Injection Injuries, 2022"
+  },
+  "tags": ["neurology", "iatrogenic"],
+  "status": "draft",
+  "rubric_score": 2.4,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

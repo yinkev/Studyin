@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.median.anterior-interosseous",
+  "stem": "A patient cannot make an OK sign due to inability to flex the distal phalanx of the index finger and interphalangeal joint of the thumb. Sensation is intact. Which nerve branch is affected?",
+  "choices": {
+    "A": "Anterior interosseous nerve",
+    "B": "Recurrent motor branch of the median nerve",
+    "C": "Posterior interosseous nerve",
+    "D": "Deep ulnar branch",
+    "E": "Superficial radial nerve"
+  },
+  "key": "A",
+  "rationale_correct": "Anterior interosseous syndrome causes motor deficits in flexor pollicis longus and the radial half of flexor digitorum profundus, impairing the OK sign without sensory loss.",
+  "rationale_distractors": {
+    "B": "The recurrent branch innervates thenar muscles, affecting thumb opposition but not the OK sign.",
+    "C": "Posterior interosseous nerve lesions cause finger extension weakness, not flexion deficit.",
+    "D": "Deep ulnar branch lesions affect interossei and adductor pollicis, not FPL/FDP.",
+    "E": "Superficial radial nerve lesions produce sensory changes only." 
+  },
+  "los": ["lo.median-nerve"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "median-nerve-entrapment.pdf",
+    "page": 16,
+    "figure": "Fig 3-2",
+    "bbox": [130, 200, 360, 480],
+    "citation": "Hand Clinics Review, 2022"
+  },
+  "tags": ["neurology", "motor"],
+  "status": "draft",
+  "rubric_score": 2.5,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

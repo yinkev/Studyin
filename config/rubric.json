@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0.0",
+  "overall_threshold": 92,
+  "critical_threshold": 2.8,
+  "categories": [
+    {
+      "id": "evidence-integration",
+      "label": "Evidence fidelity",
+      "critical": true,
+      "weight": 10,
+      "levels": {
+        "0": "No provenance for items.",
+        "1": "Some page references present.",
+        "2": "All items cite file and page.",
+        "3": "Figure + crop + bbox + one-click source + latency budget met."
+      }
+    },
+    {
+      "id": "item-quality",
+      "label": "Item quality (ABCDE)",
+      "critical": true,
+      "weight": 10,
+      "levels": {
+        "0": "Structure missing or inconsistent.",
+        "1": "Structured but uneven rationales.",
+        "2": "Per-choice rationales; review cadence.",
+        "3": "Rubric ≥2.7; NFD <5%; periodic refresh."
+      }
+    },
+    {
+      "id": "assessment-validity",
+      "label": "Assessment validity",
+      "critical": true,
+      "weight": 8,
+      "levels": {
+        "0": "Ad-hoc item sets.",
+        "1": "Topic coverage only.",
+        "2": "Blueprint enforced with feasibility.",
+        "3": "Parallel forms, psychometrics inform sets."
+      }
+    },
+    {
+      "id": "learning-science",
+      "label": "Learning science",
+      "critical": true,
+      "weight": 8,
+      "levels": {
+        "0": "No learning model.",
+        "1": "Simple spaced repetition only.",
+        "2": "Spacing + interleaving per LO.",
+        "3": "Personal spacing + ELG/min + fatigue detection."
+      }
+    },
+    {
+      "id": "adaptivity-transparency",
+      "label": "Adaptivity transparency",
+      "critical": true,
+      "weight": 6,
+      "levels": {
+        "0": "Opaque sequencing.",
+        "1": "Generic hints only.",
+        "2": "Text explaining next item.",
+        "3": "Reasoned pill with mastery delta & time."
+      }
+    },
+    {
+      "id": "analytics-actionability",
+      "label": "Analytics actionability",
+      "critical": true,
+      "weight": 8,
+      "levels": {
+        "0": "Vanity metrics.",
+        "1": "Basic trends.",
+        "2": "TTM/ELG/min/confusion/speed present.",
+        "3": "Analytics drive UI actions & drills."
+      }
+    },
+    {
+      "id": "accessibility",
+      "label": "Accessibility (WCAG 2.2 AA)",
+      "critical": true,
+      "weight": 6,
+      "levels": {
+        "0": "Not considered.",
+        "1": "Partial coverage.",
+        "2": "Keyboard + contrast checks.",
+        "3": "Automated audits, no regressions."
+      }
+    },
+    {
+      "id": "performance",
+      "label": "Performance",
+      "critical": true,
+      "weight": 6,
+      "levels": {
+        "0": "Slow/undefined budgets.",
+        "1": "Acceptable but untracked.",
+        "2": "Budgets met (TTI <2s, etc.).",
+        "3": "Budgets instrumented with alerting."
+      }
+    },
+    {
+      "id": "governance",
+      "label": "Governance & integrity",
+      "critical": true,
+      "weight": 8,
+      "levels": {
+        "0": "No gates.",
+        "1": "Manual review only.",
+        "2": "Publish gates + audit trail.",
+        "3": "Versioning, disputes, immutable logs."
+      }
+    },
+    {
+      "id": "authoring-velocity",
+      "label": "Authoring velocity",
+      "critical": false,
+      "weight": 6,
+      "levels": {
+        "0": "Manual, slow authoring.",
+        "1": "Some templates.",
+        "2": "CLI validator + SOPs.",
+        "3": "Codex interactive, <10 min per item."
+      }
+    },
+    {
+      "id": "cohort-tooling",
+      "label": "Cohort / instructor tooling",
+      "critical": false,
+      "weight": 6,
+      "levels": {
+        "0": "None.",
+        "1": "Basic exports.",
+        "2": "Coverage, item health views.",
+        "3": "Cohort mastery + drift alerts."
+      }
+    },
+    {
+      "id": "observability",
+      "label": "Observability & ops",
+      "critical": false,
+      "weight": 4,
+      "levels": {
+        "0": "None.",
+        "1": "Console logs only.",
+        "2": "Basic monitoring/log export.",
+        "3": "SLOs, error budgets, automation."
+      }
+    },
+    {
+      "id": "security-privacy",
+      "label": "Security & privacy",
+      "critical": false,
+      "weight": 4,
+      "levels": {
+        "0": "Not addressed.",
+        "1": "Basic hygiene.",
+        "2": "Pseudonymous local data.",
+        "3": "Cloud-ready (RLS, backups, audits)."
+      }
+    },
+    {
+      "id": "portability",
+      "label": "Portability",
+      "critical": false,
+      "weight": 4,
+      "levels": {
+        "0": "Locked content.",
+        "1": "Basic exports.",
+        "2": "JSON/Parquet exports.",
+        "3": "Round-trip content with schema contracts."
+      }
+    },
+    {
+      "id": "dx-release",
+      "label": "DX & release",
+      "critical": false,
+      "weight": 6,
+      "levels": {
+        "0": "Ad-hoc releases.",
+        "1": "Manual scripts.",
+        "2": "PR previews + CI checks.",
+        "3": "One-push deploy, conventional commits, changelog."
+      }
+    }
+  ]
+}
+

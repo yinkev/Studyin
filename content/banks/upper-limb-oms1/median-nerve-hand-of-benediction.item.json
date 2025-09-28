@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.median.hand-of-benediction",
+  "stem": "When asked to make a fist, a patient cannot flex the index and middle fingers after a supracondylar humerus fracture. Thumb flexion is also weak. Which structure was injured?",
+  "choices": {
+    "A": "Median nerve proximal to the elbow",
+    "B": "Anterior interosseous nerve",
+    "C": "Ulnar nerve at the wrist",
+    "D": "Radial nerve in the spiral groove",
+    "E": "Musculocutaneous nerve in the upper arm"
+  },
+  "key": "A",
+  "rationale_correct": "A median nerve injury proximal to the elbow produces the hand of benediction with weakness in flexor digitorum superficialis and lateral flexor digitorum profundus, limiting flexion of the index and middle fingers and thumb.",
+  "rationale_distractors": {
+    "B": "Anterior interosseous lesions spare the superficial flexors, allowing MCP flexion.",
+    "C": "Ulnar nerve injuries affect digits 4 and 5, not index and middle finger flexion.",
+    "D": "Radial nerve injury causes wrist drop, not finger flexion deficits.",
+    "E": "Musculocutaneous nerve lesions impair elbow flexion and forearm sensation, not finger flexion." 
+  },
+  "los": ["lo.median-nerve"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "elbow-trauma-neuropathy.pdf",
+    "page": 17,
+    "figure": "Fig 3-3",
+    "bbox": [120, 220, 360, 520],
+    "citation": "Elbow Trauma Neuropathy, 2023"
+  },
+  "tags": ["trauma", "neurology"],
+  "status": "draft",
+  "rubric_score": 2.5,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+

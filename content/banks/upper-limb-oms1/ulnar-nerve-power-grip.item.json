@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "item.ulnar.power-grip",
+  "stem": "A rock climber notices reduced grip strength when using a power grip (metacarpophalangeal flexion with interphalangeal extension). Examination shows weakness of interossei and lumbricals to digits 4 and 5, while wrist flexion with ulnar deviation is preserved. Which nerve branch is responsible for the weak power grip?",
+  "choices": {
+    "A": "Deep branch of the ulnar nerve",
+    "B": "Anterior interosseous nerve",
+    "C": "Recurrent branch of the median nerve",
+    "D": "Posterior interosseous nerve",
+    "E": "Superficial branch of the ulnar nerve"
+  },
+  "key": "A",
+  "rationale_correct": "Power grip depends on the intrinsic hand muscles (interossei, lumbricals) supplied by the deep branch of the ulnar nerve; weakness indicates its dysfunction.",
+  "rationale_distractors": {
+    "B": "The anterior interosseous nerve controls deep flexors of digits 1–3, not interossei.",
+    "C": "The recurrent median branch innervates thenar muscles for thumb opposition.",
+    "D": "Posterior interosseous nerve controls finger extensors, not intrinsic flexion.",
+    "E": "The superficial ulnar branch is sensory, not motor." 
+  },
+  "los": ["lo.ulnar-nerve"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "hand-function-review.pdf",
+    "page": 13,
+    "figure": "Fig 1-6",
+    "bbox": [115, 200, 340, 480],
+    "citation": "Hand Function Review, 2022"
+  },
+  "tags": ["neurology", "function"],
+  "status": "draft",
+  "rubric_score": 2.3,
+  "author_ids": ["author.primary"],
+  "reviewer_ids": ["reviewer.neuro"]
+}
+
