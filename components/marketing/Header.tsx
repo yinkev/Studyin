@@ -8,6 +8,7 @@ const links = [
   { href: '/study', label: 'Study' },
   { href: '/exam', label: 'Exam' },
   { href: '/drills', label: 'Drills' },
+  { href: '/summary', label: 'Summary' },
   { href: '/docs', label: 'Docs' }
 ];
 
@@ -34,4 +35,3 @@ export function Header() {
     </header>
   );
 }
-
