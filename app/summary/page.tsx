@@ -2,7 +2,9 @@ import { loadAnalyticsSummary } from '../../lib/getAnalytics';
 import { TTMBarChart } from '../../components/charts/TTMBarChart';
 import { SpeedAccuracyChart } from '../../components/charts/SpeedAccuracyChart';
 import { ConfusionBar } from '../../components/charts/ConfusionBar';
+import { ConfusionForce } from '../../components/charts/ConfusionForce';
 import { BlueprintDriftChart } from '../../components/charts/BlueprintDriftChart';
+import { TTMBarCanvas } from '../../components/canvas/TTMBarCanvas';
 
 export default async function SummaryPage() {
   const analytics = await loadAnalyticsSummary();
@@ -13,7 +15,9 @@ export default async function SummaryPage() {
         <TTMBarChart analytics={analytics} />
         <SpeedAccuracyChart analytics={analytics} />
         <ConfusionBar analytics={analytics} />
+        <ConfusionForce analytics={analytics} />
         <BlueprintDriftChart analytics={analytics} />
+        <TTMBarCanvas analytics={analytics} />
       </div>
     </section>
   );
