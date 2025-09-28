@@ -19,7 +19,7 @@ Requirements: Node 20.14.x LTS (set via `.nvmrc` soon). Install Git LFS for evid
 ## Repository Layout
 
 ```
-app/public/analytics/      # Generated analytics JSON (latest.json)
+public/analytics/          # Generated analytics JSON (latest.json)
 config/                    # Blueprint, LO hierarchy, error taxonomy
 content/banks/upper-limb-oms1/  # One JSON per item (A–E only)
 content/evidence/          # PDFs/crops (tracked via Git LFS)

@@ -20,7 +20,7 @@
 ```bash
 npm install          # Install deps (zod, vitest)
 npm run validate:items  # Validate all items (blocking gate)
-npm run analyze         # Generate app/public/analytics/latest.json
+npm run analyze         # Generate public/analytics/latest.json
 npm test                # Run Vitest engine smoke tests
 ```
 

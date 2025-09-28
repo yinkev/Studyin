@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const RUBRIC_PATH = path.join(ROOT, 'config', 'rubric.json');
 const INPUT_PATH = path.join(ROOT, 'data', 'rubric-input.json');
-const OUTPUT_PATH = path.join(ROOT, 'app', 'public', 'analytics', 'rubric-score.json');
+const OUTPUT_PATH = path.join(ROOT, 'public', 'analytics', 'rubric-score.json');
 
 async function readJson(filePath) {
   const data = await fs.readFile(filePath, 'utf8');
@@ -109,4 +109,3 @@ async function main() {
 }
 
 await main();
-

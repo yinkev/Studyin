@@ -8,7 +8,7 @@ import { parseNdjsonLine, attemptEventSchema } from './lib/schema.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DATA_PATH = path.join(ROOT, 'data', 'events.ndjson');
-const OUTPUT_PATH = path.join(ROOT, 'app', 'public', 'analytics', 'latest.json');
+const OUTPUT_PATH = path.join(ROOT, 'public', 'analytics', 'latest.json');
 const ANALYTICS_SCHEMA_VERSION = '1.0.0';
 const TARGET_MASTERY = 0.82;
 const EXPECTED_GAIN_PER_ATTEMPT = 0.12;
