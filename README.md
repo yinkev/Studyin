@@ -26,6 +26,7 @@ config/                    # Blueprint, LO hierarchy, error taxonomy
 content/banks/upper-limb-oms1/  # One JSON per item (A–E only)
 content/evidence/          # PDFs/crops (tracked via Git LFS)
 data/                      # Local telemetry (events.ndjson)
+lib/                       # Server helpers (item loader, analytics, blueprint fitter)
 scripts/lib/               # Deterministic engines + shared schemas
 scripts/validate-items.mjs # Validator CLI gate (Zod-based)
 scripts/analyze.mjs        # Analytics pipeline → latest.json
@@ -42,6 +43,12 @@ PLAN.md                    # Current milestones, To‑Dos, cadence
 - `scripts/lib/blueprint.mjs` — Feasibility checks and greedy form builder.
 
 Engine behavior is covered by `npm test` smoke tests. Update these modules before wiring into the UI.
+
+## Server Helpers & Exam Builder
+
+- `lib/getItems.ts` — loads Study mode items with evidence metadata and status for reuse across pages.
+- `lib/getAnalytics.ts` — reads the latest analytics summary produced by `npm run analyze`.
+- `lib/getExamForm.ts` — builds blueprint-aligned exam forms, preferring published items and falling back to review/draft pools with coverage warnings when supply is thin.
 
 ## Evidence Tooling
 
@@ -102,7 +109,8 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - LO IDs exist in `config/los.json`
   - published items must have `rubric_score ≥ 2.7`
   - To relax evidence during setup: run with `REQUIRE_EVIDENCE_CROP=0` to allow citation‑only (must include `citation` or `source_url`)
-- `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `public/analytics/latest.json`.
+- `npm run analyze` reads `data/events.ndjson` (seeded with sample telemetry) and writes analytics to `public/analytics/latest.json`.
+- Update or replace the sample `data/events.ndjson` to reflect real learner telemetry before releases.
 - `npm run dev` auto-opens the app in your default browser (set `DEV_URL` to override) — use `npm run dev:start` to run without auto-opening.
 
 ## Next Steps

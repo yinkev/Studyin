@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2025-09-28T10:39:31.794Z",
+  "has_events": true,
+  "totals": {
+    "attempts": 8,
+    "learners": 2
+  },
+  "ttm_per_lo": [
+    {
+      "lo_id": "lo.ulnar-nerve",
+      "attempts": 2,
+      "current_accuracy": 0,
+      "projected_minutes_to_mastery": 9.92,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.radial-nerve",
+      "attempts": 2,
+      "current_accuracy": 0.5,
+      "projected_minutes_to_mastery": 5.25,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.median-nerve",
+      "attempts": 2,
+      "current_accuracy": 0.5,
+      "projected_minutes_to_mastery": 3.25,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.vascular",
+      "attempts": 2,
+      "current_accuracy": 1,
+      "projected_minutes_to_mastery": 0,
+      "overdue": true
+    },
+    {
+      "lo_id": "lo.shoulder-pathology",
+      "attempts": 1,
+      "current_accuracy": 1,
+      "projected_minutes_to_mastery": 0,
+      "overdue": true
+    }
+  ],
+  "elg_per_min": [
+    {
+      "item_id": "item.median.carpal-tunnel",
+      "lo_ids": [
+        "lo.median-nerve"
+      ],
+      "projected_mastery_gain": 0.12,
+      "estimated_minutes": 1.08,
+      "reason": "Mastery deficit"
+    },
+    {
+      "item_id": "item.ulnar.power-grip",
+      "lo_ids": [
+        "lo.ulnar-nerve"
+      ],
+      "projected_mastery_gain": 0.12,
+      "estimated_minutes": 1.33,
+      "reason": "Mastery deficit"
+    },
+    {
+      "item_id": "item.ulnar.hook-hamate-fracture",
+      "lo_ids": [
+        "lo.ulnar-nerve"
+      ],
+      "projected_mastery_gain": 0.12,
+      "estimated_minutes": 1.5,
+      "reason": "Mastery deficit"
+    }
+  ],
+  "confusion_edges": [
+    {
+      "lo_id": "lo.ulnar-nerve",
+      "item_id": "item.ulnar.hook-hamate-fracture",
+      "choice": "B",
+      "count": 1
+    },
+    {
+      "lo_id": "lo.radial-nerve",
+      "item_id": "item.radial.high-lesion",
+      "choice": "E",
+      "count": 1
+    },
+    {
+      "lo_id": "lo.ulnar-nerve",
+      "item_id": "item.ulnar.power-grip",
+      "choice": "E",
+      "count": 1
+    },
+    {
+      "lo_id": "lo.median-nerve",
+      "item_id": "item.median.carpal-tunnel",
+      "choice": "B",
+      "count": 1
+    }
+  ],
+  "speed_accuracy": {
+    "fast_wrong": 0,
+    "slow_wrong": 4,
+    "fast_right": 0,
+    "slow_right": 4
+  },
+  "nfd_summary": []
+}

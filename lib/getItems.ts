@@ -2,6 +2,9 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { AnalyticsSummary } from './getAnalytics';
 
+export type ItemStatus = 'draft' | 'review' | 'published';
+export type BloomLevel = 'remember' | 'understand' | 'apply' | 'analyze' | 'evaluate';
+
 export interface StudyItem {
   id: string;
   stem: string;
@@ -10,7 +13,11 @@ export interface StudyItem {
   rationale_correct: string;
   rationale_distractors: Partial<Record<'A' | 'B' | 'C' | 'D' | 'E', string>>;
   difficulty: 'easy' | 'medium' | 'hard';
+  bloom: BloomLevel;
   los: string[];
+  status: ItemStatus;
+  rubric_score?: number;
+  tags?: string[];
   evidence?: {
     citation?: string;
     cropPath?: string;
@@ -54,7 +61,11 @@ export async function loadStudyItems(): Promise<StudyItem[]> {
       rationale_correct: json.rationale_correct,
       rationale_distractors: json.rationale_distractors ?? {},
       difficulty: json.difficulty,
+      bloom: json.bloom,
       los: json.los,
+      status: json.status,
+      rubric_score: json.rubric_score,
+      tags: json.tags,
       evidence: {
         citation: evidence.citation,
         cropPath: evidence.cropPath,
