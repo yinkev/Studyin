@@ -23,7 +23,29 @@
 
 ## To‑Do
 
-- UI: finish Radix adoption across Study/Exam/Drill views; audit focus traps and keyboard paths after tooltip/dialog refactor.
+### Recommendation
+1. **Ship Radix Study refactor with tight QA cadence.**
+   - Scope: Complete Day 2 tasks from `IMPLEMENTATION.md` for the Study mode — Radix Popover for “Why this next”, Radix Dialog for evidence drawer, parity for keyboard shortcuts, and snapshot updates if component structure changes.
+   - Owners: UIBuilder (implementation), AccessibilityAuditor (paired review).
+   - Definition of done: feature branch demos clean keyboard-only traversal (tab/shift+tab/esc shortcuts preserved) and preserves analytics/tooling hooks.
+2. **Immediately verify a11y and performance gates after merge.**
+   - Commands: `npm run ci:axe`, manual keyboard pass (Study mode), `npm run ci:lh` targeting ≥0.9 accessibility / ≥0.75 performance baseline.
+   - Owners: AccessibilityAuditor (axe + manual), PerformanceTuner (Lighthouse + bundle diff notes).
+   - Definition of done: no axe serious/critical issues; Lighthouse deltas recorded in PLAN.md if any drop >0.03.
+
+### Next Up (Immediate Focus)
+- **Execution checklist for Radix Study refactor:**
+  1. Rebase feature branch on latest main and confirm no conflicting Radix primitives already landed.
+  2. Implement Popover/Dialog swaps with Radix accessible primitives; update keyboard shortcut map if the trigger semantics shift.
+  3. Update unit stories/tests (if present) and capture before/after screenshots for QA archive.
+  4. Pair with AccessibilityAuditor for focused keyboard + screen-reader smoke test before requesting review.
+- **Post-merge QA + monitoring:**
+  1. Run `npm run ci:axe` in CI or locally and attach summary to PR description.
+  2. Execute manual keyboard walkthrough (Study mode: entry, rationale popover, evidence dialog, exit) and note findings.
+  3. Capture Lighthouse report via `npm run ci:lh`; compare against previous baseline and list mitigation steps for any regression.
+
+### Backlog (Keep Warm)
+- UI: finish Radix adoption across Exam/Drill views; audit focus traps and keyboard paths after tooltip/dialog refactor.
 - Evidence: replace placeholder crops with real assets; add `source_url`; flip items to `review`/`published`.
 - Analytics: enrich `data/events.ndjson`, rerun analyze, iterate chart formats & tooltips.
 - Exam polish: add timer + blueprint meter; lock evidence; post‑submit score.
