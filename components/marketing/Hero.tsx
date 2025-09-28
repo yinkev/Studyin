@@ -3,7 +3,7 @@ import Link from 'next/link';
 export function Hero() {
   return (
     <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-8 md:p-12">
-      <div className="relative z-10 max-w-3xl space-y-4">
+      <div className="relative z-10 max-w-3xl space-y-4 animate-fade-up">
         <h1 className="text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
           Learn faster with evidence‑first practice.
         </h1>
@@ -20,4 +20,3 @@ export function Hero() {
     </section>
   );
 }
-
