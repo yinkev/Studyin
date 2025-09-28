@@ -1,16 +1,25 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import type { StudyItem } from '../lib/getItems';
 
 interface ExamViewProps {
-  items: StudyItem[];
+  items: ExamItem[];
   length?: number;
+  blueprintId?: string;
 }
 
 type Choice = 'A' | 'B' | 'C' | 'D' | 'E';
 
-export function ExamView({ items, length = 10 }: ExamViewProps) {
+interface ExamItem {
+  id: string;
+  stem: string;
+  choices: Record<Choice, string>;
+  key: Choice;
+  los: string[];
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+export function ExamView({ items, length = 10, blueprintId }: ExamViewProps) {
   const form = useMemo(() => items.slice(0, Math.min(length, items.length)), [items, length]);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, Choice | undefined>>({});
@@ -44,7 +53,10 @@ export function ExamView({ items, length = 10 }: ExamViewProps) {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Exam Mode</h1>
-          <p className="text-sm text-slate-500">Evidence locked · Feedback on submit</p>
+          <p className="text-sm text-slate-500">
+            Evidence locked · Feedback on submit
+            {blueprintId ? ` · Blueprint ${blueprintId}` : ''}
+          </p>
         </div>
         {!submitted ? (
           <button onClick={() => setSubmitted(true)} className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
@@ -102,4 +114,3 @@ export function ExamView({ items, length = 10 }: ExamViewProps) {
     </div>
   );
 }
-

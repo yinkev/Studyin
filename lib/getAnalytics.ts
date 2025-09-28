@@ -43,6 +43,15 @@ export interface AnalyticsSummary {
     pick_rate: number;
     attempts: number;
   }>;
+  reliability: {
+    kr20: number | null;
+    item_point_biserial: Array<{
+      item_id: string;
+      attempts: number;
+      p_value: number;
+      point_biserial: number | null;
+    }>;
+  };
 }
 
 export async function loadAnalyticsSummary(): Promise<AnalyticsSummary | null> {

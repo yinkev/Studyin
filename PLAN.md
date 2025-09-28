@@ -2,34 +2,41 @@
 
 ## Milestones
 
-1) Core pipeline — DONE
-- Schemas + Zod, validator with blueprint preflight
-- Deterministic engines (Elo-lite, spacing, blueprint fitter)
-- Analyzer + rubric scorer
+1) Telemetry & Snapshots — IN PROGRESS
+- Supabase ingestion (attempts/sessions) + NDJSON fallback — DONE
+- Analytics refresh API + snapshots table + hourly automation
+- `/api/health` with `last_generated_at`
 
-2) UI core — IN PROGRESS
-- Landing, Study, Exam, Drills, Summary (baseline complete; continue polish)
-- Charts (D3 + canvas) with tooltips/gridlines — DONE
-- A11y keyboard paths, evidence panel — DONE / monitor regressions
+2) Advanced Analytics — IN PROGRESS
+- Reliability metrics (point-biserial, KR‑20/α)
+- Drift + velocity tracking (LO mastery, difficulty)
+- Snapshot history explorer (React Flow overlays)
 
-3) Analytics & Drills — IN PROGRESS
-- Refine TTM/ELG/min definitions
-- Confusion graphs, speed×accuracy
-- ELG/min playlists + reasons
+3) Temporal RAG — TODO
+- pgvector `evidence_chunks` table & indexer scripts
+- Deterministic `/api/search` with temporal decay
+- QA harness (recall@k checks)
 
-4) Governance & CI — IN PROGRESS
-- CI: build, validate, unit, analyze, e2e axe, Lighthouse
-- CODEOWNERS, PR template, rubric score surfaced
+4) Analytics Graphs — TODO
+- React Flow confusion graph & blueprint gap explorer
+- Session trace view with keyboard navigation
+- Axe + performance audits
 
-## To‑Do
+5) Governance & CI — IN PROGRESS
+- CI: validate/test/analyze/axe/Lighthouse
+- PLAN/README/AGENTS/IMPLEMENTATION sync — DONE
+- Monitor hourly refresh + alerting backlog
 
-- UI: finish Radix adoption across Study/Exam/Drill views; audit focus traps and keyboard paths after tooltip/dialog refactor.
-- Evidence: replace placeholder crops with real assets; add `source_url`; flip items to `review`/`published`.
-- Analytics: enrich `data/events.ndjson`, rerun analyze, iterate chart formats & tooltips.
-- Exam polish: add timer + blueprint meter; lock evidence; post‑submit score.
-- Summary polish: optional canvas confusion graph; add chart tooltips/legends if analytics grow.
-- CI: monitor Lighthouse thresholds (perf ≥0.75, a11y ≥0.9) and tighten over time; keep axe serious+ gating green.
-- Docs: keep README/AGENTS/PLAN current; add screenshots to PR template.
+## To‑Do (ordered by ROI)
+
+- Docs sweep — README/AGENTS/IMPLEMENTATION/PLAN update (DocScribe) ✅
+- Telemetry: snapshots insert + `/api/snapshots/latest`; schedule hourly refresh ✅ (cron scheduling backlog)
+- Analytics: add reliability metrics + drift analytics; bump latest.json schema ✅ (drift backlog)
+- RAG: scaffold pgvector table, indexer (`scripts/rag/build-index.mjs`), verify script, `/api/search` ✅ (quality tuning backlog)
+- React Flow: build confusion + blueprint graphs; ensure accessibility/perf budgets ✅ (session trace iteration ongoing)
+- Governance: supersede env docs, Supabase RLS audit, plan alerting on refresh failures
+- CI: extend tests for RAG + analytics metrics; keep Lighthouse/axe budgets green
+- Evidence: continue crop improvements, publish vetted items, align with RAG chunks
 
 ## Cadence
 - Daily: sync PLAN status; triage issues; verify CI on latest PRs.

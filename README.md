@@ -2,7 +2,7 @@
 
 Deterministic, evidence-first scaffold for Studyin modules. It ships with an OMS-1 upper-limb sample bank today, but the prompts, CI, and agents are module-agnostic so you can retarget new systems without retooling.
 
-UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + Radix UI primitives (wrapped under `components/ui/radix`) with light shadcn-style styling helpers.
+UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + Radix UI primitives (wrapped under `components/ui/radix`) with light shadcn-style styling helpers. React Flow powers analytics graphs.
 
 ## Quick Start
 
@@ -26,9 +26,14 @@ config/                    # Blueprint, LO hierarchy, error taxonomy
 content/banks/upper-limb-oms1/  # One JSON per item (A–E only)
 content/evidence/          # PDFs/crops (tracked via Git LFS)
 data/                      # Local telemetry (events.ndjson)
+app/api/                   # Next.js API routes (telemetry, analytics, forms, health)
+lib/server/                # Server-only helpers (forms, telemetry, Supabase adapters)
+lib/rag/                   # Deterministic embedding helpers (no external calls)
 scripts/lib/               # Deterministic engines + shared schemas
+scripts/rag/               # Evidence indexing + recall verification scripts
 scripts/validate-items.mjs # Validator CLI gate (Zod-based)
-scripts/analyze.mjs        # Analytics pipeline → latest.json
+scripts/analyze.mjs        # Analytics pipeline → latest.json + Supabase snapshot
+supabase/                  # SQL schema + RLS policies for Supabase ingestion/index
 tests/                     # Vitest smoke tests for engines
 AGENTS.md                  # Agent SOPs, rubric gates, workflow
 PLAN.md                    # Current milestones, To‑Dos, cadence
@@ -49,6 +54,16 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 - Fetch: `node scripts/tools/fetch-evidence.mjs --url https://... --out content/evidence/.../img.png`
 - Link to item: `node scripts/tools/link-evidence.mjs --id item.ulnar.claw-hand --path content/evidence/.../img.png --review`
 - Relax evidence during setup: `REQUIRE_EVIDENCE_CROP=0 npm run validate:items` (requires `citation` or `source_url`).
+
+## Temporal RAG Tooling
+
+- `node scripts/rag/build-index.mjs` — deterministic chunker that reads item stems/rationales and upserts embeddings into Supabase `evidence_chunks` (requires Supabase env vars).
+- `node scripts/rag/verify-index.mjs` — recall@k smoke test that ensures target items appear at the top of results.
+- Query top-k evidence:
+  ```bash
+  curl "http://localhost:3000/api/search?q=ulnar%20nerve&lo=lo.ulnar-nerve&k=5" \
+    -H "Authorization: Bearer dev-analytics-refresh"
+  ```
 
 ## Tests & CI
 
@@ -105,12 +120,52 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 - `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `public/analytics/latest.json`.
 - `npm run dev` auto-opens the app in your default browser (set `DEV_URL` to override) — use `npm run dev:start` to run without auto-opening.
 
+## Telemetry & Analytics APIs
+
+- `POST /api/attempts` — ingest attempt events (schema `AttemptEvent`); token required (`Authorization: Bearer <INGEST_TOKEN>`). Rate limited (10 KB, 60 req/min). Writes to NDJSON unless `USE_SUPABASE_INGEST=1`, in which case rows land in Supabase `attempts`.
+- `POST /api/sessions` — session lifecycle events; same validation + token path (`SessionEvent`).
+- `POST /api/analytics/refresh` — recomputes analytics. With `READ_ANALYTICS_FROM_SUPABASE=1` (default when Supabase ingest enabled) it pulls attempts from Supabase and writes both `public/analytics/latest.json` and the `analytics_snapshots` table.
+- `GET /api/snapshots/latest` — returns metadata + payload for the most recent analytics snapshot (service-role required).
+- `GET /api/forms` — deterministic blueprint form builder (`length`, `seed`, `publishedOnly`). Returns items without evidence crops.
+- `GET /api/search` — temporal RAG endpoint (query, LO filters, recency). Returns top-k evidence snippets with citations.
+- `GET /api/health` — reports telemetry + analytics flags, `last_generated_at`, and file existence.
+
+### Environments
+- Copy `.env.example` to `.env.local` and populate:
+  - `WRITE_TELEMETRY`, `INGEST_TOKEN`, `ANALYTICS_REFRESH_TOKEN`
+  - `USE_SUPABASE_INGEST`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+  - `READ_ANALYTICS_FROM_SUPABASE` (default auto-follows `USE_SUPABASE_INGEST`)
+  - Optional NDJSON fallbacks (`EVENTS_PATH`, `ANALYTICS_OUT_PATH`)
+- Install Supabase client: `npm i @supabase/supabase-js`
+- Apply Supabase schema & policies (`supabase/schema.sql`, `supabase/policies.sql`)
+
+## Exam Form API
+
+- Request a deterministic blueprint-aligned form via `GET /api/forms?length=20&seed=42&publishedOnly=1`.
+- The endpoint returns `{ id, blueprint_id, length, seed, items[] }` where each item omits evidence crops to keep exams locked.
+- If `publishedOnly=1` removes too many items to satisfy the blueprint, the route responds `409` with a deficit report so QA-Proctor can triage gaps.
+- Server components can import `buildExamForm` from `lib/server/forms` directly to avoid extra HTTP hops inside the app.
+
+## Analytics & Snapshots
+
+- `scripts/lib/analyzer-core.mjs` exports deterministic summarizers (TTM, ELG/min, confusion, speed×accuracy, reliability scores, temporal drift).
+- `npm run analyze` reuses the core and writes `public/analytics/latest.json` (and inserts into `analytics_snapshots` when Supabase configured).
+- Snapshots table retains history; fetch via `/api/snapshots/latest` or directly in Supabase for reporting.
+- Schedule hourly refresh (cron hitting `/api/analytics/refresh`) so latest.json stays current.
+
+## Supabase Integration
+
+- Apply SQL: `supabase/schema.sql` + `supabase/policies.sql` (attempts, sessions, analytics_snapshots, evidence_chunks + RLS).
+- Vector search for RAG relies on pgvector; ensure `create extension if not exists vector;` is run (included in schema script).
+- Keep `SUPABASE_SERVICE_ROLE_KEY` server-only; clients never see it.
+- Evidence stays in Git LFS; the RAG index stores chunk text + metadata only.
+
 ## Next Steps
 
-1. Attach evidence crops (`content/evidence/**`) and mark vetted items as `review`.
-2. Expand analytics calculations (TTM, ELG/min, confusion graph) with richer telemetry.
-3. Scaffold Next.js App Router UI (Study, Exam, Drills, Summary) consuming `latest.json`.
-4. Add CI (tests, validate, axe, Lighthouse) enforcing rubric budgets; publish rubric score on PRs.
-5. Add CODEOWNERS, PR template, and workflow automation for Studyin release discipline.
+1. Seed Supabase `attempts` with historical telemetry (use `scripts/tools/seed-attempts.mjs`) and verify analytics snapshots.
+2. Monitor hourly refresh job and `/api/health` (`last_generated_at` should be recent).
+3. Expand RAG coverage (chunk more evidence sources; run `scripts/rag/build-index.mjs`).
+4. Iterate React Flow dashboards (confusion graph, blueprint gap explorer, session trace) with accessibility audits.
+5. Broaden automated tests (Vitest + integration) to cover RAG search, reliability metrics, and snapshot endpoints.
 
 Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs.

@@ -14,6 +14,11 @@
 - **ReleaseManager** — Own GitHub Flow, PR previews (Vercel), Conventional Commits, changelog, and rubric score ≥90 with ★ categories ≥2.7.
 - **DocScribe** — Keep README, AGENTS.md, rubric docs, prompts, and changelog accurate.
 - **DataSteward** — Ensure telemetry (`data/events.ndjson`) is pseudonymous, export-ready, and schema_version aligned.
+  - Configure ingestion tokens/env flags (`WRITE_TELEMETRY`, `INGEST_TOKEN`, rate limits) before enabling remote writes.
+  - For Supabase sink and snapshots: keep `SUPABASE_SERVICE_ROLE_KEY` server-only, monitor `analytics_snapshots` retention, and scrub any PII before RAG indexing.
+- **RAGEngineer** — Maintain evidence chunk pipelines (`scripts/rag/*`), pgvector embeddings, deterministic ranking (`GET /api/search`), and recall@k quality checks.
+- **GraphUX** — Own React Flow visualizations (confusion graph, blueprint drift, session traces); ensure keyboard navigation, screen reader labels, and render <100 ms.
+- **TemporalAnalyst** — Track long-term analytics signals (TTM velocity, item drift, reliability metrics); validate hourly refresh cadence and snapshots health.
 
 ### New: ProjectManager (Studyin PM)
 - Drives execution and cadence. Keeps the plan current, raises risks, and enforces gates.

@@ -8,6 +8,10 @@ import { ConfusionForce } from '../../components/charts/ConfusionForce';
 import { BlueprintDriftChart } from '../../components/charts/BlueprintDriftChart';
 import { TTMBarCanvas } from '../../components/canvas/TTMBarCanvas';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
+import { ConfusionGraph } from '../../components/graphs/ConfusionGraph';
+import { BlueprintFlow } from '../../components/graphs/BlueprintFlow';
+import { SessionFlow } from '../../components/graphs/SessionFlow';
+import { getSupabaseAdmin } from '../../lib/server/supabase';
 
 async function readJsonIfExists<T = any>(p: string): Promise<T | null> {
   try {
@@ -18,6 +22,24 @@ async function readJsonIfExists<T = any>(p: string): Promise<T | null> {
   }
 }
 
+async function loadRecentAttempts(limit = 25) {
+  const client = await getSupabaseAdmin();
+  if (!client) return [];
+  const { data } = await client
+    .from('attempts')
+    .select('session_id,item_id,correct,ts_submit')
+    .order('ts_submit', { ascending: false })
+    .limit(limit);
+  return (
+    data?.map((row) => ({
+      session_id: row.session_id,
+      item_id: row.item_id,
+      correct: Boolean(row.correct),
+      ts_submit: Number(row.ts_submit ?? 0)
+    })) ?? []
+  );
+}
+
 export default async function SummaryPage() {
   const analytics = await loadAnalyticsSummary();
   const root = process.cwd();
@@ -25,6 +47,7 @@ export default async function SummaryPage() {
   const rubricPath = path.join(root, 'public', 'analytics', 'rubric-score.json');
   const blueprint = await readJsonIfExists<{ weights: Record<string, number> }>(blueprintPath);
   const rubric = await readJsonIfExists<{ overall_score: number; overall_pass: boolean; critical_ok: boolean; threshold: number }>(rubricPath);
+  const attempts = await loadRecentAttempts();
   return (
     <section className="space-y-6">
       <h1 className="text-2xl font-semibold text-slate-900">Summary</h1>
@@ -51,6 +74,24 @@ export default async function SummaryPage() {
         <ConfusionBar analytics={analytics} />
         <ConfusionForce analytics={analytics} />
         <TTMBarCanvas analytics={analytics} />
+        <Card className="col-span-full">
+          <CardHeader className="text-sm font-semibold text-slate-900">Confusion graph</CardHeader>
+          <CardContent>
+            <ConfusionGraph analytics={analytics} />
+          </CardContent>
+        </Card>
+        <Card className="col-span-full">
+          <CardHeader className="text-sm font-semibold text-slate-900">Blueprint flow</CardHeader>
+          <CardContent>
+            <BlueprintFlow analytics={analytics} weights={blueprint?.weights ?? {}} />
+          </CardContent>
+        </Card>
+        <Card className="col-span-full">
+          <CardHeader className="text-sm font-semibold text-slate-900">Recent session traces</CardHeader>
+          <CardContent>
+            <SessionFlow attempts={attempts} />
+          </CardContent>
+        </Card>
       </div>
     </section>
   );
