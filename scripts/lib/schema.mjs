@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 
 /**
  * Shared schema versions for cross-script compatibility.
@@ -140,9 +140,21 @@ export const sessionEventSchema = z.object({
  * Helper to parse NDJSON safely.
  */
 export function parseNdjsonLine(line, schema) {
-  if (!line.trim()) return null;
-  const parsed = JSON.parse(line);
-  return schema.parse(parsed);
+  const trimmed = line.trim();
+  if (!trimmed) return null;
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    return schema.parse(parsed);
+  } catch (error) {
+    if (error instanceof SyntaxError || error instanceof ZodError) {
+      if (process.env.DEBUG_NDJSON === '1') {
+        console.warn('Skipping invalid NDJSON line', trimmed, error);
+      }
+      return null;
+    }
+    throw error;
+  }
 }
 
 /**
