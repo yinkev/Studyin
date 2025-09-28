@@ -13,8 +13,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:rounded focus:bg-slate-900 focus:px-3 focus:py-2 focus:text-white">Skip to content</a>
         <Header />
-        <main className="mx-auto max-w-6xl p-6">{children}</main>
+        <main id="main" className="mx-auto max-w-6xl p-6">{children}</main>
         <Footer />
       </body>
     </html>
