@@ -32,6 +32,20 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
+      - name: Start app for E2E
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000
+
+      - name: Playwright install
+        run: npx playwright install --with-deps
+
+      - name: Run E2E a11y (axe)
+        run: npm run e2e
+
+      - name: Lighthouse CI (assert budgets)
+        run: npx lhci autorun
+
       # Axe, Lighthouse, Playwright placeholders (CI environment requirements TBD)
       - name: Axe accessibility check (placeholder)
         run: echo "TODO: integrate Playwright + axe"
