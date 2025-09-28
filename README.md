@@ -7,6 +7,7 @@ UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + Rad
 ## Quick Start
 
 ```bash
+nvm use
 npm install
 npm run validate:items   # Validate sample bank (A–E gate)
 npm run analyze          # Generate public/analytics/latest.json
@@ -16,7 +17,7 @@ npm test                 # Run engine smoke tests (Vitest)
 npm run dev
 ```
 
-Requirements: Node 20.14.x LTS (set via `.nvmrc` soon). Install Git LFS for evidence assets.
+Requirements: Node 20.14.x LTS (pinned via `.nvmrc`). If you use `nvm`, run `nvm install` once and `nvm use` for every session. Install Git LFS for evidence assets.
 
 ## Repository Layout
 
@@ -55,7 +56,14 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 - Unit: `npm test` (Vitest).
 - Manual/MCP a11y: use Chrome DevTools MCP or axe browser extension while `npm run dev` is running.
 - CI runs: validate → unit → analyze → build → axe CI (serious+ blockers) → Lighthouse CI (per `.lighthouserc.json`).
-- CI helpers: `npm run ci:axe`, `npm run ci:lh` (requires `npm run build` or a running server).
+- CI helpers:
+  - `npm run ci:axe`: requires either `npm run dev` running in another terminal or a prior `npm run build && npm run start`. Exits non-zero on serious axe issues.
+  - `npm run ci:lh`: run `npm run build` first. The command launches Lighthouse CI using `.lighthouserc.json` budgets.
+
+## Project Management Scripts
+
+- `npm run score:rubric`: Computes rubric metrics and writes `public/analytics/rubric-score.json`. Run during the weekly pulse and attach the JSON to the tracking issue.
+- `npm run pm:pulse`: Generates a condensed status pulse leveraging `PLAN.md`, rubric deltas, and analytics snapshots. Use it for async updates or stand-ups.
 
 ## Agents & Prompts
 

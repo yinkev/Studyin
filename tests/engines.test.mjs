@@ -17,6 +17,22 @@ describe('elo-lite engine', () => {
     expect(nextTheta).toBeGreaterThan(theta);
     expect(nextBeta).toBeGreaterThan(beta - 0.25);
   });
+
+  it('applies a smaller gain during exam mode than learn mode', () => {
+    const learn = updateAbility({ theta: 0, beta: 5, correct: true, mode: 'learn' });
+    const exam = updateAbility({ theta: 0, beta: 5, correct: true, mode: 'exam' });
+    expect(exam).toBeLessThan(learn);
+  });
+
+  it('respects maxDelta clamps for ability and difficulty updates', () => {
+    const theta = 0;
+    const beta = 5;
+    const config = { kUserLearn: 2, kItem: 2, maxDeltaUser: 0.05, maxDeltaItem: 0.02 };
+    const nextTheta = updateAbility({ theta, beta, correct: true, mode: 'learn', config });
+    const nextBeta = updateItemDifficulty({ theta, beta, correct: true, config });
+    expect(nextTheta - theta).toBeCloseTo(0.05, 5);
+    expect(nextBeta - beta).toBeCloseTo(-0.02, 5);
+  });
 });
 
 describe('spacing engine', () => {
@@ -35,6 +51,35 @@ describe('spacing engine', () => {
     const { nextReviewMs, intervalMs } = scheduleNextReview({ halfLifeHours: 12, nowMs: now });
     expect(nextReviewMs).toBeGreaterThan(now);
     expect(intervalMs).toBeGreaterThan(0);
+  });
+
+  it('applies fatigue cooldown multiplier after repeated fast misses', () => {
+    const base = updateHalfLife({
+      halfLifeHours: 10,
+      expected: 0.7,
+      correct: false,
+      fatigueStrikes: 0,
+      config: { fatigueCooldownMultiplier: 1.5 }
+    });
+    const withFatigue = updateHalfLife({
+      halfLifeHours: 10,
+      expected: 0.7,
+      correct: false,
+      fatigueStrikes: 3,
+      config: { fatigueCooldownMultiplier: 1.5 }
+    });
+    expect(withFatigue.cooldownApplied).toBe(true);
+    expect(withFatigue.halfLifeHours).toBeGreaterThan(base.halfLifeHours);
+  });
+
+  it('never schedules a review interval shorter than the configured minimum', () => {
+    const now = Date.now();
+    const { intervalMs } = scheduleNextReview({
+      halfLifeHours: 0.1,
+      nowMs: now,
+      config: { minHalfLifeHours: 2 }
+    });
+    expect(intervalMs).toBeGreaterThanOrEqual(2 * 60 * 60 * 1000);
   });
 });
 
