@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Button } from '../ui/button';
 
 export function Hero() {
   return (
@@ -11,9 +12,9 @@ export function Hero() {
           Studyin brings OMS‑1 Upper Limb mastery into focus with deterministic exams, per‑choice rationales, and analytics that tell you exactly what to do next.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
-          <Link href="/study" className="rounded bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800">Start studying</Link>
-          <Link href="/exam" className="rounded border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:border-slate-400">Try an exam</Link>
-          <Link href="/drills" className="rounded border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:border-slate-400">See drills</Link>
+          <Link href="/study"><Button size="lg">Start studying</Button></Link>
+          <Link href="/exam"><Button size="lg" variant="outline">Try an exam</Button></Link>
+          <Link href="/drills"><Button size="lg" variant="outline">See drills</Button></Link>
         </div>
       </div>
       <div className="pointer-events-none absolute inset-0 -z-0 bg-[radial-gradient(40%_30%_at_70%_10%,rgba(59,130,246,0.15),transparent)]" />

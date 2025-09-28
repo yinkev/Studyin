@@ -2,7 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+:root {
+  /* Studious theme (slate/navy with teal/blue accent) */
+  --background: 210 40% 98%; /* slate-50 */
+  --foreground: 222 47% 11%; /* slate-900 */
+  --muted: 214 32% 91%;
+  --muted-foreground: 215 16% 47%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 199 89% 48%; /* sky-500/teal-ish */
+  --primary: 222 47% 17%; /* deep slate */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --accent: 199 89% 48%;
+  --accent-foreground: 0 0% 100%;
+  --radius: 0.6rem;
+
+  color-scheme: light;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
 * { box-sizing: border-box; }
-body { margin: 0; }
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
