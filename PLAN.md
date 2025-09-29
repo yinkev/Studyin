@@ -3,6 +3,9 @@
 ## Vision
 - Build a local-first, evidence-anchored study engine that ingests structured sources, teaches with interactive lessons, drills with deterministic MCQs/spotters, tracks telemetry, and retrieves via temporal + personal RAG while Codex-CLI remains the automation brain.
 
+## Recent Merge Log
+- 2025-09-29 — PR #10 merged into `main` (OKC-heavy UI, analytics cards, lessons scaffolding). Follow-ups: fix GLTFLoader CDN (done), regenerate analytics, quick UI sanity on Home/Study/Summary.
+
 ## Non-Negotiables
 - Evidence pill everywhere (local file + page/figure/crop or web URL + access date).  
 - Deterministic runtime (scoring, blueprint weights, temporal ranking in code—no runtime LLM calls).  
