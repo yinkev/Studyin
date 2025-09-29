@@ -10,6 +10,7 @@ UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + OKC
 npm install
 npm run validate:items   # Validate sample bank (A–E gate)
 npm run analyze          # Generate public/analytics/latest.json
+npm run jobs:refit       # (manual) Run weekly Rasch/GPCM refit summary (writes data/refit-summaries)
 npm test                 # Run engine smoke tests (Vitest)
 
 # Dev server (auto opens http://localhost:3000)
@@ -26,7 +27,10 @@ config/                    # Blueprint, LO hierarchy, error taxonomy
 content/banks/upper-limb-oms1/  # One JSON per item (A–E only)
 content/evidence/          # PDFs/crops (tracked via Git LFS)
 data/                      # Local telemetry (events.ndjson)
+data/state/                # Learner ability & exposure snapshots (override via STUDY_STATE_DIR)
+data/refit-summaries/      # Weekly Rasch refit outputs (`npm run jobs:refit`)
 app/api/                   # Next.js API routes (telemetry, analytics, forms, health)
+app/study/                 # Study flow (server props + actions)
 lib/server/                # Server-only helpers (forms, telemetry, Supabase adapters)
 lib/rag/                   # Deterministic embedding helpers (no external calls)
 scripts/lib/               # Deterministic engines + shared schemas
@@ -43,8 +47,16 @@ PLAN.md                    # Current milestones, To‑Dos, cadence
 ## Deterministic Engines (stubs)
 
 - `scripts/lib/elo.mjs` — Elo-lite with adjustable K for learn/exam.
+- `scripts/lib/rasch.mjs` — Rasch 1‑PL helpers (EAP via GH quadrature, info, mastery probability).
+- `scripts/lib/gpcm.mjs` — GPCM PMF scaffolding (extend thresholds `τ`).
+- `scripts/lib/selector.mjs` — In‑session utility and randomesque top‑K.
+- `scripts/lib/scheduler.mjs` — Thompson Sampling over LOs optimizing ΔSE/min with seeded RNG.
+- `scripts/lib/fsrs.mjs` — FSRS‑inspired updates and budgeting helpers.
+- `scripts/lib/exposure.mjs` — Caps and multipliers enforcing ≤1/day, ≤2/week, 96h cooldown.
 - `scripts/lib/spacing.mjs` — Half-life updates + next review scheduling.
 - `scripts/lib/blueprint.mjs` — Feasibility checks and greedy form builder.
+- `lib/study-engine.ts` — Shared adaptive engine (Rasch EAP, scheduler arms, retention budgeting, “Why this next”).
+- `app/study/actions.ts` — Server action that logs attempts, updates learner state JSON, and returns refreshed ability signals.
 
 Engine behavior is covered by `npm test` smoke tests. Update these modules before wiring into the UI.
 
@@ -81,6 +93,17 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - `itemsmith.md` — author MCQs
   - `validator-fixer.md` — fix validator failures
   - `studyin-pm.md` — project manager agent
+  - Recommendation: see `AGENTS.md` → Agent Recommendation Playbook for which agent and model to use next (tiers: `gpt-5 {minimal,low,medium,high}` and `gpt-5-codex {low,medium,high}`).
+
+## Model Tiers & Configuration
+- Configure defaults in `~/.codex/config.toml`:
+  - `model = "gpt-5" | "gpt-5-codex"`
+  - `model_reasoning_effort = "minimal" | "low" | "medium" | "high"`
+- Recommended defaults for this repo:
+  - Repo-aware work: `gpt-5-codex` + `high`
+  - Narrative docs: `gpt-5` + `high` (or `medium` for speed)
+  - Cheap triage: `gpt-5-codex` + `low`
+- Override per run via CLI flags or project profiles if supported by your Codex client.
 
 ## MCP Tooling (Context7, Codex MCP, Chrome DevTools MCP)
 
@@ -140,6 +163,7 @@ Notes
   - To relax evidence during setup: run with `REQUIRE_EVIDENCE_CROP=0` to allow citation‑only (must include `citation` or `source_url`)
 - `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `public/analytics/latest.json`.
 - `npm run dev` auto-opens the app in your default browser (set `DEV_URL` to override) — use `npm run dev:start` to run without auto-opening.
+- Analytics output now includes `retention_summary` (total reviews, correct/incorrect counts, success rate) derived from FSRS retention events.
 
 ## Telemetry & Analytics APIs
 
@@ -150,6 +174,10 @@ Notes
 - `GET /api/forms` — deterministic blueprint form builder (`length`, `seed`, `publishedOnly`). Returns items without evidence crops.
 - `GET /api/search` — temporal RAG endpoint (query, LO filters, recency). Returns top-k evidence snippets with citations.
 - `GET /api/health` — reports telemetry + analytics flags, `last_generated_at`, and file existence.
+
+- Study server actions persist learner state under `data/state/<learnerId>.json`; set `STUDY_STATE_DIR` to relocate (e.g., RAM disk or Supabase mount). Each file stores LO ability (`thetaHat`, `SE`), recent stop-rule metrics, and per-item exposure timestamps for scheduler cooldowns.
+- `lib/study-insights.ts` computes dashboard data (Priority/Stalled LOs, Overexposed items) surfaced in the Study UI, combining learner state and `public/analytics/latest.json`.
+- Weekly Rasch refit: `npm run jobs:refit` (or cron/n8n call) writes JSON to `data/refit-summaries/`; review with AnalyticsEngineer and archive older files. A GitHub Action (`.github/workflows/refit-weekly.yml`) runs every Monday at 07:00 UTC and uploads the latest summary artifact.
 
 ### Environments
 - Copy `.env.example` to `.env.local` and populate:
