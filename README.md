@@ -124,6 +124,8 @@ Notes
 - Stage intentionally: `git add <path>`; review via `git status -sb`; commit with Conventional Commits (`feat(scope): summary`).
 - Follow GitHub Flow: feature branch → PR → review → merge → deploy.
 - See `AGENTS.md` for role responsibilities, SOPs, and evidence checklists.
+ - See `docs/WORKFLOW.md` for the agent invocation playbook and gates.
+ - See `docs/TAILWIND_V4_RUNBOOK.md` for Tailwind v4 compliance steps.
 
 ## Data & Validation Pipeline
 
