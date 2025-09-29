@@ -64,3 +64,38 @@
   body { @apply bg-background text-foreground; }
   a, button { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70; }
 }
+
+/* OKC (Duolingo-inspired) palette + utilities */
+:root {
+  --okc-feather: #58CC02;
+  --okc-mask: #89E219;
+  --okc-eel: #4B4B4B;
+  --okc-snow: #FFFFFF;
+  --okc-macaw: #1CB0F6;
+  --okc-cardinal: #FF4B4B;
+  --okc-bee: #FFC800;
+}
+
+.okc-light { color-scheme: light; }
+
+.duo-button {
+  background: var(--okc-feather);
+  border-radius: 16px;
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+  box-shadow: 0 4px 12px rgba(88, 204, 2, 0.3);
+}
+.duo-button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(88, 204, 2, 0.4); }
+.duo-button:focus-visible { outline: 2px solid #111827; outline-offset: 3px; }
+
+.duo-card { background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+.duo-progress { background: linear-gradient(90deg, var(--okc-feather) 0%, var(--okc-mask) 100%); border-radius: 12px; }
+.achievement-badge { background: linear-gradient(135deg, var(--okc-bee) 0%, var(--okc-macaw) 100%); border-radius: 50%; }
+.bouncy-text { display: inline-block; animation: okc-float 3s ease-in-out infinite; }
+@keyframes okc-float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-6px)} }
+.streak-counter { background: linear-gradient(135deg, var(--okc-cardinal) 0%, #ff6b6b 100%); border-radius: 20px; }
+.okc-module-card { background: #fff; border-radius: 20px; border: 2px solid transparent; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.okc-module-card:hover { border-color: var(--okc-feather); transform: translateY(-6px); box-shadow: 0 16px 32px rgba(88, 204, 2, 0.2); }
+.okc-progress-ring { transform: rotate(-90deg); }
+.okc-progress-circle { stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset .5s ease-in-out; }
+.okc-confetti { position: absolute; width: 10px; height: 10px; animation: okc-confetti-fall 3s linear forwards; }
+@keyframes okc-confetti-fall { 0% { transform: translateY(-50vh) rotate(0deg) } 100% { transform: translateY(60vh) rotate(360deg) } }

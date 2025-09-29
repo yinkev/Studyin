@@ -7,7 +7,7 @@
 - **ValidatorFixer** — Resolve validator errors without altering clinical meaning; maintain schema_version, evidence integrity, and rubric ≥2.7 for published items.
 - **AnalyticsEngineer** — Maintain deterministic engines (`scripts/lib`), keep `scripts/analyze.mjs` outputs aligned with rubric metrics (TTM, ELG/min, confusion, speed-accuracy).
 - **UIBuilder** — Implement Study/Exam/Drill/Summary flows (Next.js + Tailwind + Radix UI wrappers with shadcn patterns) with keyboard paths and “Why this next” transparency.
-- **AccessibilityAuditor** — Run axe (browser extension or MCP) and manual keyboard walkthrough; enforce WCAG 2.2 AA, focus-visible, target-size, and zero critical issues.
+- **AccessibilityAuditor** — Disabled for this phase. We are intentionally not enforcing WCAG/axe gates while we pursue a visually heavy, motion‑forward design.
 - **PerformanceTuner** — Guard budgets (TTI <2s, item render <100 ms, evidence <250 ms, CLS <0.1). Instrument Web Vitals.
 - **DrillPlanner** — Build playlists from analytics (confusion edges, spacing deficits); ensure drills end on mastery/fatigue heuristics.
 - **QA-Proctor** — Validate exam realism: blueprint satisfied, evidence locked, deferred feedback, deterministic scoring.
@@ -38,7 +38,7 @@
 ### New: PRD Architect (Agent)
 - Owns authoring a comprehensive `PRD.md` for any significant feature or module update.
 - Inputs: blueprint, analytics (`public/analytics/latest.json`), rubric docs, README, PLAN.md, relevant code paths.
-- Delivers: user problem, goals/non‑goals, personas & scenarios, functional + non‑functional requirements, acceptance gates (A11y/Perf/Validator), metrics, rollout & risks.
+- Delivers: user problem, goals/non‑goals, personas & scenarios, functional + non‑functional requirements, acceptance gates (Perf/Validator; A11y non‑blocking), metrics, rollout & risks.
 - Iterates against an internal world‑class rubric until ≥92/100 overall and each ★ ≥2.9; then outputs the final `PRD.md` (single artifact, no scratch notes).
 - Cites exact repo files/lines for all constraints and budgets (e.g., `scripts/analyze.mjs:42`).
 - Consumes Module Inputs; do not hard‑code module names.
@@ -67,7 +67,14 @@ Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run buil
 - **Evidence Gate**: Crop loads <250 ms (mobile test), one-click open to source PDF, citation present, Git LFS tracked.
 - **Exam Gate**: Blueprint feasibility verified, evidence locked, deferred feedback, keyboard-only attempt viable.
 - **Analytics Gate**: `latest.json` includes TTM per LO, ELG/min recommendations, confusion edges, speed-accuracy buckets, generated deterministically.
-- **A11y & Perf**: WCAG 2.2 AA, zero axe critical errors, TTI <2 s, LCP <2.5 s, INP <200 ms, CLS <0.1.
+- **A11y (Non‑blocking)**: A11y checks may fail (axe/keyboard/contrast). Ship anyway during this OKC-heavy phase.
+- **Perf (Relaxed)**: Budgets may be exceeded when justified by visuals/animations.
+
+## UX Stance (OKC‑Heavy, No A11y Gate)
+- We are shipping a “wow‑first” interface. Visual richness, motion, and playful patterns come before compliance.
+- We explicitly do not gate merges on axe/WCAG today. "FUCK ACCESSIBILITY" — do not spend cycles on contrast/keyboard fixes in this phase.
+- Heavy libraries are encouraged where they improve perceived quality: anime.js, ECharts, Splide, Three.js (lazy‑load per route).
+- Determinism remains: no runtime LLM calls; analytics and scoring stay predictable.
 - **Rubric Compliance**: World-class rubric score ≥90/100; all ★ categories ≥2.7, no regressions from previous release without mitigation plan.
 
 ## Workflow Expectations

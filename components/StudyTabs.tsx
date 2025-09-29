@@ -30,23 +30,15 @@ export function StudyTabs({ items, lessons, analytics }: StudyTabsProps) {
   }, []);
 
   return (
-    <Tabs defaultValue="learn" className="space-y-6 text-slate-100">
+    <Tabs defaultValue="learn" className="space-y-6 px-4 py-10 max-w-6xl mx-auto text-gray-900">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Mastery cockpit</p>
-          <h1 className="text-3xl font-semibold text-white">Study</h1>
+          <p className="text-xs uppercase tracking-wide text-gray-500">Mastery cockpit</p>
+          <h1 className="text-3xl font-extrabold">Study</h1>
         </div>
-        <TabsList className="bg-white/10">
-          <TabsTrigger value="learn" className="data-[state=active]:bg-white/90 data-[state=active]:text-slate-900">
-            Learn
-          </TabsTrigger>
-          <TabsTrigger
-            value="practice"
-            data-study-trigger="practice"
-            className="data-[state=active]:bg-white/90 data-[state=active]:text-slate-900"
-          >
-            Practice
-          </TabsTrigger>
+        <TabsList>
+          <TabsTrigger value="learn">Learn</TabsTrigger>
+          <TabsTrigger value="practice" data-study-trigger="practice">Practice</TabsTrigger>
         </TabsList>
       </div>
       <TabsContent value="learn" className="focus-visible:outline-none">

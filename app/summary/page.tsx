@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { loadAnalyticsSummary } from '../../lib/getAnalytics';
-import { TTMBarChart } from '../../components/charts/TTMBarChart';
-import { SpeedAccuracyChart } from '../../components/charts/SpeedAccuracyChart';
-import { ConfusionBar } from '../../components/charts/ConfusionBar';
+import { TTMCard } from '../../components/okc/charts/TTMCard';
+import { SpeedAccuracyCard } from '../../components/okc/charts/SpeedAccuracyCard';
+import { ConfusionBarCard } from '../../components/okc/charts/ConfusionBarCard';
 import { ConfusionForce } from '../../components/charts/ConfusionForce';
 import { BlueprintDriftChart } from '../../components/charts/BlueprintDriftChart';
 import { TTMBarCanvas } from '../../components/canvas/TTMBarCanvas';
@@ -89,19 +89,19 @@ export default async function SummaryPage() {
         <Card>
           <CardHeader>Mastery · TTM</CardHeader>
           <CardContent>
-            <TTMBarChart analytics={analytics} />
+            <TTMCard analytics={analytics} />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>Speed vs accuracy</CardHeader>
           <CardContent>
-            <SpeedAccuracyChart analytics={analytics} />
+            <SpeedAccuracyCard analytics={analytics} />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>Confusion hotspots</CardHeader>
           <CardContent>
-            <ConfusionBar analytics={analytics} />
+            <ConfusionBarCard analytics={analytics} />
           </CardContent>
         </Card>
         <Card>

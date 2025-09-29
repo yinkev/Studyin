@@ -107,47 +107,47 @@ export function StudyView({ items, analytics }: StudyViewProps) {
   const isCorrect = selected && selected === current.key;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Practice</h1>
-          <p className="text-sm text-slate-300">Keyboard: 1–5 answer · N/P arrows for navigation · E toggle evidence</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Practice</h1>
+          <p className="text-sm text-gray-600">Keyboard: 1–5 answer · N/P arrows for navigation · E toggle evidence</p>
         </div>
         <Popover>
-          <PopoverTrigger className="flex max-w-xs flex-col gap-1 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-left text-sm text-slate-100 shadow-lg shadow-slate-900/20 transition hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70">
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Why this next</span>
-            <span className="line-clamp-2 text-sm text-white/90">{whyNext}</span>
+          <PopoverTrigger className="flex max-w-xs flex-col gap-1 rounded-full border border-gray-300 bg-white px-4 py-2 text-left text-sm text-gray-800 shadow transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">Why this next</span>
+            <span className="line-clamp-2 text-sm">{whyNext}</span>
           </PopoverTrigger>
-          <PopoverContent className="w-96 space-y-2 border-white/20 bg-slate-900/90 text-slate-100">
-            <h3 className="text-sm font-semibold text-white">Focus rationale</h3>
-            <p className="text-sm text-slate-200">{whyNext}</p>
-            <p className="text-xs text-slate-400">Keyboard: Enter/Space to open · Escape to close.</p>
+          <PopoverContent className="w-96 space-y-2 border-gray-200 bg-white text-gray-900">
+            <h3 className="text-sm font-semibold">Focus rationale</h3>
+            <p className="text-sm">{whyNext}</p>
+            <p className="text-xs text-gray-500">Keyboard: Enter/Space to open · Escape to close.</p>
           </PopoverContent>
         </Popover>
       </header>
 
       <article className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <section className="space-y-5 rounded-3xl border border-white/10 bg-slate-950/50 p-6 shadow-xl shadow-slate-900/20">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+        <section className="space-y-5 duo-card p-6">
+          <div className="flex items-center justify-between text-xs text-gray-600">
             <div className="inline-flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+              <span className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-700">
                 #{index + 1} / {items.length}
               </span>
-              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-medium capitalize text-slate-300">
+              <span className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-[10px] font-medium capitalize text-gray-700">
                 Difficulty {current.difficulty}
               </span>
               {current.los.map((lo) => (
-                <span key={lo} className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+                <span key={lo} className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700">
                   {lo}
                 </span>
               ))}
             </div>
-            <span className="font-mono text-[11px] text-slate-500">{current.id}</span>
+            <span className="font-mono text-[11px] text-gray-500">{current.id}</span>
           </div>
-          <div className="h-1 w-full rounded bg-white/5">
-            <div className="h-1 rounded bg-sky-500/70" style={{ width: `${Math.round(((index + 1) / items.length) * 100)}%` }} />
+          <div className="h-1 w-full rounded bg-gray-200">
+            <div className="h-1 rounded bg-green-500" style={{ width: `${Math.round(((index + 1) / items.length) * 100)}%` }} />
           </div>
-          <h2 className="text-xl font-semibold leading-relaxed text-white">{current.stem}</h2>
+          <h2 className="text-xl font-semibold leading-relaxed text-gray-900">{current.stem}</h2>
 
           <div className="space-y-3">
             {letters.map((letter, idx) => {
@@ -167,16 +167,16 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                       : 'border-white/10 bg-white/5 text-slate-100 hover:border-white/20 hover:bg-white/10'
                   }`}
                 >
-                  <span className="mt-1 rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold text-slate-300">
+                  <span className="mt-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600">
                     {idx + 1}
                   </span>
                   <div className="space-y-1">
                     <p className="font-medium">{letter}. {choice}</p>
                     {feedback.correctShown && letter === current.key && (
-                      <p className="text-sm text-emerald-200/90">{current.rationale_correct}</p>
+                      <p className="text-sm text-emerald-700">{current.rationale_correct}</p>
                     )}
                     {feedback.correctShown && isSelected && letter !== current.key && (
-                      <p className="text-sm text-rose-200/90">
+                      <p className="text-sm text-rose-700">
                         {current.rationale_distractors?.[letter] ?? 'Review the underlying anatomy.'}
                       </p>
                     )}
@@ -186,44 +186,44 @@ export function StudyView({ items, analytics }: StudyViewProps) {
             })}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm text-slate-300">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm text-gray-600">
             <div className="space-x-2">
-              <button onClick={handlePrev} className="rounded-lg border border-white/20 px-3 py-1 text-slate-200 hover:border-white/40">
+              <button onClick={handlePrev} className="rounded-lg border border-gray-200 bg-white px-3 py-1 text-gray-800 hover:bg-gray-50">
                 ← Prev
               </button>
-              <button onClick={handleNext} className="rounded-lg border border-white/20 px-3 py-1 text-slate-200 hover:border-white/40">
+              <button onClick={handleNext} className="rounded-lg border border-gray-200 bg-white px-3 py-1 text-gray-800 hover:bg-gray-50">
                 Next →
               </button>
             </div>
             {feedback.correctShown && (
-              <span className={`font-semibold ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
+              <span className={`font-semibold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}`}>
                 {isCorrect ? 'Correct' : `Correct answer: ${current.key}`}
               </span>
             )}
           </div>
         </section>
 
-        <aside className="space-y-4 rounded-3xl border border-white/10 bg-slate-950/40 p-5 shadow-xl shadow-slate-900/20">
+        <aside className="space-y-4 duo-card p-5">
           <Dialog open={evidenceOpen} onOpenChange={setEvidenceOpen}>
             <header className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">Evidence</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Evidence</h3>
               <DialogTrigger asChild>
-                <button className="text-[10px] uppercase tracking-wide text-slate-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70">
+                <button className="text-[10px] uppercase tracking-wide text-gray-600 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
                   {evidenceOpen ? 'Close (E)' : 'View (E)'}
                 </button>
               </DialogTrigger>
             </header>
-            <div className="space-y-2 text-xs text-slate-300">
+            <div className="space-y-2 text-xs text-gray-700">
               <p>{current.evidence?.citation ?? 'Evidence crop pending review.'}</p>
               <p>
                 Source: {current.evidence?.file ?? 'source PDF'}
                 {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
               </p>
             </div>
-            <DialogContent className="border-white/20 bg-slate-900/90 text-slate-100">
+            <DialogContent className="border-gray-200 bg-white text-gray-900">
               <DialogHeader>
                 <DialogTitle>Evidence for {current.id}</DialogTitle>
-                <DialogDescription className="text-slate-300">
+                <DialogDescription className="text-gray-600">
                   {current.evidence?.citation ?? 'Review the attached primary source.'}
                 </DialogDescription>
               </DialogHeader>
@@ -232,16 +232,16 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                   <img
                     src={current.evidence.dataUri}
                     alt={current.evidence.citation ?? current.id}
-                    className="w-full rounded-lg border border-white/10 object-contain"
+                    className="w-full rounded-lg border border-gray-200 object-contain"
                     loading="lazy"
                   />
-                  <figcaption className="text-xs text-slate-400">
+                  <figcaption className="text-xs text-gray-500">
                     {current.evidence?.file ?? 'source.pdf'}
                     {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
                   </figcaption>
                 </figure>
               ) : (
-                <p className="rounded-lg border border-dashed border-white/20 bg-white/5 p-3 text-sm text-slate-200">
+                <p className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3 text-sm text-gray-700">
                   Evidence crop not available. Refer to {current.evidence?.file ?? 'source PDF'}
                   {current.evidence?.page ? ` (page ${current.evidence.page})` : ''}.
                 </p>
@@ -251,12 +251,12 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                   href={current.evidence.source_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-3 py-1 text-xs text-slate-200 hover:border-white/40"
+                  className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-1 text-xs text-gray-800 hover:bg-gray-50"
                 >
                   View source URL
                 </a>
               )}
-              <p className="text-xs text-slate-500">Keyboard: Press Escape to close. Shortcut E toggles this dialog.</p>
+              <p className="text-xs text-gray-500">Keyboard: Press Escape to close. Shortcut E toggles this dialog.</p>
             </DialogContent>
           </Dialog>
           <VisuallyHidden>

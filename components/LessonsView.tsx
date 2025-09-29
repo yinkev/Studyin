@@ -28,7 +28,7 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
 
   if (!lessons.length) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-12 text-center text-slate-200">
+      <div className="duo-card px-6 py-12 text-center text-gray-700">
         <p>No lessons found. Place files under <code>content/lessons/&lt;module&gt;/*.lesson.json</code>.</p>
       </div>
     );
@@ -38,22 +38,22 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Lesson blueprint</p>
-          <h2 className="text-xl font-semibold text-white">{current.title}</h2>
-          <p className="text-sm text-slate-300">LO: {current.lo_id}</p>
+          <p className="text-xs uppercase tracking-wide text-gray-500">Lesson blueprint</p>
+          <h2 className="text-xl font-semibold text-gray-900">{current.title}</h2>
+          <p className="text-sm text-gray-600">LO: {current.lo_id}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={nav.prevLesson} aria-label="Previous lesson" className="border-white/30 text-slate-100 hover:bg-white/10">
+          <Button variant="outline" onClick={nav.prevLesson} aria-label="Previous lesson" className="border-gray-300 text-gray-800 hover:bg-gray-50">
             Prev
           </Button>
-          <Button variant="outline" onClick={nav.nextLesson} aria-label="Next lesson" className="border-white/30 text-slate-100 hover:bg-white/10">
+          <Button variant="outline" onClick={nav.nextLesson} aria-label="Next lesson" className="border-gray-300 text-gray-800 hover:bg-gray-50">
             Next
           </Button>
           {onPractice && (
             <Button
               onClick={() => onPractice(current.lo_id)}
               aria-label="Practice this learning objective"
-              className="bg-white text-slate-900 hover:bg-slate-200"
+              className="duo-button text-white"
             >
               Practice this LO
             </Button>
@@ -64,7 +64,7 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
       <Card>
         <CardHeader>High-yield</CardHeader>
         <CardContent>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-slate-100/90">
+          <ul className="list-disc space-y-1 pl-5 text-sm text-gray-800">
             {(current.high_yield ?? []).map((h, i) => (
               <li key={i}>{h}</li>
             ))}
@@ -76,7 +76,7 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
         <Card>
           <CardHeader>Pitfalls</CardHeader>
           <CardContent>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-slate-100/80">
+            <ul className="list-disc space-y-1 pl-5 text-sm text-gray-700">
               {current.pitfalls.map((p, i) => (
                 <li key={i}>{p}</li>
               ))}
@@ -86,10 +86,10 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
       ) : null}
 
       <Card>
-        <CardHeader className="flex items-center justify-between text-white">
+        <CardHeader className="flex items-center justify-between text-gray-900">
           <span>Timeline</span>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={nav.prevBeat} disabled={beatIndex === 0} className="border-white/30 text-slate-100 hover:bg-white/10">
+            <Button variant="outline" onClick={nav.prevBeat} disabled={beatIndex === 0} className="border-gray-300 text-gray-800 hover:bg-gray-50">
               ◀
             </Button>
             <span className="text-xs text-slate-400">
@@ -99,7 +99,7 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
               variant="outline"
               onClick={nav.nextBeat}
               disabled={beatIndex >= Math.max(beats.length - 1, 0)}
-              className="border-white/30 text-slate-100 hover:bg-white/10"
+              className="border-gray-300 text-gray-800 hover:bg-gray-50"
             >
               ▶
             </Button>
@@ -108,17 +108,17 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
         <CardContent>
           {beats.length ? (
             <div className="space-y-2">
-              <p className="text-sm text-slate-100/90">
+              <p className="text-sm text-gray-800">
                 <span className="font-semibold">Narration: </span>
                 {beats[beatIndex]?.narration ?? '—'}
               </p>
-              <p className="text-sm text-slate-300/90">
-                <span className="font-semibold text-slate-100">Visual: </span>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold text-gray-800">Visual: </span>
                 {beats[beatIndex]?.visual ?? '—'}
               </p>
             </div>
           ) : (
-            <p className="text-sm text-slate-300">No timeline beats defined.</p>
+            <p className="text-sm text-gray-600">No timeline beats defined.</p>
           )}
         </CardContent>
         <CardFooter>Use Left/Right keys to step through beats.</CardFooter>
