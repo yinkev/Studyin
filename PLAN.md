@@ -1,10 +1,17 @@
-# Studyin Plan (V6)
+# Studyin Plan (V7)
 
 ## Vision
 - Build a local-first, evidence-anchored study engine that ingests structured sources, teaches with interactive lessons, drills with deterministic MCQs/spotters, tracks telemetry, and retrieves via temporal + personal RAG while Codex-CLI remains the automation brain.
 
 ## Recent Merge Log
-- 2025-09-29 — PR #10 merged into `main` (OKC-heavy UI, analytics cards, lessons scaffolding). Follow-ups: fix GLTFLoader CDN (done), regenerate analytics, quick UI sanity on Home/Study/Summary.
+- Latest — OKC-heavy UI, analytics cards, lessons scaffolding landed; GLTFLoader CDN fixed; analytics regenerated.
+
+## Module Inputs
+- MODULE: <fill at epic kickoff>
+- SYSTEM/SECTION: <optional>
+- BLUEPRINT_PATH: `config/blueprint.json` (override via env)
+- SCOPE_DIRS: `content/banks/**` (CSV or glob)
+- METRICS_SOURCE: `public/analytics/latest.json`
 
 ## Non-Negotiables
 - Evidence pill everywhere (local file + page/figure/crop or web URL + access date).  
@@ -55,14 +62,15 @@
 - Follow-up: extend indexer to image embeddings (CLIP) once MiniLM + temporal eval hits target uplift.
 
 ## To‑Do (Ordered by ROI)
-- Run LO-Extractor on a real module asset; refresh `config/los.json` (A).  
+- Run LO‑Extractor on a real module asset; refresh `config/los.json` (A).  
 - Draft 5–10 LessonSmith concept cards + timelines (A).  
 - Author 10–15 ItemSmith MCQs with evidence; loop `npm run validate:items` (A).  
-- Implement RAG recall@10 harness + expose “why this rank” numerics in UI (B).  
-- Finish `/api/search` temporal decay + Supabase/Chroma adapter (B).  
-- Schedule analytics refresh (cron/n8n) + monitor `/api/health` (B/C).  
+- Expose “Why this next” pill using `ttm_per_lo` and `elg_per_min` from `public/analytics/latest.json` (B).  
+- Implement RAG recall@k harness and document thresholds; verify `/api/search` ranking (B).  
+- Schedule analytics refresh (cron/n8n) and monitor `/api/health` (B/C).  
 - React Flow editors + OKC polish (D).  
-- Publish evidence latency check (P95 <250 ms) + document in README (governance).
+- Publish evidence latency check (P95 <250 ms) and document expectations in README (governance).  
+- Run `npm run score:rubric` and attach `public/analytics/rubric-score.json` to tracker (PM cadence).
 
 ## Cadence
 - Daily: sync PLAN status; triage issues; verify CI on latest PRs.  
@@ -70,4 +78,4 @@
 - Release: gates green (validator, perf, rubric). A11y non‑blocking in OKC phase. Evidence latency spot‑check; blueprint preflight passes.
 
 ## Single Next Step
-Run Codex LO-Extractor on one real PPT/PDF → update `config/los.json`. Follow with LessonSmith for 5–10 LOs and ItemSmith for 10–15 MCQs; iterate until `npm run validate:items` reports ✓.
+Run LO‑Extractor on one real PPT/PDF → update `config/los.json`. Follow with LessonSmith for 5–10 LOs and ItemSmith for 10–15 MCQs; iterate until `npm run validate:items` reports ✓.

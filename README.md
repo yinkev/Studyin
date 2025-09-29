@@ -16,7 +16,7 @@ npm test                 # Run engine smoke tests (Vitest)
 npm run dev
 ```
 
-Requirements: Node 20.14.x LTS (set via `.nvmrc` soon). Install Git LFS for evidence assets.
+Requirements: Node 20.14.x LTS (set via `.nvmrc`). Install Git LFS for evidence assets.
 
 ## Repository Layout
 
@@ -70,6 +70,7 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 - Unit: `npm test` (Vitest).
 - CI runs: validate → unit → analyze → build → Lighthouse CI (per `.lighthouserc.json`).
 - A11y is non‑blocking during the OKC heavy‑visual phase. You may still run `npm run ci:axe` locally if desired.
+- PM pulse: `npm run score:rubric` writes `public/analytics/rubric-score.json` for tracking.
 
 ## Agents & Prompts
 

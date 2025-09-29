@@ -1,14 +1,15 @@
 ## Summary
 - [ ] Purpose and scope clearly described
 - [ ] Relevant screenshots/video (if UI change)
+- [ ] PRD/IMPLEMENTATION updated for significant feature changes
 
 ## Gates (check when satisfied)
 - [ ] `npm run validate:items`
 - [ ] `npm test -- --run`
 - [ ] `npm run analyze`
-- [ ] axe automated checks (no critical issues)
-- [ ] Lighthouse budgets (TTI < 2s, LCP < 2.5s, INP < 200ms, CLS < 0.1, bundle budget)
-- [ ] Rubric score ≥ 92 with ★ ≥ 2.8 (attach output)
+- [ ] Lighthouse budgets (TTI < 2s, FCP < 2s, TBT < 200 ms, CLS < 0.1)
+- [ ] A11y audited (non‑blocking during OKC phase; note any known issues)
+- [ ] Rubric score meets thresholds (attach `public/analytics/rubric-score.json`)
 
 ## Evidence
 - [ ] Evidence crops committed (Git LFS) with `{file,page,(bbox|cropPath),citation}`

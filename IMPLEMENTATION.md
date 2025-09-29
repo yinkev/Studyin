@@ -86,12 +86,12 @@ This plan translates the backend roadmap for Studyin into executable work. The g
 - Backout: remove routes and helpers; restore previous `scripts/analyze.mjs` if required (keep git tag before refactor).
 - ProjectManager to update `PLAN.md` after each merge; ReleaseManager verifies validator/tests/analytics/axe/LH gates.
 
-## Timeline & Ownership (indicative)
-- **Week 1:** Docs sweep; snapshot insert + `/api/snapshots/latest`; schedule refresh job.
-- **Week 2:** Reliability metrics; analyzer + tests; update latest.json schema & UI consumers.
-- **Week 3:** RAG indexer + `/api/search`; Supabase `evidence_chunks`; retrieval tests.
-- **Week 4:** React Flow graphs; accessibility/perf audits; finalize docs & PLAN.md.
-- **Ongoing:** Automate refresh, monitor health, evolve analytics signals.
+## Execution Phases (sequence, no dates)
+- Foundation: Docs sweep, ensure validator green, wire `/api/snapshots/latest`, and schedule analytics refresh.
+- Reliability: Extend analyzer for point‑biserial and KR‑20/α; add tests and update `latest.json` consumers.
+- Retrieval: Build RAG indexer and `/api/search`; create `evidence_chunks` store; add deterministic ranking tests.
+- Visualization: Enhance React Flow graphs (confusion, blueprint gaps, sessions) with OKC polish.
+- Governance: Automate rubric scoring in PRs, keep PLAN updated post‑merge, and document any perf justifications.
 
 ## Risk Register
 | Risk | Owner | Status | Mitigation |
