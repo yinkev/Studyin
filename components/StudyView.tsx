@@ -1,7 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
+import type { OptimisticLearnerStateUpdate } from '../lib/client/useLearnerState';
+  optimisticLearnerStateUpdate: OptimisticLearnerStateUpdate;
+  invalidateLearnerState: () => Promise<void>;
 // (no-op)
 
 interface StudyViewProps {
@@ -58,33 +62,82 @@ export function StudyView({ items, analytics }: StudyViewProps) {
     setFeedback({ correctShown: false });
     setEvidenceOpen(false);
     setIndex((prev) => (prev + 1) % items.length);
-  }, [items.length]);
-
-  const handlePrev = useCallback(() => {
-    setFeedback({ correctShown: false });
-    setEvidenceOpen(false);
-    setIndex((prev) => (prev - 1 + items.length) % items.length);
-  }, [items.length]);
-
-  useEffect(() => {
-    const listener = (event: KeyboardEvent) => {
-      if (!current) return;
-      const key = event.key;
-      if (key === 'ArrowRight' || key === 'n') {
-        handleNext();
-      } else if (key === 'ArrowLeft' || key === 'p') {
-        handlePrev();
-      } else if (key === 'e' || key === 'E') {
-        setEvidenceOpen((prev) => !prev);
-      } else if (/^[1-5]$/.test(key)) {
-        const idx = Number(key) - 1;
-        const choice = (['A', 'B', 'C', 'D', 'E'] as const)[idx];
-        handleSelect(choice);
+export function StudyView({
+  items,
+  analytics,
+  learnerId,
+  learnerState,
+  onLearnerStateChange,
+  optimisticLearnerStateUpdate,
+  invalidateLearnerState
+}: StudyViewProps) {
+  const studyAttemptMutation = useMutation<
+    Awaited<ReturnType<typeof submitStudyAttempt>>,
+    Error,
+    Parameters<typeof submitStudyAttempt>[0],
+    { previous: LearnerState }
+  >({
+    mutationFn: submitStudyAttempt,
+    onMutate: async (variables) => {
+      const snapshot = await optimisticLearnerStateUpdate((current) => {
+        const now = Date.now();
+        const existing = current.items[variables.itemId] ?? {
+          attempts: 0,
+          correct: 0,
+          recentAttempts: [] as number[]
+        };
+        const attempts = (existing.recentAttempts ?? []).slice(-20);
+        attempts.push(now);
+        return {
+          ...current,
+          updatedAt: new Date().toISOString(),
+          items: {
+            ...current.items,
+            [variables.itemId]: {
+              attempts: (existing.attempts ?? 0) + 1,
+              correct: (existing.correct ?? 0) + (variables.correct ? 1 : 0),
+              lastAttemptTs: now,
+              recentAttempts: attempts.slice(-20)
+            }
+          }
+        } satisfies LearnerState;
+      });
+      return { previous: snapshot };
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previous) {
+        onLearnerStateChange(context.previous);
       }
-    };
-    window.addEventListener('keydown', listener);
-    return () => window.removeEventListener('keydown', listener);
-  }, [current, handleNext, handlePrev, handleSelect]);
+      console.error('submitStudyAttempt failed', error);
+    },
+    onSuccess: (result) => {
+      if (result?.learnerState) {
+        onLearnerStateChange(result.learnerState);
+      }
+    },
+    onSettled: () => {
+      void invalidateLearnerState();
+    }
+  });
+  const isPending = studyAttemptMutation.isPending;
+      if (!current || feedback.correctShown || isPending) return;
+      studyAttemptMutation.mutate({
+        learnerId,
+        sessionId,
+        itemId: current.id,
+        loIds: current.los ?? [],
+        difficulty: current.difficulty,
+        choice,
+        correct: choice === current.key,
+        durationMs,
+        openedEvidence: evidenceOpen,
+        appVersion: process.env.NEXT_PUBLIC_APP_VERSION
+    [current, evidenceOpen, feedback.correctShown, isPending, learnerId, questionStart, sessionId, studyAttemptMutation]
+    if (isPending) return;
+  }, [isPending, items.length]);
+    if (isPending) return;
+  }, [isPending, items.length]);
+  }, [current, handleNext, handlePrev, isPending, letters, submitAttempt]);
 
   if (!current) {
     return (
@@ -94,7 +147,7 @@ export function StudyView({ items, analytics }: StudyViewProps) {
     );
   }
 
-  const letters = ['A', 'B', 'C', 'D', 'E'] as const;
+    <div className="space-y-6 px-4 py-6" aria-busy={isPending}>
   const selected = feedback.selected;
   const isCorrect = selected && selected === current.key;
 
@@ -233,3 +286,11 @@ export function StudyView({ items, analytics }: StudyViewProps) {
     </div>
   );
 }
+            <div className="flex items-center gap-3">
+              {isPending && <span className="text-xs text-emerald-700 animate-pulse">Saving attempt…</span>}
+              {feedback.correctShown && current && (
+                <span className={`font-semibold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}`}>
+                  {isCorrect ? 'Correct' : `Correct answer: ${current.key}`}
+                </span>
+              )}
+            </div>
