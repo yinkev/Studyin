@@ -2,16 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/radix/popover';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from './ui/radix/dialog';
-import { VisuallyHidden } from './ui/radix/visually-hidden';
+// (no-op)
 
 interface StudyViewProps {
   items: StudyItem[];
@@ -52,6 +43,7 @@ export function StudyView({ items, analytics }: StudyViewProps) {
   const [evidenceOpen, setEvidenceOpen] = useState(false);
 
   const current = items[index];
+  const [showWhy, setShowWhy] = useState(false);
   const whyNext = useMemo(() => getWhyThisNext(current?.id ?? '', current?.los ?? [], analytics), [current?.id, current?.los, analytics]);
 
   const handleSelect = useCallback(
@@ -113,17 +105,19 @@ export function StudyView({ items, analytics }: StudyViewProps) {
           <h1 className="text-2xl font-semibold text-gray-900">Practice</h1>
           <p className="text-sm text-gray-600">Keyboard: 1–5 answer · N/P arrows for navigation · E toggle evidence</p>
         </div>
-        <Popover>
-          <PopoverTrigger className="flex max-w-xs flex-col gap-1 rounded-full border border-gray-300 bg-white px-4 py-2 text-left text-sm text-gray-800 shadow transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
+        <div className="relative">
+          <button onClick={() => setShowWhy((v) => !v)} className="flex max-w-xs flex-col gap-1 rounded-full border border-gray-300 bg-white px-4 py-2 text-left text-sm text-gray-800 shadow transition hover:bg-gray-50">
             <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">Why this next</span>
             <span className="line-clamp-2 text-sm">{whyNext}</span>
-          </PopoverTrigger>
-          <PopoverContent className="w-96 space-y-2 border-gray-200 bg-white text-gray-900">
-            <h3 className="text-sm font-semibold">Focus rationale</h3>
-            <p className="text-sm">{whyNext}</p>
-            <p className="text-xs text-gray-500">Keyboard: Enter/Space to open · Escape to close.</p>
-          </PopoverContent>
-        </Popover>
+          </button>
+          {showWhy && (
+            <div className="absolute right-0 z-10 mt-2 w-96 rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-900 shadow-xl">
+              <h3 className="text-sm font-semibold">Focus rationale</h3>
+              <p className="text-sm">{whyNext}</p>
+              <p className="text-xs text-gray-500">Keyboard: E toggles evidence.</p>
+            </div>
+          )}
+        </div>
       </header>
 
       <article className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
@@ -200,37 +194,24 @@ export function StudyView({ items, analytics }: StudyViewProps) {
         </section>
 
         <aside className="space-y-4 duo-card p-5">
-          <Dialog open={evidenceOpen} onOpenChange={setEvidenceOpen}>
-            <header className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900">Evidence</h3>
-              <DialogTrigger asChild>
-                <button className="text-[10px] uppercase tracking-wide text-gray-600 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
-                  {evidenceOpen ? 'Close (E)' : 'View (E)'}
-                </button>
-              </DialogTrigger>
-            </header>
-            <div className="space-y-2 text-xs text-gray-700">
-              <p>{current.evidence?.citation ?? 'Evidence crop pending review.'}</p>
-              <p>
-                Source: {current.evidence?.file ?? 'source PDF'}
-                {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
-              </p>
-            </div>
-            <DialogContent className="border-gray-200 bg-white text-gray-900">
-              <DialogHeader>
-                <DialogTitle>Evidence for {current.id}</DialogTitle>
-                <DialogDescription className="text-gray-600">
-                  {current.evidence?.citation ?? 'Review the attached primary source.'}
-                </DialogDescription>
-              </DialogHeader>
+          <header className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-900">Evidence</h3>
+            <button onClick={() => setEvidenceOpen((v)=>!v)} className="text-[10px] uppercase tracking-wide text-gray-600 hover:text-gray-800">
+              {evidenceOpen ? 'Close (E)' : 'View (E)'}
+            </button>
+          </header>
+          <div className="space-y-2 text-xs text-gray-700">
+            <p>{current.evidence?.citation ?? 'Evidence crop pending review.'}</p>
+            <p>
+              Source: {current.evidence?.file ?? 'source PDF'}
+              {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
+            </p>
+          </div>
+          {evidenceOpen && (
+            <div className="space-y-3">
               {current.evidence?.dataUri ? (
                 <figure className="space-y-3">
-                  <img
-                    src={current.evidence.dataUri}
-                    alt={current.evidence.citation ?? current.id}
-                    className="w-full rounded-lg border border-gray-200 object-contain"
-                    loading="lazy"
-                  />
+                  <img src={current.evidence.dataUri} alt={current.evidence.citation ?? current.id} className="w-full rounded-lg border border-gray-200 object-contain" loading="lazy" />
                   <figcaption className="text-xs text-gray-500">
                     {current.evidence?.file ?? 'source.pdf'}
                     {current.evidence?.page ? ` · Page ${current.evidence.page}` : ''}
@@ -243,21 +224,10 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                 </p>
               )}
               {current.evidence?.source_url && (
-                <a
-                  href={current.evidence.source_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-1 text-xs text-gray-800 hover:bg-gray-50"
-                >
-                  View source URL
-                </a>
+                <a href={current.evidence.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-1 text-xs text-gray-800 hover:bg-gray-50">View source URL</a>
               )}
-              <p className="text-xs text-gray-500">Keyboard: Press Escape to close. Shortcut E toggles this dialog.</p>
-            </DialogContent>
-          </Dialog>
-          <VisuallyHidden>
-            <span>Press the E key to toggle the evidence dialog.</span>
-          </VisuallyHidden>
+            </div>
+          )}
         </aside>
       </article>
     </div>

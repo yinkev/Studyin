@@ -4,7 +4,6 @@ import { useMemo, useState, useCallback } from 'react';
 import type { StudyItem } from '../lib/getItems';
 import type { LessonDoc } from '../lib/getLessons';
 import type { AnalyticsSummary } from '../lib/getAnalytics';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/radix/tabs';
 import { LessonsView } from './LessonsView';
 import { StudyView } from './StudyView';
 
@@ -16,6 +15,7 @@ interface StudyTabsProps {
 
 export function StudyTabs({ items, lessons, analytics }: StudyTabsProps) {
   const [activeLo, setActiveLo] = useState<string | null>(lessons[0]?.lo_id ?? null);
+  const [tab, setTab] = useState<'learn' | 'practice'>('learn');
   const practiceItems = useMemo(() => {
     if (!activeLo) return items;
     const filtered = items.filter((it) => (it.los ?? []).includes(activeLo));
@@ -30,23 +30,22 @@ export function StudyTabs({ items, lessons, analytics }: StudyTabsProps) {
   }, []);
 
   return (
-    <Tabs defaultValue="learn" className="space-y-6 px-4 py-10 max-w-6xl mx-auto text-gray-900">
+    <section className="space-y-6 px-4 py-10 max-w-6xl mx-auto text-gray-900">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-gray-500">Mastery cockpit</p>
           <h1 className="text-3xl font-extrabold">Study</h1>
         </div>
-        <TabsList>
-          <TabsTrigger value="learn">Learn</TabsTrigger>
-          <TabsTrigger value="practice" data-study-trigger="practice">Practice</TabsTrigger>
-        </TabsList>
+        <div className="inline-flex items-center gap-2">
+          <button className={`btn-ghost ${tab==='learn' ? 'ring-2 ring-green-500' : ''}`} onClick={() => setTab('learn')}>Learn</button>
+          <button className={`btn-ghost ${tab==='practice' ? 'ring-2 ring-green-500' : ''}`} data-study-trigger="practice" onClick={() => setTab('practice')}>Practice</button>
+        </div>
       </div>
-      <TabsContent value="learn" className="focus-visible:outline-none">
+      {tab === 'learn' ? (
         <LessonsView lessons={lessons} onPractice={handlePractice} />
-      </TabsContent>
-      <TabsContent value="practice" className="focus-visible:outline-none">
+      ) : (
         <StudyView items={practiceItems} analytics={analytics} />
-      </TabsContent>
-    </Tabs>
+      )}
+    </section>
   );
 }
