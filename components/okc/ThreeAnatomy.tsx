@@ -105,9 +105,12 @@ export function ThreeAnatomy({ height = 256 }: { height?: number }) {
   return (
     <div>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" strategy="afterInteractive" onLoad={() => setThreeReady(true)} />
-      <Script src="https://threejs.org/examples/js/loaders/GLTFLoader.js" strategy="afterInteractive" onLoad={() => setLoaderReady(true)} />
+      <Script
+        src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"
+        strategy="afterInteractive"
+        onLoad={() => setLoaderReady(true)}
+      />
       <div ref={containerRef} style={{ height }} />
     </div>
   );
 }
-
