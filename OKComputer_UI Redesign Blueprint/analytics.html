@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Analytics - Studyin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-feather: #58CC02;
+            --duo-mask: #89E219;
+            --duo-eel: #4B4B4B;
+            --duo-snow: #FFFFFF;
+            --duo-macaw: #1CB0F6;
+            --duo-cardinal: #FF4B4B;
+            --duo-bee: #FFC800;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .duo-card {
+            background: var(--duo-snow);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .duo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--duo-snow) 0%, #f8fafc 100%);
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--duo-feather);
+            transform: translateY(-2px);
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(135deg, var(--duo-bee) 0%, var(--duo-macaw) 100%);
+            border-radius: 50%;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .bouncy-text {
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .chart-container {
+            min-height: 300px;
+        }
+        
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .trend-up {
+            color: var(--duo-feather);
+        }
+        
+        .trend-down {
+            color: var(--duo-cardinal);
+        }
+        
+        .learning-streak {
+            background: linear-gradient(135deg, var(--duo-cardinal) 0%, #ff6b6b 100%);
+            border-radius: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 75, 75, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0); }
+        }
+        
+        .module-progress {
+            background: linear-gradient(90deg, var(--duo-feather) 0%, var(--duo-mask) 100%);
+            border-radius: 12px;
+            height: 8px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            <span class="text-3xl bouncy-text" style="color: var(--duo-feather);">📚</span>
+                            Studyin
+                        </h1>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="learning-streak px-4 py-2 text-white font-bold">
+                        🔥 7 Day Streak
+                    </div>
+                    <div class="achievement-badge w-12 h-12 flex items-center justify-center text-white font-bold text-lg">
+                        🏆
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="py-12 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-4xl font-black text-gray-900 mb-4">
+                Your Learning <span class="bouncy-text" style="color: var(--duo-feather);">Analytics</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Track your progress, identify strengths, and discover areas for improvement with detailed insights into your learning journey.
+            </p>
+        </div>
+    </section>
+
+    <!-- Key Metrics Overview -->
+    <section class="py-8 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <!-- Overall Accuracy -->
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">🎯</div>
+                        <div class="metric-trend trend-up">
+                            <span class="text-sm font-bold">+5.2%</span>
+                            <span class="text-lg">↗️</span>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">94.2%</div>
+                    <div class="text-sm text-gray-600">Overall Accuracy</div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                        <div class="module-progress h-2 rounded-full" style="width: 94.2%;"></div>
+                    </div>
+                </div>
+
+                <!-- Study Time -->
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">⏱️</div>
+                        <div class="metric-trend trend-up">
+                            <span class="text-sm font-bold">+12.5%</span>
+                            <span class="text-lg">↗️</span>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">2.3h</div>
+                    <div class="text-sm text-gray-600">This Week</div>
+                    <div class="text-xs text-gray-500 mt-1">Avg: 19.7 min/day</div>
+                </div>
+
+                <!-- Questions Answered -->
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">❓</div>
+                        <div class="metric-trend trend-up">
+                            <span class="text-sm font-bold">+8.1%</span>
+                            <span class="text-lg">↗️</span>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">247</div>
+                    <div class="text-sm text-gray-600">Questions Answered</div>
+                    <div class="text-xs text-gray-500 mt-1">This month</div>
+                </div>
+
+                <!-- Current Streak -->
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">🔥</div>
+                        <div class="metric-trend trend-up">
+                            <span class="text-sm font-bold">+1</span>
+                            <span class="text-lg">↗️</span>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">7</div>
+                    <div class="text-sm text-gray-600">Day Streak</div>
+                    <div class="text-xs text-gray-500 mt-1">Best: 14 days</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="py-8 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <!-- Performance Trend -->
+                <div class="duo-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Performance Trend</h3>
+                    <div id="performanceChart" class="chart-container"></div>
+                </div>
+
+                <!-- Study Time Distribution -->
+                <div class="duo-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Study Time Distribution</h3>
+                    <div id="studyTimeChart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Module Progress -->
+            <div class="duo-card p-6 mb-12">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">Module Progress</h3>
+                <div id="moduleProgressChart" class="chart-container" style="min-height: 400px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Analytics -->
+    <section class="py-8 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Strengths & Weaknesses -->
+                <div class="duo-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Subject Areas</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-2xl">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">💪</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Upper Limb</div>
+                                    <div class="text-sm text-gray-600">Strong performance</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-green-600">96%</div>
+                                <div class="text-xs text-gray-500">Accuracy</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-2xl">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🧠</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Neuroanatomy</div>
+                                    <div class="text-sm text-gray-600">Needs practice</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-yellow-600">78%</div>
+                                <div class="text-xs text-gray-500">Accuracy</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-2xl">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">❤️</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Cardiovascular</div>
+                                    <div class="text-sm text-gray-600">Good progress</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-blue-600">89%</div>
+                                <div class="text-xs text-gray-500">Accuracy</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Achievements -->
+                <div class="duo-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Recent Achievements</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl">
+                            <div class="achievement-badge w-12 h-12 flex items-center justify-center text-xl">💪</div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800">Knowledge Seeker</div>
+                                <div class="text-sm text-gray-600">Completed 50 lessons</div>
+                                <div class="text-xs text-gray-500">2 days ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+                            <div class="achievement-badge w-12 h-12 flex items-center justify-center text-xl">⚡</div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800">Speed Demon</div>
+                                <div class="text-sm text-gray-600">Answered 20 questions in 5 minutes</div>
+                                <div class="text-xs text-gray-500">1 week ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl">
+                            <div class="achievement-badge w-12 h-12 flex items-center justify-center text-xl">🎯</div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800">Perfectionist</div>
+                                <div class="text-sm text-gray-600">Scored 100% in a quiz</div>
+                                <div class="text-xs text-gray-500">2 weeks ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Goals -->
+                <div class="duo-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Learning Goals</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-gray-800">Weekly Study Time</span>
+                                <span class="text-sm font-bold" style="color: var(--duo-feather);">12/15 hours</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="module-progress h-3 rounded-full" style="width: 80%;"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">3 hours remaining</div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-gray-800">Monthly Quizzes</span>
+                                <span class="text-sm font-bold" style="color: var(--duo-feather);">8/10 completed</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="module-progress h-3 rounded-full" style="width: 80%;"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">2 quizzes remaining</div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-gray-800">Accuracy Target</span>
+                                <span class="text-sm font-bold" style="color: var(--duo-feather);">94.2/95%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="module-progress h-3 rounded-full" style="width: 99.2%;"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Almost there!</div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-6 duo-button py-3 text-white font-bold" style="background: var(--duo-feather);">
+                        Set New Goals 🎯
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-4">
+                    <span class="text-3xl bouncy-text">📚</span> Studyin
+                </h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Transforming medical education with playful, engaging design inspired by Duolingo's award-winning approach to learning.
+                </p>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <p class="text-gray-500">
+                    © 2025 Studyin. Made with 💚 for medical students worldwide.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            animateProgressRings();
+            setupCardAnimations();
+        });
+
+        function initializeCharts() {
+            // Performance Trend Chart
+            const performanceChart = echarts.init(document.getElementById('performanceChart'));
+            const performanceOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
+                    axisLine: { show: false },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 70,
+                    max: 100,
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    splitLine: { 
+                        lineStyle: { 
+                            color: '#f0f0f0',
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Accuracy %',
+                    data: [85, 88, 92, 89, 94, 96, 94.2],
+                    type: 'line',
+                    smooth: true,
+                    lineStyle: {
+                        color: '#58CC02',
+                        width: 4
+                    },
+                    itemStyle: {
+                        color: '#58CC02',
+                        borderWidth: 3,
+                        borderColor: '#fff'
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(88, 204, 2, 0.3)' },
+                                { offset: 1, color: 'rgba(88, 204, 2, 0.05)' }
+                            ]
+                        }
+                    }
+                }]
+            };
+            performanceChart.setOption(performanceOption);
+
+            // Study Time Distribution Chart
+            const studyTimeChart = echarts.init(document.getElementById('studyTimeChart'));
+            const studyTimeOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c}h ({d}%)'
+                },
+                series: [{
+                    name: 'Study Time',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '18',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        { value: 1.2, name: 'Upper Limb', itemStyle: { color: '#58CC02' } },
+                        { value: 0.8, name: 'Neuroanatomy', itemStyle: { color: '#1CB0F6' } },
+                        { value: 0.3, name: 'Cardiovascular', itemStyle: { color: '#FFC800' } }
+                    ]
+                }]
+            };
+            studyTimeChart.setOption(studyTimeOption);
+
+            // Module Progress Chart
+            const moduleChart = echarts.init(document.getElementById('moduleProgressChart'));
+            const moduleOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                legend: {
+                    data: ['Completed', 'Remaining'],
+                    bottom: 0
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Upper Limb', 'Neuroanatomy', 'Cardiovascular', 'Respiratory', 'Digestive', 'Renal'],
+                    axisLine: { show: false },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    splitLine: { 
+                        lineStyle: { 
+                            color: '#f0f0f0',
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Completed',
+                        type: 'bar',
+                        stack: 'total',
+                        data: [8, 3, 0, 0, 0, 0],
+                        itemStyle: {
+                            color: '#58CC02',
+                            borderRadius: [0, 0, 0, 0]
+                        }
+                    },
+                    {
+                        name: 'Remaining',
+                        type: 'bar',
+                        stack: 'total',
+                        data: [4, 12, 10, 15, 12, 8],
+                        itemStyle: {
+                            color: '#e5e7eb',
+                            borderRadius: [0, 8, 8, 0]
+                        }
+                    }
+                ]
+            };
+            moduleChart.setOption(moduleOption);
+
+            // Make charts responsive
+            window.addEventListener('resize', () => {
+                performanceChart.resize();
+                studyTimeChart.resize();
+                moduleChart.resize();
+            });
+        }
+
+        function animateProgressRings() {
+            const progressRings = document.querySelectorAll('.progress-ring-circle');
+            progressRings.forEach((ring, index) => {
+                setTimeout(() => {
+                    const progress = [94.2, 80, 99.2][index] || 0;
+                    const circumference = 2 * Math.PI * 40;
+                    const offset = circumference - (progress / 100) * circumference;
+                    ring.style.strokeDashoffset = offset;
+                }, index * 200);
+            });
+        }
+
+        function setupCardAnimations() {
+            const cards = document.querySelectorAll('.duo-card, .stat-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            translateY: [50, 0],
+                            opacity: [0, 1],
+                            duration: 800,
+                            easing: 'easeOutElastic(1, .8)',
+                            delay: Math.random() * 200
+                        });
+                    }
+                });
+            });
+
+            cards.forEach(card => observer.observe(card));
+        }
+    </script>
+</body>
+</html>

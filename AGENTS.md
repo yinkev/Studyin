@@ -89,6 +89,8 @@ Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run buil
 
 Notes
 - Use Context7 MCP for up‑to‑date library documentation when drafting code‑adjacent sections; cite sources. If Context7 cannot supply material, explicitly note gaps and rely on in‑repo evidence.
+- Codex should rely on internal reasoning first; only call shell or other tools when they are strictly necessary for the task.
+- Codex MCP quickstart: prefer `npx @modelcontextprotocol/inspector codex mcp` for local inspection. In client configs, spawn `codex mcp serve` via stdio (see `.mcp/servers.example.json`). If inspector ports are busy, set `CLIENT_PORT` and `SERVER_PORT`.
 
 ## Rubric Snapshot (critical metrics)
 

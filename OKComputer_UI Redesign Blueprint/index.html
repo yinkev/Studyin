@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studyin - Learn with Duolingo-Inspired Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-feather: #58CC02;
+            --duo-mask: #89E219;
+            --duo-eel: #4B4B4B;
+            --duo-snow: #FFFFFF;
+            --duo-macaw: #1CB0F6;
+            --duo-cardinal: #FF4B4B;
+            --duo-bee: #FFC800;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .duo-button {
+            background: var(--duo-feather);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(88, 204, 2, 0.3);
+        }
+        
+        .duo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(88, 204, 2, 0.4);
+        }
+        
+        .duo-card {
+            background: var(--duo-snow);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .duo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+        }
+        
+        .duo-progress {
+            background: linear-gradient(90deg, var(--duo-feather) 0%, var(--duo-mask) 100%);
+            border-radius: 12px;
+            height: 12px;
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(135deg, var(--duo-bee) 0%, var(--duo-macaw) 100%);
+            border-radius: 50%;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .bouncy-text {
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .cultural-icon {
+            background: linear-gradient(135deg, var(--duo-macaw) 0%, var(--duo-feather) 100%);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .cultural-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .streak-counter {
+            background: linear-gradient(135deg, var(--duo-cardinal) 0%, #ff6b6b 100%);
+            border-radius: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 75, 75, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0); }
+        }
+        
+        .learning-path {
+            background: linear-gradient(135deg, var(--duo-snow) 0%, #f1f5f9 100%);
+            border-radius: 24px;
+            border: 3px solid var(--duo-feather);
+        }
+        
+        .module-card {
+            background: var(--duo-snow);
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .module-card:hover {
+            border-color: var(--duo-feather);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(88, 204, 2, 0.2);
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        
+        .celebration-confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--duo-bee);
+            animation: confetti-fall 3s linear infinite;
+        }
+        
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            <span class="text-3xl bouncy-text" style="color: var(--duo-feather);">📚</span>
+                            Studyin
+                        </h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="streak-counter px-4 py-2 text-white font-bold">
+                        🔥 7 Day Streak
+                    </div>
+                    <div class="achievement-badge w-12 h-12 flex items-center justify-center text-white font-bold text-lg">
+                        🏆
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-16 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-5xl font-black text-gray-900 mb-6">
+                Master Medical Knowledge with
+                <span style="color: var(--duo-feather);" class="bouncy-text">Confidence</span>
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                Experience the joy of learning with our Duolingo-inspired interface. 
+                Bold, bouncy, and bright design makes medical education fun and engaging.
+            </p>
+            <button class="duo-button px-8 py-4 text-white font-bold text-lg">
+                Start Learning Journey 🚀
+            </button>
+        </div>
+    </section>
+
+    <!-- Progress Dashboard -->
+    <section class="py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <!-- Overall Progress -->
+                <div class="duo-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">Overall Progress</h3>
+                        <span class="text-2xl">📊</span>
+                    </div>
+                    <div class="relative w-24 h-24 mx-auto mb-4">
+                        <svg class="progress-ring w-24 h-24">
+                            <circle class="progress-ring-circle" stroke="var(--duo-feather)" stroke-width="4" fill="transparent" r="40" cx="48" cy="48"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-xl font-bold" style="color: var(--duo-feather);">68%</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center">Keep up the great work!</p>
+                </div>
+
+                <!-- Weekly Goal -->
+                <div class="duo-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">Weekly Goal</h3>
+                        <span class="text-2xl">🎯</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span>Lessons Completed</span>
+                            <span class="font-bold">12/15</span>
+                        </div>
+                        <div class="duo-progress w-full">
+                            <div class="duo-progress h-full" style="width: 80%;"></div>
+                        </div>
+                        <p class="text-xs text-gray-600">3 more lessons to reach your goal!</p>
+                    </div>
+                </div>
+
+                <!-- Achievement Showcase -->
+                <div class="duo-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">Latest Achievement</h3>
+                        <span class="text-2xl">🏅</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="achievement-badge w-16 h-16 mx-auto mb-3 flex items-center justify-center text-2xl">
+                            💪
+                        </div>
+                        <h4 class="font-bold text-gray-900">Knowledge Seeker</h4>
+                        <p class="text-sm text-gray-600">Completed 50 lessons</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Modules -->
+    <section class="py-12 px-4 bg-gradient-to-br from-blue-50 to-green-50">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+                Choose Your Learning Path
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Upper Limb Module -->
+                <div class="module-card p-6 cursor-pointer">
+                    <div class="cultural-icon w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl">
+                        💪
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 text-center">Upper Limb Anatomy</h3>
+                    <p class="text-gray-600 text-sm mb-4 text-center">
+                        Master the complex anatomy of the upper extremities through interactive lessons and 3D visualizations.
+                    </p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span>Progress</span>
+                            <span class="font-bold" style="color: var(--duo-feather);">8/12 lessons</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="duo-progress h-2 rounded-full" style="width: 67%;"></div>
+                        </div>
+                    </div>
+                    <button class="w-full duo-button py-3 text-white font-bold">
+                        Continue Learning →
+                    </button>
+                </div>
+
+                <!-- Neuroanatomy Module -->
+                <div class="module-card p-6 cursor-pointer">
+                    <div class="cultural-icon w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl">
+                        🧠
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 text-center">Neuroanatomy</h3>
+                    <p class="text-gray-600 text-sm mb-4 text-center">
+                        Explore the intricate pathways of the nervous system with detailed diagrams and clinical correlations.
+                    </p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span>Progress</span>
+                            <span class="font-bold" style="color: var(--duo-feather);">3/15 lessons</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="duo-progress h-2 rounded-full" style="width: 20%;"></div>
+                        </div>
+                    </div>
+                    <button class="w-full duo-button py-3 text-white font-bold">
+                        Start Module →
+                    </button>
+                </div>
+
+                <!-- Cardiovascular Module -->
+                <div class="module-card p-6 cursor-pointer">
+                    <div class="cultural-icon w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl">
+                        ❤️
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 text-center">Cardiovascular System</h3>
+                    <p class="text-gray-600 text-sm mb-4 text-center">
+                        Understand heart anatomy and circulation through dynamic models and real-time visualizations.
+                    </p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span>Progress</span>
+                            <span class="font-bold" style="color: var(--duo-feather);">0/10 lessons</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="duo-progress h-2 rounded-full" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <button class="w-full duo-button py-3 text-white font-bold">
+                        Unlock Module 🔒
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Learning Features -->
+    <section class="py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+                Interactive Learning Experience
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- 3D Anatomy Viewer -->
+                <div class="duo-card p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">3D Anatomy Explorer</h3>
+                    <div class="bg-gradient-to-br from-blue-100 to-green-100 rounded-2xl h-64 flex items-center justify-center mb-6">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">🦴</div>
+                            <p class="text-gray-600">Interactive 3D Model</p>
+                            <p class="text-sm text-gray-500">Click and drag to explore</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button class="flex-1 duo-button py-3 text-white font-bold">
+                            🔄 Rotate Model
+                        </button>
+                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-2xl font-bold transition-colors">
+                            🎯 Quiz Mode
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Analytics -->
+                <div class="duo-card p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Learning Analytics</h3>
+                    <div id="progressChart" class="h-64 mb-6"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-4 bg-green-50 rounded-2xl">
+                            <div class="text-2xl font-bold" style="color: var(--duo-feather);">94%</div>
+                            <div class="text-sm text-gray-600">Accuracy Rate</div>
+                        </div>
+                        <div class="text-center p-4 bg-blue-50 rounded-2xl">
+                            <div class="text-2xl font-bold" style="color: var(--duo-macaw);">2.3h</div>
+                            <div class="text-sm text-gray-600">Study Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievement Gallery -->
+    <section class="py-16 px-4 bg-gradient-to-br from-yellow-50 to-orange-50">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+                Your Achievement Gallery
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div class="achievement-badge w-20 h-20 flex items-center justify-center text-2xl cursor-pointer" title="First Steps">
+                    👶
+                </div>
+                <div class="achievement-badge w-20 h-20 flex items-center justify-center text-2xl cursor-pointer" title="Quick Learner">
+                    ⚡
+                </div>
+                <div class="achievement-badge w-20 h-20 flex items-center justify-center text-2xl cursor-pointer" title="Consistency Master">
+                    🗓️
+                </div>
+                <div class="achievement-badge w-20 h-20 flex items-center justify-center text-2xl cursor-pointer" title="Perfectionist">
+                    ⭐
+                </div>
+                <div class="achievement-badge w-20 h-20 flex items-center justify-center text-2xl cursor-pointer" title="Team Player">
+                    🤝
+                </div>
+                <div class="achievement-badge w-20 h-20 flex items-center justify-center text-2xl cursor-pointer" title="Knowledge Seeker">
+                    💪
+                </div>
+            </div>
+            
+            <div class="text-center mt-8">
+                <p class="text-gray-600 mb-4">Collect all achievements to unlock special rewards!</p>
+                <button class="duo-button px-6 py-3 text-white font-bold">
+                    View All Achievements 🏆
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-4">
+                    <span class="text-3xl bouncy-text">📚</span> Studyin
+                </h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Transforming medical education with playful, engaging design inspired by Duolingo's award-winning approach to learning.
+                </p>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <p class="text-gray-500">
+                    © 2025 Studyin. Made with 💚 for medical students worldwide.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize animations and interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate progress ring
+            const progressRing = document.querySelector('.progress-ring-circle');
+            const circumference = 2 * Math.PI * 40;
+            const progress = 68;
+            const offset = circumference - (progress / 100) * circumference;
+            
+            setTimeout(() => {
+                progressRing.style.strokeDashoffset = offset;
+            }, 500);
+
+            // Animate cards on scroll
+            const cards = document.querySelectorAll('.duo-card, .module-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            translateY: [50, 0],
+                            opacity: [0, 1],
+                            duration: 800,
+                            easing: 'easeOutElastic(1, .8)',
+                            delay: Math.random() * 200
+                        });
+                    }
+                });
+            });
+
+            cards.forEach(card => observer.observe(card));
+
+            // Button hover animations
+            const buttons = document.querySelectorAll('.duo-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    anime({
+                        targets: button,
+                        scale: [1, 1.05],
+                        duration: 300,
+                        easing: 'easeOutElastic(1, .8)'
+                    });
+                });
+
+                button.addEventListener('mouseleave', () => {
+                    anime({
+                        targets: button,
+                        scale: [1.05, 1],
+                        duration: 300,
+                        easing: 'easeOutElastic(1, .8)'
+                    });
+                });
+            });
+
+            // Achievement badge interactions
+            const badges = document.querySelectorAll('.achievement-badge');
+            badges.forEach(badge => {
+                badge.addEventListener('click', () => {
+                    // Create celebration effect
+                    createCelebration(badge);
+                    
+                    anime({
+                        targets: badge,
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 360],
+                        duration: 600,
+                        easing: 'easeOutElastic(1, .8)'
+                    });
+                });
+            });
+
+            // Initialize progress chart
+            initializeProgressChart();
+
+            // Add scroll-triggered animations
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const parallax = document.querySelector('.bouncy-text');
+                if (parallax) {
+                    const speed = scrolled * 0.5;
+                    parallax.style.transform = `translateY(${speed}px)`;
+                }
+            });
+        });
+
+        function createCelebration(element) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 12; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'celebration-confetti';
+                confetti.style.left = centerX + 'px';
+                confetti.style.top = centerY + 'px';
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.background = ['#58CC02', '#89E219', '#1CB0F6', '#FFC800'][Math.floor(Math.random() * 4)];
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        function initializeProgressChart() {
+            const chartDom = document.getElementById('progressChart');
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    axisLine: { show: false },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    splitLine: { 
+                        lineStyle: { 
+                            color: '#f0f0f0',
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: [{
+                    data: [85, 92, 88, 94, 90, 96, 94],
+                    type: 'line',
+                    smooth: true,
+                    lineStyle: {
+                        color: '#58CC02',
+                        width: 4
+                    },
+                    itemStyle: {
+                        color: '#58CC02',
+                        borderWidth: 3,
+                        borderColor: '#fff'
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [{
+                                offset: 0, color: 'rgba(88, 204, 2, 0.3)'
+                            }, {
+                                offset: 1, color: 'rgba(88, 204, 2, 0.05)'
+                            }]
+                        }
+                    }
+                }]
+            };
+            
+            myChart.setOption(option);
+            
+            // Make chart responsive
+            window.addEventListener('resize', () => {
+                myChart.resize();
+            });
+        }
+    </script>
+</body>
+</html>
