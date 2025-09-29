@@ -36,7 +36,7 @@
 - Ensure runtime retrieval remains local; cloud is additive only.
 
 ### D — Authoring Speed (BACKLOG)
-- React Flow timeline editor + RAG inspector — PARTIAL (graphs exist; authoring editors pending perf/a11y budget).
+- React Flow timeline editor + RAG inspector — PARTIAL (graphs exist; authoring editors pending visual polish).
 - n8n local automations (ingest, nightly refresh, evidence backups) — TODO.
 - Anki styling (Tailwind-compiled CSS + QSS) — TODO.
 
@@ -58,13 +58,13 @@
 - Implement RAG recall@10 harness + expose “why this rank” numerics in UI (B).  
 - Finish `/api/search` temporal decay + Supabase/Chroma adapter (B).  
 - Schedule analytics refresh (cron/n8n) + monitor `/api/health` (B/C).  
-- React Flow editors + accessibility/perf audits (D).  
+- React Flow editors + OKC polish (D).  
 - Publish evidence latency check (P95 <250 ms) + document in README (governance).
 
 ## Cadence
 - Daily: sync PLAN status; triage issues; verify CI on latest PRs.  
 - Weekly: run `npm run score:rubric`; attach `public/analytics/rubric-score.json` to tracker; flag ★ < 2.8.  
-- Release: gates green (validator, a11y, perf, rubric). Evidence latency spot-check; blueprint preflight passes.
+- Release: gates green (validator, perf, rubric). A11y non‑blocking in OKC phase. Evidence latency spot‑check; blueprint preflight passes.
 
 ## Single Next Step
 Run Codex LO-Extractor on one real PPT/PDF → update `config/los.json`. Follow with LessonSmith for 5–10 LOs and ItemSmith for 10–15 MCQs; iterate until `npm run validate:items` reports ✓.

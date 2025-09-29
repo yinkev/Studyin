@@ -2,7 +2,7 @@
 
 Deterministic, evidence-first scaffold for Studyin modules. It ships with an OMS-1 upper-limb sample bank today, but the prompts, CI, and agents are module-agnostic so you can retarget new systems without retooling.
 
-UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + Radix UI primitives (wrapped under `components/ui/radix`) with light shadcn-style styling helpers. React Flow powers analytics graphs.
+UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + OKC (Duolingo‑inspired) design. Heavy visuals via anime.js (micro‑motion), ECharts (charts), Splide (carousels), and Three.js (3D viewer). React Flow powers the custom graphs.
 
 ## Quick Start
 
@@ -68,9 +68,8 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 ## Tests & CI
 
 - Unit: `npm test` (Vitest).
-- Manual/MCP a11y: use Chrome DevTools MCP or axe browser extension while `npm run dev` is running.
-- CI runs: validate → unit → analyze → build → axe CI (serious+ blockers) → Lighthouse CI (per `.lighthouserc.json`).
-- CI helpers: `npm run ci:axe`, `npm run ci:lh` (requires `npm run build` or a running server).
+- CI runs: validate → unit → analyze → build → Lighthouse CI (per `.lighthouserc.json`).
+- A11y is non‑blocking during the OKC heavy‑visual phase. You may still run `npm run ci:axe` locally if desired.
 
 ## Agents & Prompts
 
@@ -184,7 +183,7 @@ Notes
 1. Seed Supabase `attempts` with historical telemetry (use `scripts/tools/seed-attempts.mjs`) and verify analytics snapshots.
 2. Monitor hourly refresh job and `/api/health` (`last_generated_at` should be recent).
 3. Expand RAG coverage (chunk more evidence sources; run `scripts/rag/build-index.mjs`).
-4. Iterate React Flow dashboards (confusion graph, blueprint gap explorer, session trace) with accessibility audits.
+4. Iterate React Flow dashboards (confusion graph, blueprint gap explorer, session trace) with OKC polish.
 5. Broaden automated tests (Vitest + integration) to cover RAG search, reliability metrics, and snapshot endpoints.
 
-Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs.
+Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs. A11y gates are non‑blocking during this phase.
