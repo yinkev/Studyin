@@ -77,14 +77,21 @@ export function ConfusionGraph({ analytics }: ConfusionGraphProps) {
   }, [data]);
 
   if (!hasData) {
-    return <p className="text-sm text-slate-500">No confusion edges yet. Collect more attempts.</p>;
+    return <p className="text-sm text-slate-300/80">No confusion edges yet. Collect more attempts.</p>;
   }
 
   return (
-    <div className="h-96 w-full rounded-lg border border-slate-200 bg-white">
-      <ReactFlow nodes={nodes} edges={edges} fitView fitViewOptions={{ padding: 0.2 }} proOptions={{ hideAttribution: true }}>
-        <Background gap={24} color="#e2e8f0" />
-        <MiniMap pannable zoomable nodeStrokeColor="#0f172a" nodeColor="#e2e8f0" nodeBorderRadius={4} />
+    <div className="h-96 w-full rounded-xl border border-white/10 bg-white/5 shadow">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        proOptions={{ hideAttribution: true }}
+        style={{ fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, sans-serif' }}
+      >
+        <Background gap={24} color="#334155" />
+        <MiniMap pannable zoomable nodeStrokeColor="#94a3b8" nodeColor="#0b1220" nodeBorderRadius={6} />
         <Controls showInteractive={false} />
       </ReactFlow>
     </div>

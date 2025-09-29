@@ -9,7 +9,8 @@ export const SCHEMA_VERSIONS = Object.freeze({
   learningObjective: '1.0.0',
   errorTaxonomy: '1.0.0',
   attemptEvent: '1.0.0',
-  sessionEvent: '1.0.0'
+  sessionEvent: '1.0.0',
+  lessonEvent: '1.0.0'
 });
 
 const semver = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[\w.-]+)?$/;
@@ -136,6 +137,18 @@ export const sessionEventSchema = z.object({
   mastery_by_lo: z.record(z.number()).optional()
 });
 
+export const lessonEventSchema = z.object({
+  schema_version: schemaVersionSchema.default(SCHEMA_VERSIONS.lessonEvent),
+  app_version: z.string().min(1),
+  session_id: z.string().min(1),
+  user_id: z.string().min(1),
+  lo_id: z.string().min(1),
+  card_id: z.string().min(1),
+  action: z.enum(['reveal', 'play', 'pause', 'seek', 'complete']),
+  ts: z.number().int().nonnegative(),
+  dwell_ms: z.number().nonnegative().optional()
+});
+
 /**
  * Helper to parse NDJSON safely.
  */
@@ -154,4 +167,5 @@ export function parseNdjsonLine(line, schema) {
  * @typedef {import('zod').infer<typeof errorTaxonomySchema>} ErrorTaxonomy
  * @typedef {import('zod').infer<typeof attemptEventSchema>} AttemptEvent
  * @typedef {import('zod').infer<typeof sessionEventSchema>} SessionEvent
+ * @typedef {import('zod').infer<typeof lessonEventSchema>} LessonEvent
  */

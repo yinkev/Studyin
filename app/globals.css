@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root {
-  /* Studious theme (slate/navy with teal/blue accent) */
-  --background: 210 40% 98%; /* slate-50 */
-  --foreground: 222 47% 11%; /* slate-900 */
-  --muted: 214 32% 91%;
-  --muted-foreground: 215 16% 47%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 199 89% 48%; /* sky-500/teal-ish */
-  --primary: 222 47% 17%; /* deep slate */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
+  /* Dark neon theme by default (slate/indigo with sky accents) */
+  --background: 222 47% 9%;   /* slate-950-ish */
+  --foreground: 210 40% 98%;  /* slate-50 */
+  --muted: 222 47% 13%;       /* deep slate panels */
+  --muted-foreground: 215 20% 75%;
+  --border: 222 45% 18%;
+  --input: 222 45% 16%;
+  --ring: 199 89% 48%;        /* sky-500 accent */
+  --primary: 222 47% 14%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 222 40% 12%;
+  --secondary-foreground: 210 40% 98%;
   --accent: 199 89% 48%;
-  --accent-foreground: 0 0% 100%;
+  --accent-foreground: 222 47% 9%;
   --radius: 0.6rem;
 
-  color-scheme: light;
+  color-scheme: dark;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -62,4 +62,53 @@
 @layer base {
   * { @apply border-border; }
   body { @apply bg-background text-foreground; }
+  a, button { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70; }
 }
+
+/* OKC (Duolingo-inspired) palette + utilities */
+:root {
+  --okc-feather: #58CC02;
+  --okc-mask: #89E219;
+  --okc-eel: #4B4B4B;
+  --okc-snow: #FFFFFF;
+  --okc-macaw: #1CB0F6;
+  --okc-cardinal: #FF4B4B;
+  --okc-bee: #FFC800;
+}
+
+.okc-light { color-scheme: light; }
+
+.duo-button {
+  background: var(--okc-feather);
+  border-radius: 16px;
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+  box-shadow: 0 4px 12px rgba(88, 204, 2, 0.3);
+}
+.duo-button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(88, 204, 2, 0.4); }
+.duo-button:focus-visible { outline: 2px solid #111827; outline-offset: 3px; }
+
+.duo-card { background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+.duo-card { color: #4B4B4B; }
+.duo-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.12); transition: transform .2s ease, box-shadow .2s ease; }
+.duo-card h1, .duo-card h2, .duo-card h3, .duo-card h4 { color: #0f172a; }
+.duo-card p { color: #4B4B4B; }
+.duo-button { font-weight: 800; letter-spacing: .2px; }
+.duo-progress { background: linear-gradient(90deg, var(--okc-feather) 0%, var(--okc-mask) 100%); border-radius: 12px; }
+.achievement-badge { background: linear-gradient(135deg, var(--okc-bee) 0%, var(--okc-macaw) 100%); border-radius: 50%; }
+.bouncy-text { display: inline-block; animation: okc-float 3s ease-in-out infinite; }
+@keyframes okc-float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-6px)} }
+.streak-counter { background: linear-gradient(135deg, var(--okc-cardinal) 0%, #ff6b6b 100%); border-radius: 20px; }
+.okc-module-card { background: #fff; border-radius: 20px; border: 2px solid transparent; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.okc-module-card:hover { border-color: var(--okc-feather); transform: translateY(-6px); box-shadow: 0 16px 32px rgba(88, 204, 2, 0.2); }
+.okc-progress-ring { transform: rotate(-90deg); }
+.okc-progress-circle { stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset .5s ease-in-out; }
+.okc-confetti { position: absolute; width: 10px; height: 10px; animation: okc-confetti-fall 3s linear forwards; }
+@keyframes okc-confetti-fall { 0% { transform: translateY(-50vh) rotate(0deg) } 100% { transform: translateY(60vh) rotate(360deg) } }
+
+/* OKC utility surfaces */
+.okc-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb; background: #f8fafc; color: #334155; border-radius: 9999px; padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: .2px; }
+.okc-pill-ghost { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb; background: #ffffff; color: #475569; border-radius: 9999px; padding: 2px 8px; font-size: 10px; font-weight: 700; }
+.btn-ghost { border: 1px solid #e5e7eb; background: #ffffff; color: #111827; border-radius: 10px; padding: 6px 12px; }
+.btn-ghost:hover { background: #f8fafc; }
+.okc-section { padding-top: 56px; padding-bottom: 56px; }
+.okc-shadow { box-shadow: 0 12px 32px rgba(2, 6, 23, 0.08); }

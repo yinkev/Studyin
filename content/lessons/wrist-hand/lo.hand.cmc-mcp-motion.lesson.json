@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.hand.cmc-mcp-motion",
+  "lo_id": "lo.hand.cmc-mcp-motion",
+  "title": "Degrees of Freedom at the Hand Joints",
+  "summary": "Compare CMC, MCP, PIP, and DIP motions with quick icons and clinical tie-ins so learners can predict movement loss patterns.",
+  "high_yield": [
+    "Thumb CMC is saddle (flex/ext, abd/add, opposition); digits 2–5 are plane.",
+    "MCP joints allow flex/ext + abd/add + circumduction (except thumb).",
+    "PIP/DIP are hinge only—tie to splint positioning."
+  ],
+  "pitfalls": [
+    "Thumb MCP has limited abduction—clarify during the MCP section.",
+    "Students mix up passive vs. active ROM norms; include quick numerical cues (e.g., MCP flex 90°)."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 4,
+      "narration": "Introduce a joint stack infographic from proximal (CMC) to distal (DIP).",
+      "visual": "Vertical stack with joint icons and DOF badges."
+    },
+    {
+      "beat": 1,
+      "duration_s": 6,
+      "narration": "Animate thumb CMC showing opposition path versus a plane glide for the ring finger CMC.",
+      "visual": "Split animation: thumb sweeping across palm, ring finger sliding minimally."
+    },
+    {
+      "beat": 2,
+      "duration_s": 5,
+      "narration": "Highlight MCP flexion/extension plus abduction by toggling between fists and splayed fingers; end with hinge-only IP joints.",
+      "visual": "Hand silhouette flexing to fist then abducting digits, followed by hinge animation at PIP/DIP."
+    }
+  ]
+}

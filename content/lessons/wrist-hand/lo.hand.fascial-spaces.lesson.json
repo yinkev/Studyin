@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.hand.fascial-spaces",
+  "lo_id": "lo.hand.fascial-spaces",
+  "title": "Palmar and Dorsal Fascia Compartments",
+  "summary": "Slice the hand into compartments (thenar, hypothenar, midpalmar, adductor, dorsal) and connect each to infection spread pathways and surgical releases.",
+  "high_yield": [
+    "Midpalmar vs. thenar space separation is key for deep infections—show the septa boundaries.",
+    "Parona’s space continuity with forearm flexor compartment explains horseshoe abscess routes.",
+    "Emphasize dorsal subaponeurotic space for bite wound spread."
+  ],
+  "pitfalls": [
+    "Learners confuse lumbrical canals with fascial spaces—call them out separately.",
+    "Avoid suggesting spaces are always present cavities—note they are potential spaces opened by pathology."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 5,
+      "narration": "Begin with palmar fascia cross-section, coloring thenar, hypothenar, midpalmar, and adductor compartments.",
+      "visual": "Transverse slice diagram with color-coded compartments and labels."
+    },
+    {
+      "beat": 1,
+      "duration_s": 6,
+      "narration": "Show longitudinal view tracing the midpalmar space proximally to Parona’s space; animate infection arrow.",
+      "visual": "Side view with red arrow following flexor tendons into forearm."
+    },
+    {
+      "beat": 2,
+      "duration_s": 5,
+      "narration": "Flip to dorsal hand highlighting subcutaneous vs. subaponeurotic layers and lymphatic drainage to epitrochlear/axillary nodes.",
+      "visual": "Dorsal overlay with lymphatic arrows and caution icon for human bites."
+    }
+  ]
+}

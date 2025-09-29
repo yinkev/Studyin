@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.wrist.carpal-architecture",
+  "lo_id": "lo.wrist.carpal-architecture",
+  "title": "Orient to the Carpal Grid",
+  "summary": "Walk through proximal and distal carpal rows, landmarking each bone and their articulations so learners can visualize the grid before layering mechanics.",
+  "high_yield": [
+    "Remember the lateral-to-medial sequence (Scaphoid to Pisiform, Trapezium to Hamate) because it drives palpation and injury localization.",
+    "Capitate sits central and anchors the wrist axis—mention this before discussing midcarpal motion.",
+    "Hook of the hamate is a frequent compression site (ulnar nerve/artery) to flag for clinical translation."
+  ],
+  "pitfalls": [
+    "Learners often swap trapezium and trapezoid—highlight thumb alignment to prevent this.",
+    "Pisiform is sesamoid; emphasize it rides volar to the triquetrum so it is not mis-labeled as a carpal partner."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 5,
+      "narration": "Start with a dorsal wrist silhouette. Fade in proximal row bones labeled from scaphoid to pisiform.",
+      "visual": "Outline carpal grid; sequential highlight scaphoid→lunate→triquetrum→pisiform with captions."
+    },
+    {
+      "beat": 1,
+      "duration_s": 5,
+      "narration": "Bring on the distal row, anchoring trapezium at the thumb side and sweeping medially.",
+      "visual": "Add distal row overlay; animate labels trapezium→trapezoid→capitate→hamate."
+    },
+    {
+      "beat": 2,
+      "duration_s": 6,
+      "narration": "Call out key articulations: scaphoid with radius, lunate with radius, capitate pivot, hamate hook.",
+      "visual": "Pulse contact surfaces; draw arrows from bones to articulation callouts on side panel."
+    }
+  ]
+}

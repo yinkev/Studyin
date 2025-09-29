@@ -6,13 +6,58 @@ import { createClient } from '@supabase/supabase-js';
 import { generateDeterministicEmbedding, EMBEDDING_DIMENSIONS } from '../../lib/rag/embedding.mjs';
 
 const ROOT = process.cwd();
-const BANK_DIR = path.join(ROOT, 'content', 'banks', 'upper-limb-oms1');
+const DEFAULT_BANK_ROOT = path.join(ROOT, 'content', 'banks');
+
+function resolveFromRoot(targetPath) {
+  if (!targetPath) return null;
+  return path.isAbsolute(targetPath) ? targetPath : path.join(ROOT, targetPath);
+}
+
+const scopeInput = process.env.BANK_DIRS ?? process.env.SCOPE_DIRS ?? '';
+const BANK_SCOPES = scopeInput
+  .split(',')
+  .map((entry) => entry.trim())
+  .filter(Boolean)
+  .map((entry) => resolveFromRoot(entry))
+  .filter(Boolean);
+
+const ITEM_SCOPES = BANK_SCOPES.length ? BANK_SCOPES : [DEFAULT_BANK_ROOT];
+
+async function walkForItems(basePath, output) {
+  try {
+    const stat = await fs.stat(basePath);
+    if (stat.isFile()) {
+      if (basePath.endsWith('.item.json')) {
+        output.push(basePath);
+      }
+      return;
+    }
+    if (!stat.isDirectory()) return;
+  } catch (error) {
+    if (error.code === 'ENOENT') return;
+    throw error;
+  }
+
+  const entries = await fs.readdir(basePath, { withFileTypes: true });
+  for (const entry of entries) {
+    const nextPath = path.join(basePath, entry.name);
+    if (entry.isDirectory()) {
+      await walkForItems(nextPath, output);
+    } else if (entry.isFile() && entry.name.endsWith('.item.json')) {
+      output.push(nextPath);
+    }
+  }
+}
 
 async function loadItems() {
-  const files = (await fs.readdir(BANK_DIR)).filter((file) => file.endsWith('.item.json')).sort();
+  const files = [];
+  for (const scope of ITEM_SCOPES) {
+    await walkForItems(scope, files);
+  }
+  files.sort((a, b) => a.localeCompare(b));
   const items = [];
-  for (const file of files) {
-    const raw = await fs.readFile(path.join(BANK_DIR, file), 'utf8');
+  for (const filePath of files) {
+    const raw = await fs.readFile(filePath, 'utf8');
     items.push(JSON.parse(raw));
   }
   return items;
@@ -43,6 +88,10 @@ async function main() {
   }
   const supabase = createClient(url, key, { auth: { persistSession: false } });
   const items = await loadItems();
+  if (!items.length) {
+    console.error('No items found. Checked scopes:', ITEM_SCOPES.map((scope) => path.relative(ROOT, scope)).join(', '));
+    process.exit(1);
+  }
   const chunks = items.map(createChunkFromItem);
   for (const chunk of chunks) {
     const payload = {
@@ -64,6 +113,7 @@ async function main() {
     }
   }
   console.log(`Indexed ${chunks.length} evidence chunks (dim=${EMBEDDING_DIMENSIONS}).`);
+  console.log('Scopes:', ITEM_SCOPES.map((scope) => path.relative(ROOT, scope)).join(', '));
 }
 
 await main();

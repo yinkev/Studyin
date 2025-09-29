@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.hand.intrinsic-muscle-groups",
+  "lo_id": "lo.hand.intrinsic-muscle-groups",
+  "title": "Map the Intrinsic Muscle Groups",
+  "summary": "Segment thenar, hypothenar, lumbricals, and interossei with origin/insertion mnemonics and quick innervation overlays.",
+  "high_yield": [
+    "Reinforce LOAF innervation split (median vs. ulnar) while highlighting muscle bellies.",
+    "Show functional motions (opposition, abduction/adduction) to connect to clinical deficits.",
+    "Use color-coded groups to prep for intrinsic-minus hand pathology recognition."
+  ],
+  "pitfalls": [
+    "Avoid overwhelming with too many attachment points—limit to proximal/distal summary boxes.",
+    "Differentiate dorsal vs. palmar interossei actions (DAB/PAD) explicitly."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 5,
+      "narration": "Highlight thenar muscles sequentially (Abductor/APB, Flexor/FPB, Opponens) with LOAF callout.",
+      "visual": "Thumb mound color-coded; overlay 'Median nerve (recurrent branch)'."
+    },
+    {
+      "beat": 1,
+      "duration_s": 5,
+      "narration": "Shift to hypothenar trio (ADM, FDM, ODM) plus palmaris brevis; tag ulnar nerve innervation.",
+      "visual": "Medial palm glow with ulnar nerve icon flowing through Guyon’s canal."
+    },
+    {
+      "beat": 2,
+      "duration_s": 6,
+      "narration": "Overlay lumbricals and interossei with motion arrows (DAB/PAD) and note dual innervation for lumbricals 1–2.",
+      "visual": "Palmar view with arrows showing ab/adduct; text badges for median vs. deep ulnar."
+    }
+  ]
+}

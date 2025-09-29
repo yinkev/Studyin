@@ -14,9 +14,23 @@ import { isBlueprintFeasible, deriveLoTargets } from './lib/blueprint.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-const BANK_DIR = path.join(ROOT, 'content', 'banks', 'upper-limb-oms1');
-const BLUEPRINT_PATH = path.join(ROOT, 'config', 'blueprint.json');
-const LOS_PATH = path.join(ROOT, 'config', 'los.json');
+const DEFAULT_BANK_ROOT = path.join(ROOT, 'content', 'banks');
+
+function resolveFromRoot(targetPath, fallback) {
+  if (!targetPath) return fallback;
+  return path.isAbsolute(targetPath) ? targetPath : path.join(ROOT, targetPath);
+}
+
+const SCOPE_DIRS = (process.env.SCOPE_DIRS ?? '')
+  .split(',')
+  .map((entry) => entry.trim())
+  .filter(Boolean)
+  .map((entry) => resolveFromRoot(entry, entry));
+
+const BANK_SCOPES = SCOPE_DIRS.length ? SCOPE_DIRS : [DEFAULT_BANK_ROOT];
+
+const BLUEPRINT_PATH = resolveFromRoot(process.env.BLUEPRINT_PATH, path.join(ROOT, 'config', 'blueprint.json'));
+const LOS_PATH = resolveFromRoot(process.env.LOS_PATH, path.join(ROOT, 'config', 'los.json'));
 const TARGET_FORM_LENGTH = Number.parseInt(process.env.VALIDATION_FORM_LENGTH ?? '30', 10);
 const REQUIRE_EVIDENCE_CROP = process.env.REQUIRE_EVIDENCE_CROP !== '0';
 
@@ -49,6 +63,32 @@ function ensureChoicesUnique(item) {
   return duplicates;
 }
 
+async function walkForItems(basePath, output) {
+  try {
+    const stat = await fs.stat(basePath);
+    if (stat.isFile()) {
+      if (basePath.endsWith('.item.json')) {
+        output.push(basePath);
+      }
+      return;
+    }
+    if (!stat.isDirectory()) return;
+  } catch (error) {
+    if (error.code === 'ENOENT') return;
+    throw error;
+  }
+
+  const entries = await fs.readdir(basePath, { withFileTypes: true });
+  for (const entry of entries) {
+    const nextPath = path.join(basePath, entry.name);
+    if (entry.isDirectory()) {
+      await walkForItems(nextPath, output);
+    } else if (entry.isFile() && entry.name.endsWith('.item.json')) {
+      output.push(nextPath);
+    }
+  }
+}
+
 async function main() {
   try {
     const blueprintRaw = await readJson(BLUEPRINT_PATH);
@@ -58,10 +98,14 @@ async function main() {
     const loDoc = learningObjectivesDocumentSchema.parse(loDocRaw);
     const loSet = new Set(loDoc.learning_objectives.map((lo) => lo.id));
 
-    const files = await fs.readdir(BANK_DIR);
-    const itemFiles = files.filter((file) => file.endsWith('.item.json')).sort();
+    const collectedFiles = [];
+    for (const scope of BANK_SCOPES) {
+      await walkForItems(scope, collectedFiles);
+    }
+    const itemFiles = collectedFiles.sort((a, b) => a.localeCompare(b));
     if (!itemFiles.length) {
-      console.error('No item files found in', path.relative(ROOT, BANK_DIR));
+      const scopeSummary = BANK_SCOPES.map((scope) => path.relative(ROOT, scope)).join(', ');
+      console.error('No item files found. Checked scopes:', scopeSummary || '(none)');
       process.exitCode = 1;
       return;
     }
@@ -70,8 +114,7 @@ async function main() {
     const summaries = [];
     const parsedItems = [];
 
-    for (const filename of itemFiles) {
-      const filePath = path.join(BANK_DIR, filename);
+    for (const filePath of itemFiles) {
       const raw = await readJson(filePath);
       const parsed = itemSchema.parse(raw);
 
@@ -115,7 +158,7 @@ async function main() {
       }
 
       if (itemErrors.length) {
-        errors.push({ file: filename, messages: itemErrors });
+        errors.push({ file: path.relative(ROOT, filePath), messages: itemErrors });
       }
 
       parsedItems.push(parsed);
@@ -178,6 +221,7 @@ async function main() {
 
     if (!errors.length) {
       console.log(`✓ ${itemFiles.length} items validated`);
+      console.log('Scopes:', BANK_SCOPES.map((scope) => path.relative(ROOT, scope)).join(', '));
       console.log(
         `Blueprint '${blueprint.id}' weights tracked (${Object.keys(blueprint.weights).length} LOs)`
       );

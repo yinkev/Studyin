@@ -97,9 +97,8 @@ export function ConfusionForce({ analytics, width = 680, height = 340 }: { analy
   }, [nodes, links, width, height]);
 
   return (
-    <ChartCard title="Confusion graph" description="LO nodes connect to distractors; width ~ count" className="bg-white">
+    <ChartCard title="Confusion graph" description="LO nodes connect to distractors; width ~ count">
       <svg ref={ref} width={width} height={height} role="img" aria-label="Confusion graph" />
     </ChartCard>
   );
 }
-

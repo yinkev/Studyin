@@ -2,7 +2,7 @@
 
 Deterministic, evidence-first scaffold for Studyin modules. It ships with an OMS-1 upper-limb sample bank today, but the prompts, CI, and agents are module-agnostic so you can retarget new systems without retooling.
 
-UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + Radix UI primitives (wrapped under `components/ui/radix`) with light shadcn-style styling helpers. React Flow powers analytics graphs.
+UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + OKC (Duolingo‑inspired) design. Heavy visuals via anime.js (micro‑motion), ECharts (charts), Splide (carousels), and Three.js (3D viewer). React Flow powers the custom graphs.
 
 ## Quick Start
 
@@ -68,9 +68,8 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 ## Tests & CI
 
 - Unit: `npm test` (Vitest).
-- Manual/MCP a11y: use Chrome DevTools MCP or axe browser extension while `npm run dev` is running.
-- CI runs: validate → unit → analyze → build → axe CI (serious+ blockers) → Lighthouse CI (per `.lighthouserc.json`).
-- CI helpers: `npm run ci:axe`, `npm run ci:lh` (requires `npm run build` or a running server).
+- CI runs: validate → unit → analyze → build → Lighthouse CI (per `.lighthouserc.json`).
+- A11y is non‑blocking during the OKC heavy‑visual phase. You may still run `npm run ci:axe` locally if desired.
 
 ## Agents & Prompts
 
@@ -84,19 +83,38 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 
 ## MCP Tooling (Context7, Codex MCP, Chrome DevTools MCP)
 
-- **Context7 + Codex MCP**: configure your MCP client (Cursor, Context7 desktop, VS Code MCP) to point at `scripts/codex/` prompts. Set the working directory to the repo root.
-- **Chrome DevTools MCP**: run `npm run dev` (auto-opens http://localhost:3000) and start Chrome with `--remote-debugging-port=9222`. Attach the DevTools MCP to audit accessibility/perf.
-- **Usage pattern**:
-  1. Generate a context window in your MCP client (open files or load `PLAN.md`).
-  2. Run a prompt (planner / PM / itemsmith / validator) with recent diffs or questions.
-  3. For quick a11y/perf checks, use Chrome DevTools MCP or the axe extension, then note results in PLAN.md or the PR.
+- Context7 docs: prefer Context7 MCP for library documentation and syntax help. Export `CONTEXT7_API_KEY` in your shell; never hard‑code secrets in configs.
+- Codex as MCP: clients should spawn Codex via stdio (`codex mcp serve`). For quick inspection without a client, run the Inspector:
+  - `npx @modelcontextprotocol/inspector codex mcp`
+  - If ports 6274/6277 are busy: `CLIENT_PORT=8080 SERVER_PORT=9000 npx @modelcontextprotocol/inspector codex mcp`
+- Chrome DevTools MCP: run `npm run dev` (http://localhost:3000) and start Chrome with `--remote-debugging-port=9222`. Attach the DevTools MCP to audit accessibility/perf.
+- Usage pattern:
+  1. Open files or load `PLAN.md` in your MCP client to seed context.
+  2. Run planner/PM/itemsmith/validator prompts with recent diffs.
+  3. Use DevTools MCP or axe for a11y/perf, log results in PLAN.md or PR.
 
 ### Quick setup
-1. Copy `.mcp/servers.example.json` to your MCP servers config (often `~/.config/mcp/servers.json`).
-2. Adjust the Studyin path if the repo lives elsewhere.
-3. Ensure `codex-mcp-server` and `chrome-devtools-mcp` CLIs are available (via `npm install -g` or `npx`).
-4. Start `npm run dev`. Launch Chrome: `open -a "Google Chrome" --args --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-mcp` (macOS example).
-5. Reload Context7; confirm tools like `fs.readFile`, `git.diff`, `navigate`, `lighthouse`, `axe` are listed.
+1. Copy `.mcp/servers.example.json` to your MCP client config (often `~/.config/mcp/servers.json`).
+2. Adjust paths if the repo lives elsewhere.
+3. Example server entries (STDIO transport):
+```
+{
+  "mcpServers": {
+    "codex": {
+      "type": "stdio",
+      "command": "codex",
+      "args": ["mcp", "serve"]
+    },
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["chrome-devtools-mcp", "--target", "http://localhost:3000", "--chrome-port", "9222"]
+    }
+  }
+}
+```
+Notes
+- `codex mcp serve` exits immediately if no client is attached; your MCP client is responsible for spawning and maintaining the stdio pipes.
 
 
 ## Working With Codex & Git
@@ -165,7 +183,7 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 1. Seed Supabase `attempts` with historical telemetry (use `scripts/tools/seed-attempts.mjs`) and verify analytics snapshots.
 2. Monitor hourly refresh job and `/api/health` (`last_generated_at` should be recent).
 3. Expand RAG coverage (chunk more evidence sources; run `scripts/rag/build-index.mjs`).
-4. Iterate React Flow dashboards (confusion graph, blueprint gap explorer, session trace) with accessibility audits.
+4. Iterate React Flow dashboards (confusion graph, blueprint gap explorer, session trace) with OKC polish.
 5. Broaden automated tests (Vitest + integration) to cover RAG search, reliability metrics, and snapshot endpoints.
 
-Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs.
+Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs. A11y gates are non‑blocking during this phase.

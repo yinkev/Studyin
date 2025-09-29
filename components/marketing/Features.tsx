@@ -21,12 +21,14 @@ export function Features() {
   return (
     <section className="grid gap-4 md:grid-cols-2">
       {features.map((f) => (
-        <div key={f.title} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900">{f.title}</h3>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">{f.body}</p>
+        <div
+          key={f.title}
+          className="rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-100 shadow-lg shadow-slate-900/20"
+        >
+          <h3 className="text-lg font-semibold text-white">{f.title}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-200/90">{f.body}</p>
         </div>
       ))}
     </section>
   );
 }
-

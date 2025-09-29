@@ -1,15 +1,12 @@
 import { loadAnalyticsSummary } from '../lib/getAnalytics';
-import { Hero } from '../components/marketing/Hero';
-import { Features } from '../components/marketing/Features';
-import { Stats } from '../components/marketing/Stats';
+import { HomeShell } from '../components/okc/HomeShell';
 
 export default async function Page() {
   const analytics = await loadAnalyticsSummary();
-  return (
-    <div className="space-y-10">
-      <Hero />
-      <Stats analytics={analytics} />
-      <Features />
-    </div>
-  );
+  const adapted = analytics ? {
+    accuracy_overall: (analytics as any).overall_accuracy ?? (analytics as any).accuracy_overall ?? undefined,
+    study_time_hours: (analytics as any).study_time_hours ?? undefined,
+    progress_overall: (analytics as any).progress_overall ?? ((analytics as any).progress?.overall ?? undefined)
+  } : null;
+  return <HomeShell analytics={adapted as any} />;
 }

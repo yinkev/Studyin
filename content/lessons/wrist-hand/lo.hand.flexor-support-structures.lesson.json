@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lesson.lo.hand.flexor-support-structures",
+  "lo_id": "lo.hand.flexor-support-structures",
+  "title": "Flexor Retinacula, Palmar Aponeurosis, and Sheaths",
+  "summary": "Layer the roof (retinacula), fascia (palmar aponeurosis), and synovial sheaths so learners can trace tendon pathways and compression sites.",
+  "high_yield": [
+    "Flexor retinaculum forms the carpal tunnel roof—call out medial vs. lateral attachments.",
+    "Palmar aponeurosis fans from palmaris longus; Dupuytren’s contracture example cements relevance.",
+    "Synovial sheaths (radial, ulnar, digital) share infection pathways—highlight the horseshoe pattern."
+  ],
+  "pitfalls": [
+    "Students conflate palmar carpal ligament with transverse carpal ligament—ensure both are shown with labels.",
+    "Digital sheath pulley names (A1 etc.) can overwhelm; keep focus on the continuous tube concept."
+  ],
+  "animation_timeline": [
+    {
+      "beat": 0,
+      "duration_s": 5,
+      "narration": "Start with carpal tunnel bones, then lay down the flexor retinaculum spanning scaphoid/trapezium to pisiform/hamate hook.",
+      "visual": "Isometric view with translucent ligament band overlay; attach labels medial vs. lateral."
+    },
+    {
+      "beat": 1,
+      "duration_s": 6,
+      "narration": "Fade in palmar aponeurosis fans inserting into fibrous digital sheaths; connect palmaris longus tendon proximally.",
+      "visual": "Fanning fascia animation, with tendon overlay feeding into central slip."
+    },
+    {
+      "beat": 2,
+      "duration_s": 6,
+      "narration": "Trace synovial sheaths—highlight radial bursa (FPL), ulnar bursa (FDS/FDP), then individual digital sheaths with infection arrow pathway.",
+      "visual": "Blue fluid tracings along tendon tunnels culminating in 'horseshoe abscess' warning icon."
+    }
+  ]
+}
