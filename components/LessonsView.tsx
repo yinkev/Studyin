@@ -43,10 +43,10 @@ export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
           <p className="text-sm text-gray-600">LO: {current.lo_id}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={nav.prevLesson} aria-label="Previous lesson" className="border-gray-300 text-gray-800 hover:bg-gray-50">
+          <Button variant="outline" onClick={nav.prevLesson} aria-label="Previous lesson" className="btn-ghost">
             Prev
           </Button>
-          <Button variant="outline" onClick={nav.nextLesson} aria-label="Next lesson" className="border-gray-300 text-gray-800 hover:bg-gray-50">
+          <Button variant="outline" onClick={nav.nextLesson} aria-label="Next lesson" className="btn-ghost">
             Next
           </Button>
           {onPractice && (

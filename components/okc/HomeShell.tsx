@@ -68,8 +68,8 @@ export function HomeShell({ analytics }: { analytics: AnalyticsSummary | null })
       {/* Hero */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl font-black mb-6">Master Medical Knowledge with <span className="bouncy-text" style={{ color: 'var(--okc-feather)' }}>Confidence</span></h1>
-          <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto">Experience the joy of learning with a playful interface. Bold, bouncy, and bright—made for momentum.</p>
+          <h1 className="text-5xl font-extrabold mb-6 text-gray-900">Master medical knowledge with <span className="bouncy-text" style={{ color: 'var(--okc-feather)' }}>confidence</span></h1>
+          <p className="text-xl mb-8 max-w-3xl mx-auto" style={{ color: '#4B4B4B' }}>Playful, focused, and fast. Learn with evidence‑anchored practice and transparent analytics.</p>
           <Link href="/study" className="inline-block duo-button px-8 py-4 text-white font-bold text-lg" aria-label="Start learning journey">Start Learning Journey 🚀</Link>
         </div>
       </section>
@@ -87,7 +87,7 @@ export function HomeShell({ analytics }: { analytics: AnalyticsSummary | null })
             <div className="space-y-3">
               <div className="flex justify-between text-sm"><span>Lessons Completed</span><span className="font-bold">—</span></div>
               <div className="w-full bg-gray-200 rounded-full h-2" aria-hidden><div className="duo-progress h-2 rounded-full" style={{ width: `${Math.round(progress*100)}%` }} /></div>
-              <p className="text-xs text-gray-700">Stay consistent to reach your goal.</p>
+              <p className="text-sm" style={{ color: '#4B4B4B' }}>Stay consistent to reach your goal.</p>
             </div>
           </div>
           <div className="duo-card p-6" role="region" aria-label="latest achievement">
@@ -110,7 +110,7 @@ export function HomeShell({ analytics }: { analytics: AnalyticsSummary | null })
               <Link key={m.title} href={m.href} className="okc-module-card p-6 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                 <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl rounded-2xl" style={{ background: 'linear-gradient(135deg, var(--okc-macaw) 0%, var(--okc-feather) 100%)' }} aria-hidden>{m.icon}</div>
                 <h3 className="text-xl font-bold mb-2 text-center">{m.title}</h3>
-                <p className="text-gray-700 text-sm mb-4 text-center">Adaptive drills and evidence-anchored practice.</p>
+                <p className="text-sm mb-4 text-center" style={{ color: '#4B4B4B' }}>Adaptive drills and evidence‑anchored practice.</p>
                 <div className="space-y-2 mb-4" aria-hidden>
                   <div className="flex justify-between text-sm"><span>Progress</span><span className="font-bold" style={{ color: 'var(--okc-feather)' }}>{m.pct}%</span></div>
                   <div className="w-full bg-gray-200 rounded-full h-2"><div className="duo-progress h-2 rounded-full" style={{ width: `${m.pct}%` }} /></div>
@@ -140,15 +140,15 @@ export function HomeShell({ analytics }: { analytics: AnalyticsSummary | null })
             <EChartsClient height={256} />
             <div className="mt-6 grid grid-cols-2 gap-4" aria-live="polite">
               <div className="text-center p-4 bg-green-50 rounded-2xl">
-                <div className="text-2xl font-bold" style={{ color: 'var(--okc-feather)' }}>{accuracy}%</div>
-                <div className="text-sm text-gray-700">Accuracy Rate</div>
+                <div className="text-2xl font-extrabold" style={{ color: 'var(--okc-feather)' }}>{accuracy}%</div>
+                <div className="text-sm" style={{ color: '#4B4B4B' }}>Accuracy rate</div>
               </div>
               <div className="text-center p-4 bg-blue-50 rounded-2xl">
-                <div className="text-2xl font-bold" style={{ color: 'var(--okc-macaw)' }}>{studyHours}h</div>
-                <div className="text-sm text-gray-700">Study Time</div>
+                <div className="text-2xl font-extrabold" style={{ color: 'var(--okc-macaw)' }}>{studyHours}h</div>
+                <div className="text-sm" style={{ color: '#4B4B4B' }}>Study time</div>
               </div>
             </div>
-            <div className="mt-4 text-sm text-gray-700">See full details in <Link href="/summary" className="font-semibold text-sky-700 underline">Summary</Link>.</div>
+            <div className="mt-4 text-sm" style={{ color: '#4B4B4B' }}>See full details in <Link href="/summary" className="font-semibold text-sky-700 underline">Summary</Link>.</div>
           </div>
         </div>
       </section>

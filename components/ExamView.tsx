@@ -74,7 +74,7 @@ export function ExamView({ items, length = 10, blueprintId }: ExamViewProps) {
           <span>#{index + 1} of {form.length}</span>
           <span className="font-mono text-xs text-gray-500">{current.id}</span>
         </div>
-        <h2 className="text-lg font-semibold text-gray-900">{current.stem}</h2>
+        <h2 className="text-lg font-extrabold text-gray-900">{current.stem}</h2>
 
         <div className="space-y-3">
           {letters.map((letter, idx) => {
@@ -90,9 +90,9 @@ export function ExamView({ items, length = 10, blueprintId }: ExamViewProps) {
                 key={letter}
                 disabled={disabled}
                 onClick={() => select(letter)}
-                className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left text-gray-900 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${klass}`}
+                className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left text-gray-900 transition hover:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${klass}`}
               >
-                <span className="mt-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600">{idx + 1}</span>
+                <span className="mt-1 okc-pill-ghost">{idx + 1}</span>
                 <p className="font-medium">{letter}. {choice}</p>
               </button>
             );

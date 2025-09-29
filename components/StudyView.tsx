@@ -144,8 +144,8 @@ export function StudyView({ items, analytics }: StudyViewProps) {
             </div>
             <span className="font-mono text-[11px] text-gray-500">{current.id}</span>
           </div>
-          <div className="h-1 w-full rounded bg-gray-200">
-            <div className="h-1 rounded bg-green-500" style={{ width: `${Math.round(((index + 1) / items.length) * 100)}%` }} />
+          <div className="h-1 w-full rounded bg-gray-200 overflow-hidden">
+            <div className="h-1 duo-progress" style={{ width: `${Math.round(((index + 1) / items.length) * 100)}%` }} />
           </div>
           <h2 className="text-xl font-semibold leading-relaxed text-gray-900">{current.stem}</h2>
 
@@ -159,15 +159,15 @@ export function StudyView({ items, analytics }: StudyViewProps) {
                 <button
                   key={letter}
                   onClick={() => handleSelect(letter)}
-                  className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition ${
+                  className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition hover:translate-y-0.5 ${
                     isSelected
                       ? isCorrect
-                        ? 'border-emerald-400/70 bg-emerald-500/10 text-emerald-100'
-                        : 'border-rose-500/70 bg-rose-500/10 text-rose-100'
-                      : 'border-white/10 bg-white/5 text-slate-100 hover:border-white/20 hover:bg-white/10'
+                        ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                        : 'border-rose-500 bg-rose-50 text-rose-900'
+                      : 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50'
                   }`}
                 >
-                  <span className="mt-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600">
+                  <span className="mt-1 okc-pill-ghost">
                     {idx + 1}
                   </span>
                   <div className="space-y-1">
@@ -188,12 +188,8 @@ export function StudyView({ items, analytics }: StudyViewProps) {
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm text-gray-600">
             <div className="space-x-2">
-              <button onClick={handlePrev} className="rounded-lg border border-gray-200 bg-white px-3 py-1 text-gray-800 hover:bg-gray-50">
-                ← Prev
-              </button>
-              <button onClick={handleNext} className="rounded-lg border border-gray-200 bg-white px-3 py-1 text-gray-800 hover:bg-gray-50">
-                Next →
-              </button>
+              <button onClick={handlePrev} className="btn-ghost">← Prev</button>
+              <button onClick={handleNext} className="btn-ghost">Next →</button>
             </div>
             {feedback.correctShown && (
               <span className={`font-semibold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}`}>
