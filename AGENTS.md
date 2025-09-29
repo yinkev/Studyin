@@ -11,7 +11,7 @@
 - **PerformanceTuner** — Guard budgets (TTI <2s, item render <100 ms, evidence <250 ms, CLS <0.1). Instrument Web Vitals.
 - **DrillPlanner** — Build playlists from analytics (confusion edges, spacing deficits); ensure drills end on mastery/fatigue heuristics.
 - **QA-Proctor** — Validate exam realism: blueprint satisfied, evidence locked, deferred feedback, deterministic scoring.
-- **ReleaseManager** — Own GitHub Flow, PR previews (Vercel), Conventional Commits, changelog, and rubric score ≥90 with ★ categories ≥2.7.
+- **ReleaseManager** — Own GitHub Flow, PR previews (Vercel), Conventional Commits, changelog, and rubric score ≥92 with ★ categories ≥2.8.
 - **DocScribe** — Keep README, AGENTS.md, rubric docs, prompts, and changelog accurate.
 - **DataSteward** — Ensure telemetry (`data/events.ndjson`) is pseudonymous, export-ready, and schema_version aligned.
   - Configure ingestion tokens/env flags (`WRITE_TELEMETRY`, `INGEST_TOKEN`, rate limits) before enabling remote writes.
