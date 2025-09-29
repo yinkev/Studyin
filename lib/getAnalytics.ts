@@ -52,6 +52,12 @@ export interface AnalyticsSummary {
       point_biserial: number | null;
     }>;
   };
+  retention_summary?: {
+    total_reviews: number;
+    correct: number;
+    incorrect: number;
+    success_rate: number;
+  };
 }
 
 export async function loadAnalyticsSummary(): Promise<AnalyticsSummary | null> {

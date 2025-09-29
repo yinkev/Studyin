@@ -12,6 +12,9 @@ import { ConfusionGraph } from '../../components/graphs/ConfusionGraph';
 import { BlueprintFlow } from '../../components/graphs/BlueprintFlow';
 import { SessionFlow } from '../../components/graphs/SessionFlow';
 import { getSupabaseAdmin } from '../../lib/server/supabase';
+import { computeStudyDashboards } from '../../lib/study-insights';
+import { loadLearnerState } from '../../lib/server/study-state';
+import { SummaryDashboards } from '../../components/SummaryDashboards';
 
 async function readJsonIfExists<T = any>(p: string): Promise<T | null> {
   try {
@@ -42,6 +45,8 @@ async function loadRecentAttempts(limit = 25) {
 
 export default async function SummaryPage() {
   const analytics = await loadAnalyticsSummary();
+  const learnerState = await loadLearnerState('demo-learner');
+  const dashboards = computeStudyDashboards(learnerState, analytics);
   const root = process.cwd();
   const blueprintPath = path.join(root, 'config', 'blueprint.json');
   const rubricPath = path.join(root, 'public', 'analytics', 'rubric-score.json');
@@ -80,6 +85,35 @@ export default async function SummaryPage() {
             <p className="text-xs text-slate-400">Critical gates must stay green — rerun rubric scoring before every release.</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader>Retention throughput</CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {analytics?.retention_summary ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <span>Total reviews</span>
+                  <span>{analytics.retention_summary.total_reviews}</span>
+                </div>
+                <div className="flex items-center justify-between text-emerald-200">
+                  <span>Correct</span>
+                  <span>{analytics.retention_summary.correct}</span>
+                </div>
+                <div className="flex items-center justify-between text-rose-200">
+                  <span>Incorrect</span>
+                  <span>{analytics.retention_summary.incorrect}</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-300">
+                  <span>Success rate</span>
+                  <span>{(analytics.retention_summary.success_rate * 100).toFixed(0)}%</span>
+                </div>
+              </>
+            ) : (
+              <p className="text-slate-400">
+                No retention reviews logged yet. Run the study flow with FSRS queue to populate analytics.
+              </p>
+            )}
+          </CardContent>
+        </Card>
         <Card className="h-full">
           <CardHeader>Blueprint drift</CardHeader>
           <CardContent>
@@ -114,6 +148,12 @@ export default async function SummaryPage() {
           <CardHeader>TTM canvas</CardHeader>
           <CardContent>
             <TTMBarCanvas analytics={analytics} />
+          </CardContent>
+        </Card>
+        <Card className="col-span-full">
+          <CardHeader>Adaptive dashboards</CardHeader>
+          <CardContent>
+            <SummaryDashboards dashboards={dashboards} />
           </CardContent>
         </Card>
         <Card className="col-span-full">

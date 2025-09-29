@@ -50,7 +50,13 @@ export function summarizeAttempts(attempts, now = Date.now()) {
         fast_right: 0,
         slow_right: 0
       },
-      nfd_summary: []
+      nfd_summary: [],
+      retention_summary: {
+        total_reviews: 0,
+        correct: 0,
+        incorrect: 0,
+        success_rate: 0
+      }
     };
   }
 
@@ -67,6 +73,11 @@ export function summarizeAttempts(attempts, now = Date.now()) {
   const confusionMap = new Map();
   const learnerStats = new Map();
   const sessionStats = new Map();
+  const retentionStats = {
+    total: 0,
+    correct: 0,
+    incorrect: 0
+  };
 
   for (const attempt of attempts) {
     learnerIds.add(attempt.user_id);
@@ -123,6 +134,12 @@ export function summarizeAttempts(attempts, now = Date.now()) {
         record.count += 1;
         confusionMap.set(confusionKey, record);
       });
+    }
+
+    if (attempt.mode === 'spotter') {
+      retentionStats.total += 1;
+      if (attempt.correct) retentionStats.correct += 1;
+      else retentionStats.incorrect += 1;
     }
   }
 
@@ -268,6 +285,15 @@ export function summarizeAttempts(attempts, now = Date.now()) {
     confusion_edges,
     speed_accuracy: speedBuckets,
     nfd_summary,
-    reliability
+    reliability,
+    retention_summary: {
+      total_reviews: retentionStats.total,
+      correct: retentionStats.correct,
+      incorrect: retentionStats.incorrect,
+      success_rate:
+        retentionStats.total > 0
+          ? Number((retentionStats.correct / retentionStats.total).toFixed(2))
+          : 0
+    }
   };
 }

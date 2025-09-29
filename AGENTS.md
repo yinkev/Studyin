@@ -19,6 +19,7 @@
 - **RAGEngineer** — Maintain evidence chunk pipelines (`scripts/rag/*`), pgvector embeddings, deterministic ranking (`GET /api/search`), and recall@k quality checks.
 - **GraphUX** — Own React Flow visualizations (confusion graph, blueprint drift, session traces); ensure keyboard navigation, screen reader labels, and render <100 ms.
 - **TemporalAnalyst** — Track long-term analytics signals (TTM velocity, item drift, reliability metrics); validate hourly refresh cadence and snapshots health.
+- **AdaptiveEngineer (Agent)** — Own the Personal Adaptive Study Engine end‑to‑end: Rasch/GPCM + Elo fallback, in‑session selector, cross‑topic Thompson Sampling scheduler, FSRS retention lane, blueprint rails (±5%), exposure caps (≤1/day, ≤2/week, 96h cooldown), and stop rules. Maintain deterministic behavior, telemetry logging, and “Why this next” transparency.
 
 ### New: ProjectManager (Studyin PM)
 - Drives execution and cadence. Keeps the plan current, raises risks, and enforces gates.
@@ -42,6 +43,9 @@
 - Iterates against an internal world‑class rubric until ≥92/100 overall and each ★ ≥2.9; then outputs the final `PRD.md` (single artifact, no scratch notes).
 - Cites exact repo files/lines for all constraints and budgets (e.g., `scripts/analyze.mjs:42`).
 - Consumes Module Inputs; do not hard‑code module names.
+
+### New: Adaptive Engine Spec (Authoritative)
+- Before any adaptive engine work, read: `docs/personal-adaptive-study-engine-prompt.md` and `docs/personal-adaptive-study-engine-spec.md`. Treat these as authoritative for algorithms, thresholds, and gating. Do not deviate from formulas; adapt only for language/runtime.
 
 ### New: Implementation Strategist (Agent)
 - Owns authoring `IMPLEMENTATION.md` translating PRD into a concrete, testable plan.
@@ -69,6 +73,7 @@ Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run buil
 - **Analytics Gate**: `latest.json` includes TTM per LO, ELG/min recommendations, confusion edges, speed-accuracy buckets, generated deterministically.
 - **A11y (Non‑blocking)**: A11y checks may fail (axe/keyboard/contrast). Ship anyway during this OKC-heavy phase.
 - **Perf (Relaxed)**: Budgets may be exceeded when justified by visuals/animations.
+ - **Engine Gate**: For the adaptive engine, enforce: blueprint rails within ±5% (per system/LO), exposure caps (≤1/day, ≤2/week, 96h cooldown), randomesque top‑K selector, stop rules (`SE ≤ 0.20` with min items, or `ΔSE` plateau, or `mastery_prob ≥ 0.85` with probe in `b ∈ [θ̂ ± 0.3]`), retention budgeting ≤40% baseline (≤60% if overdue >7d). Log reasons/signals for each selection.
 
 ## UX Stance (OKC‑Heavy, No A11y Gate)
 - We are shipping a “wow‑first” interface. Visual richness, motion, and playful patterns come before compliance.
@@ -115,6 +120,41 @@ Keep this SOP current as tooling evolves. Changes require DocScribe + ReleaseMan
 - **Model usage**
   - Use `gpt-5-codex-high` for any repo-aware work (code edits, scripts, items, analytics, CI, prompts).
   - Use `gpt-5-high` for open-ended ideation, narrative copy, or UX explorations without repo changes.
+  - Optional: use `gpt-5-codex-mid` for quick triage or small, low-risk edits when cost matters.
+
+## Agent Recommendation Playbook
+- Default: prefer `gpt-5-codex-high` for next steps that touch the repo.
+
+### Model Tiers (selection guide)
+- `gpt-5-minimal`: ultra‑cheap, for trivial checks, quick summaries, or routing.
+- `gpt-5-low`: low‑cost narrative or brainstorming; not for code.
+- `gpt-5-medium`: balanced narrative or light planning; limited code reasoning.
+- `gpt-5-high`: long‑form PRD/IMPLEMENTATION prose; complex narrative synthesis.
+
+- `gpt-5-codex-low`: quick triage, tiny diffs, find/replace, small config edits.
+- `gpt-5-codex-medium`: moderate code edits in 1–3 files, simple tests.
+- `gpt-5-codex-high` (default): repo‑aware multi‑file changes, engine work, tests, scripts, CI.
+
+### Task → Agent → Model
+- Study/Exam engine changes → AdaptiveEngineer + Implementation Strategist → `gpt-5-codex-high`.
+- Item authoring/fixes → ItemSmith + EvidenceCurator + ValidatorFixer → `gpt-5-codex-high` (repo), `gpt-5-high` (rationale prose).
+- Analytics/metrics & gates → AnalyticsEngineer → `gpt-5-codex-high`.
+- UI flows/graphs → UIBuilder + GraphUX → `gpt-5-codex-high`.
+- RAG/index/search → RAGEngineer → `gpt-5-codex-high`.
+- Telemetry/privacy/env → DataSteward → `gpt-5-codex-high`.
+- Planning/docs → PRD Architect / Implementation Strategist / DocScribe → `gpt-5-high` (narrative) or `gpt-5-codex-medium` for code‑referenced sections.
+
+### Verification Note (online + local)
+- Local source of truth: `~/.codex/config.toml` (`model`, `model_reasoning_effort`) — currently set to `gpt-5` with `high` effort. Adjust per task.
+- Online sanity check: confirm your provider’s current model availability and capacity before overriding tiers. If a tier is unavailable, fall back to the nearest higher tier for correctness (e.g., prefer `codex-medium` → `codex-high`).
+
+### “Next-Step Agent” Convention
+- At the end of each artifact/PR or milestone update, include a line:
+  - `Next agent: <Role> · Model: <gpt-5-codex-high|gpt-5-high|gpt-5-codex-mid> · Scope: <paths>`
+- Examples:
+  - `Next agent: AdaptiveEngineer · Model: gpt-5-codex-high · Scope: scripts/lib/{selector,scheduler}.mjs`
+  - `Next agent: ItemSmith · Model: gpt-5-codex-high · Scope: content/banks/**`
+  - `Next agent: UIBuilder · Model: gpt-5-codex-high · Scope: app/(study)/** components/**`
 
 - **Git workflow (Conventional Commits)**
   - Stage: `git add <paths>` (scope specific paths; avoid `git add .` unless intentional).

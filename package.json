@@ -6,6 +6,7 @@
   "scripts": {
     "validate:items": "node scripts/validate-items.mjs",
     "analyze": "node scripts/analyze.mjs",
+    "jobs:refit": "node scripts/jobs/refit-weekly.mjs",
     "dev": "run-p dev:start dev:open",
     "dev:start": "next dev",
     "dev:open": "wait-on http://localhost:3000 && node scripts/tools/open-browser.mjs",
