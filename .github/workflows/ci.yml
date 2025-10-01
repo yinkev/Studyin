@@ -42,7 +42,7 @@ jobs:
         run: npm run validate:items
 
       - name: Run unit tests
-        run: npm test -- --run
+        run: npm test
 
       - name: Run analyze
         run: npm run analyze
