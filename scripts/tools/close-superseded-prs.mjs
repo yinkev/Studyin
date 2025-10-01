@@ -12,6 +12,31 @@
  *   - TARGET_PRS (csv) optional; defaults to all open PRs with head ref starting with "codex/" except #11
  */
 
+import { readFileSync, existsSync } from 'fs';
+import path from 'path';
+
+// Load .env.local if present (without overriding pre-set env vars)
+try {
+  const envPath = path.join(process.cwd(), '.env.local');
+  if (existsSync(envPath)) {
+    const text = readFileSync(envPath, 'utf8');
+    for (const rawLine of text.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+      const idx = line.indexOf('=');
+      if (idx <= 0) continue;
+      const key = line.slice(0, idx).trim();
+      let val = line.slice(idx + 1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      if (!(key in process.env)) {
+        process.env[key] = val;
+      }
+    }
+  }
+} catch {}
+
 const REPO = process.env.REPO || 'yinkev/Studyin';
 const TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
 const DRY_RUN = Boolean(process.env.DRY_RUN) || !TOKEN;
@@ -83,4 +108,3 @@ main().catch((err) => {
   console.error(err.stack || err.message || String(err));
   process.exit(1);
 });
-
