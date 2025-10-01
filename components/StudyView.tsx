@@ -7,6 +7,7 @@ import type { CandidateItem } from '../lib/study-engine';
 import { buildWhyThisNext, difficultyToBeta, scoreCandidates } from '../lib/study-engine';
 import { masteryProbability } from '../scripts/lib/rasch.mjs';
 import { submitStudyAttempt } from '../app/study/actions';
+import type { OptimisticLearnerStateUpdate } from '../lib/client/useLearnerState';
 
 interface StudyViewProps {
   items: StudyItem[];
@@ -14,6 +15,8 @@ interface StudyViewProps {
   learnerId: string;
   learnerState: LearnerState;
   onLearnerStateChange: (state: LearnerState) => void;
+  optimisticLearnerStateUpdate: OptimisticLearnerStateUpdate;
+  invalidateLearnerState: () => Promise<void>;
 }
 
 interface ChoiceFeedback {
@@ -83,11 +86,66 @@ function deriveAbility(loIds: string[], learnerState: LearnerState, analytics: A
   return fallbackLoEstimate(loIds, analytics);
 }
 
-export function StudyView({ items, analytics, learnerId, learnerState, onLearnerStateChange }: StudyViewProps) {
+function defaultLoState(): LearnerState['los'][string] {
+  return {
+    thetaHat: 0,
+    se: 0.8,
+    itemsAttempted: 0,
+    recentSes: [],
+    priorMu: 0,
+    priorSigma: 0.8
+  };
+}
+
+function updateLearnerStateAfterAttempt(
+  state: LearnerState,
+  item: StudyItem,
+  correct: boolean
+): LearnerState {
+  const now = Date.now();
+  const items: LearnerState['items'] = { ...state.items };
+  const currentItem = items[item.id] ?? { attempts: 0, correct: 0, recentAttempts: [] as number[] };
+  const updatedItem = {
+    attempts: (currentItem.attempts ?? 0) + 1,
+    correct: (currentItem.correct ?? 0) + (correct ? 1 : 0),
+    lastAttemptTs: now,
+    recentAttempts: [...(currentItem.recentAttempts ?? []), now].slice(-20)
+  };
+  items[item.id] = updatedItem;
+
+  const los: LearnerState['los'] = { ...state.los };
+  for (const loId of item.los ?? []) {
+    const current = los[loId] ?? defaultLoState();
+    los[loId] = {
+      ...current,
+      itemsAttempted: (current.itemsAttempted ?? 0) + 1,
+      recentSes: [...(current.recentSes ?? []), current.se ?? 0.6].slice(-10)
+    };
+  }
+
+  return {
+    ...state,
+    updatedAt: new Date().toISOString(),
+    items,
+    los
+  };
+}
+
+export function StudyView({
+  items,
+  analytics,
+  learnerId,
+  learnerState,
+  onLearnerStateChange,
+  optimisticLearnerStateUpdate,
+  invalidateLearnerState
+}: StudyViewProps) {
   const [index, setIndex] = useState(0);
   const [feedback, setFeedback] = useState<ChoiceFeedback>({ correctShown: false });
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [showWhy, setShowWhy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [sessionId] = useState(() => crypto.randomUUID());
   const [questionStart, setQuestionStart] = useState(() => Date.now());
@@ -136,57 +194,111 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
 
   const letters = ANSWER_LETTERS;
   const selected = feedback.selected;
-  const isCorrect = selected && current && selected === current.key;
+  const isCorrect = Boolean(selected && current && selected === current.key);
+  const busy = isSaving || isPending;
+
+  const currentStats = current ? learnerState.items[current.id] : undefined;
+  const attempts = currentStats?.attempts ?? 0;
+  const accuracy = attempts > 0 ? Math.round(((currentStats?.correct ?? 0) / attempts) * 100) : null;
+  const lastSyncLabel = useMemo(() => {
+    const parsed = new Date(learnerState.updatedAt);
+    if (Number.isNaN(parsed.getTime())) {
+      return 'just now';
+    }
+    return parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }, [learnerState.updatedAt]);
 
   const submitAttempt = useCallback(
     (choice: (typeof letters)[number]) => {
-      if (!current || feedback.correctShown) return;
+      if (!current || feedback.correctShown || busy) return;
+      const correct = choice === current.key;
       const durationMs = Date.now() - questionStart;
       setFeedback({ selected: choice, correctShown: true });
-      startTransition(async () => {
-        try {
-          const result = await submitStudyAttempt({
-            learnerId,
-            sessionId,
-            itemId: current.id,
-            loIds: current.los ?? [],
-            difficulty: current.difficulty,
-            choice,
-            correct: choice === current.key,
-            durationMs,
-            openedEvidence: evidenceOpen,
-            appVersion: process.env.NEXT_PUBLIC_APP_VERSION
+      setError(null);
+      setIsSaving(true);
+
+      let revertState: LearnerState | null = null;
+      let optimisticState: LearnerState | null = null;
+
+      optimisticLearnerStateUpdate((draft) => {
+        revertState = draft;
+        const next = updateLearnerStateAfterAttempt(draft, current, correct);
+        optimisticState = next;
+        return next;
+      })
+        .then((snapshot) => {
+          revertState = snapshot;
+          startTransition(() => {
+            (async () => {
+              try {
+                const result = await submitStudyAttempt({
+                  learnerId,
+                  sessionId,
+                  itemId: current.id,
+                  loIds: current.los ?? [],
+                  difficulty: current.difficulty,
+                  choice,
+                  correct,
+                  durationMs,
+                  openedEvidence: evidenceOpen,
+                  appVersion: process.env.NEXT_PUBLIC_APP_VERSION
+                });
+                if (result?.learnerState) {
+                  onLearnerStateChange(result.learnerState);
+                } else if (optimisticState) {
+                  onLearnerStateChange(optimisticState);
+                }
+              } catch (err) {
+                console.error('submitStudyAttempt failed', err);
+                if (revertState) {
+                  onLearnerStateChange(revertState);
+                }
+                setError('We could not sync your progress. Retrying shortly…');
+                setFeedback((prev) => ({ ...prev, correctShown: true }));
+              } finally {
+                setIsSaving(false);
+                void invalidateLearnerState();
+              }
+            })();
           });
-          if (result?.learnerState) {
-            onLearnerStateChange(result.learnerState);
-          }
-        } catch (error) {
-          console.error('submitStudyAttempt failed', error);
-        }
-      });
+        })
+        .catch((err) => {
+          console.error('Failed to optimistically update learner state', err);
+          setIsSaving(false);
+          setFeedback({ correctShown: false });
+          setError('Something went wrong updating your progress. Try again.');
+        });
     },
-    [current, evidenceOpen, feedback.correctShown, learnerId, questionStart, sessionId, onLearnerStateChange]
+    [busy, current, evidenceOpen, feedback.correctShown, invalidateLearnerState, learnerId, optimisticLearnerStateUpdate, onLearnerStateChange, questionStart, sessionId]
   );
 
   const handleNext = useCallback(() => {
+    if (!items.length || busy) return;
     setFeedback({ correctShown: false });
     setEvidenceOpen(false);
     setShowWhy(false);
     setQuestionStart(Date.now());
     setIndex((prev) => (prev + 1) % items.length);
-  }, [items.length]);
+  }, [busy, items.length]);
 
   const handlePrev = useCallback(() => {
+    if (!items.length || busy) return;
     setFeedback({ correctShown: false });
     setEvidenceOpen(false);
     setShowWhy(false);
     setQuestionStart(Date.now());
     setIndex((prev) => (prev - 1 + items.length) % items.length);
-  }, [items.length]);
+  }, [busy, items.length]);
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
       if (!current) return;
+      if (busy) {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+          event.preventDefault();
+        }
+        return;
+      }
       const key = event.key;
       if (key === 'ArrowRight' || key === 'n') {
         handleNext();
@@ -197,27 +309,32 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
       } else if (/^[1-5]$/.test(key)) {
         const idx = Number(key) - 1;
         const choice = letters[idx];
-        submitAttempt(choice);
+        if (choice) {
+          submitAttempt(choice);
+        }
       }
     };
     window.addEventListener('keydown', listener);
     return () => window.removeEventListener('keydown', listener);
-  }, [current, handleNext, handlePrev, letters, submitAttempt]);
+  }, [busy, current, handleNext, handlePrev, letters, submitAttempt]);
 
   if (!current) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-12 text-center text-slate-200">
-        <p>No study items available. Add <code>*.item.json</code> under <code>content/banks/&lt;module&gt;</code> or set `SCOPE_DIRS`.</p>
+        <p>
+          No study items available. Add <code>*.item.json</code> under <code>content/banks/&lt;module&gt;</code> or set `SCOPE_DIRS`.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 px-4 py-6">
+    <div className="space-y-6 px-4 py-6" aria-busy={busy} data-learner-id={learnerId}>
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Practice</h1>
           <p className="text-sm text-gray-600">Keyboard: 1–5 answer · N/P arrows for navigation · E toggle evidence</p>
+          <p className="text-xs text-gray-500">Progress synced {lastSyncLabel}</p>
         </div>
         <div className="relative">
           <button
@@ -236,6 +353,8 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
           )}
         </div>
       </header>
+
+      {error && <p className="rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
 
       <article className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <section className="space-y-5 duo-card p-6">
@@ -258,6 +377,10 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
           <div className="h-1 w-full overflow-hidden rounded bg-gray-200">
             <div className="h-1 duo-progress" style={{ width: `${Math.round(((index + 1) / items.length) * 100)}%` }} />
           </div>
+          <div className="text-xs text-gray-500">
+            Attempts: {attempts}
+            {attempts > 0 && typeof accuracy === 'number' ? ` · Accuracy ${accuracy}%` : ''}
+          </div>
           <h2 className="text-xl font-semibold leading-relaxed text-gray-900">{current.stem}</h2>
 
           <div className="space-y-3">
@@ -270,14 +393,14 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
                 <button
                   key={letter}
                   onClick={() => submitAttempt(letter)}
-                  disabled={feedback.correctShown || isPending}
+                  disabled={feedback.correctShown || busy}
                   className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition hover:translate-y-0.5 ${
                     isSelected
                       ? isCorrect
                         ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
                         : 'border-rose-500 bg-rose-50 text-rose-900'
                       : 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50'
-                  } ${isPending ? 'opacity-70' : ''}`}
+                  } ${busy ? 'opacity-70' : ''}`}
                 >
                   <span className="mt-1 okc-pill-ghost">{idx + 1}</span>
                   <div className="space-y-1">
@@ -300,18 +423,23 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm text-gray-600">
             <div className="space-x-2">
-              <button onClick={handlePrev} className="btn-ghost" disabled={isPending}>
+              <button onClick={handlePrev} className="btn-ghost" disabled={busy}>
                 ← Prev
               </button>
-              <button onClick={handleNext} className="btn-ghost" disabled={isPending}>
+              <button onClick={handleNext} className="btn-ghost" disabled={busy}>
                 Next →
               </button>
             </div>
-            {feedback.correctShown && current && (
-              <span className={`font-semibold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}`}>
-                {isCorrect ? 'Correct' : `Correct answer: ${current.key}`}
-              </span>
-            )}
+            <div className="flex items-center gap-3">
+              {(isSaving || isPending) && (
+                <span className="text-xs text-emerald-700 animate-pulse">Saving attempt…</span>
+              )}
+              {feedback.correctShown && current && (
+                <span className={`font-semibold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}`}>
+                  {isCorrect ? 'Correct' : `Correct answer: ${current.key}`}
+                </span>
+              )}
+            </div>
           </div>
         </section>
 
@@ -321,6 +449,7 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
             <button
               onClick={() => setEvidenceOpen((v) => !v)}
               className="text-[10px] uppercase tracking-wide text-gray-600 hover:text-gray-800"
+              disabled={busy}
             >
               {evidenceOpen ? 'Close (E)' : 'View (E)'}
             </button>
@@ -337,7 +466,9 @@ export function StudyView({ items, analytics, learnerId, learnerState, onLearner
               )}
             </div>
           ) : (
-            <p className="text-sm text-gray-600">Evidence is locked in exams—toggle above during study.</p>
+            <p className="text-sm text-gray-600">
+              Evidence locked until you request it. Toggle with keyboard <kbd className="rounded border border-gray-300 bg-gray-100 px-1 text-[10px]">E</kbd>.
+            </p>
           )}
         </aside>
       </article>

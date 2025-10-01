@@ -11,6 +11,7 @@ import { LessonsView } from './LessonsView';
 import { StudyView } from './StudyView';
 import { buildRetentionQueue } from '../lib/study-engine';
 import { submitRetentionReview } from '../app/study/actions';
+import { useLearnerState } from '../lib/client/useLearnerState';
 
 interface StudyTabsProps {
   items: StudyItem[];
@@ -39,18 +40,29 @@ export function StudyTabs({
   retentionInfo,
   dashboards
 }: StudyTabsProps) {
-  const [learnerState, setLearnerState] = useState<LearnerState>(initialLearnerState);
+  const {
+    data: learnerStateData,
+    isFetching: learnerStateSyncing,
+    setLearnerState: syncLearnerState,
+    optimisticUpdate,
+    invalidateLearnerState
+  } = useLearnerState(learnerId, initialLearnerState);
+
+  const learnerState = learnerStateData ?? initialLearnerState;
+
   useEffect(() => {
-    setLearnerState(initialLearnerState);
-  }, [initialLearnerState]);
+    syncLearnerState(initialLearnerState);
+  }, [initialLearnerState, syncLearnerState]);
 
   const [activeLo, setActiveLo] = useState<string | null>(recommendedLoId ?? lessons[0]?.lo_id ?? null);
   const [tab, setTab] = useState<'learn' | 'practice'>('learn');
+
   const practiceItems = useMemo(() => {
     if (!activeLo) return items;
     const filtered = items.filter((it) => (it.los ?? []).includes(activeLo));
     return filtered.length ? filtered : items;
   }, [items, activeLo]);
+
   const sortedArms = useMemo(() => {
     return schedulerArms
       .slice()
@@ -113,22 +125,31 @@ export function StudyTabs({
             appVersion: process.env.NEXT_PUBLIC_APP_VERSION
           });
           if (result?.learnerState) {
-            setLearnerState(result.learnerState);
+            syncLearnerState(result.learnerState);
           }
         } catch (error) {
           console.error('submitRetentionReview failed', error);
+        } finally {
+          void invalidateLearnerState();
         }
       });
     },
-    [activeRetentionEntry, learnerId, retentionSessionId]
+    [activeRetentionEntry, invalidateLearnerState, learnerId, retentionSessionId, syncLearnerState]
   );
 
   const handlePractice = useCallback((loId: string) => {
     setActiveLo(loId);
-    // switch tab via DOM id for simplicity
+    setTab('practice');
     const trigger = document.querySelector('[data-study-trigger="practice"]') as HTMLButtonElement | null;
-    trigger?.click();
+    trigger?.focus();
   }, []);
+
+  const handleLearnerStateChange = useCallback(
+    (state: LearnerState) => {
+      syncLearnerState(state);
+    },
+    [syncLearnerState]
+  );
 
   return (
     <section className="space-y-6 px-4 py-10 max-w-6xl mx-auto text-gray-900">
@@ -166,6 +187,12 @@ export function StudyTabs({
           </div>
         </div>
       </div>
+      {learnerStateSyncing && (
+        <div className="flex items-center gap-2 text-xs text-emerald-600 animate-pulse">
+          <span className="okc-pill-ghost" aria-hidden>⟳</span>
+          <span>Syncing learner progress…</span>
+        </div>
+      )}
       <div className="grid gap-3 text-xs text-gray-700 md:grid-cols-2">
         <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2">
           <span className="text-emerald-800 font-semibold">Retention queue ({retentionQueue.length})</span>
@@ -305,7 +332,9 @@ export function StudyTabs({
           analytics={analytics}
           learnerId={learnerId}
           learnerState={learnerState}
-          onLearnerStateChange={setLearnerState}
+          onLearnerStateChange={handleLearnerStateChange}
+          optimisticLearnerStateUpdate={optimisticUpdate}
+          invalidateLearnerState={invalidateLearnerState}
         />
       )}
     </section>

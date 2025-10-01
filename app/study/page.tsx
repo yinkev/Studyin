@@ -7,8 +7,10 @@ import blueprint from '../../config/blueprint.json';
 import { buildThompsonArms, scheduleNextLo, computeRetentionBudget } from '../../lib/study-engine';
 import { computeStudyDashboards } from '../../lib/study-insights';
 
+const DEFAULT_LEARNER_ID = process.env.NEXT_PUBLIC_LEARNER_ID ?? 'demo-learner';
+
 export default async function StudyPage() {
-  const learnerId = 'demo-learner';
+  const learnerId = DEFAULT_LEARNER_ID;
   const [items, analytics, lessons] = await Promise.all([
     loadStudyItems(),
     loadAnalyticsSummary(),
