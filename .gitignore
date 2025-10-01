@@ -24,6 +24,7 @@ yarn-error.log*
 
 # Local data / outputs
 data/events.ndjson
+data/learner-state/
 public/analytics/latest.json
 
 # Env files
