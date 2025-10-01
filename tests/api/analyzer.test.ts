@@ -31,6 +31,21 @@ const sampleAttempts = [
     choice: 'C',
     correct: false,
     opened_evidence: false
+  },
+  {
+    schema_version: '1.0.0',
+    app_version: '0.1.0',
+    session_id: 'sess-3',
+    user_id: 'learner-1',
+    item_id: 'item.shoulder.anterior-dislocation',
+    lo_ids: ['lo.shoulder-pathology'],
+    ts_start: 3,
+    ts_submit: 63,
+    duration_ms: 20000,
+    mode: 'spotter',
+    choice: 'B',
+    correct: false,
+    opened_evidence: false
   }
 ];
 
@@ -38,12 +53,14 @@ describe('summarizeAttempts', () => {
   it('produces deterministic summary metrics', () => {
     const summary = summarizeAttempts(sampleAttempts, 1000);
     expect(summary.has_events).toBe(true);
-    expect(summary.totals.attempts).toBe(2);
-    expect(summary.speed_accuracy.fast_wrong).toBe(1);
-    expect(summary.confusion_edges).toHaveLength(1);
+    expect(summary.totals.attempts).toBe(3);
+    expect(summary.speed_accuracy.fast_wrong).toBe(2);
+    expect(summary.confusion_edges).toHaveLength(2);
     expect(summary.ttm_per_lo.length).toBeGreaterThan(0);
     expect(summary.reliability.kr20).toBeDefined();
     expect(summary.reliability.item_point_biserial[0]).toHaveProperty('point_biserial');
+    expect(summary.retention_summary?.total_reviews).toBe(1);
+    expect(summary.retention_summary?.incorrect).toBe(1);
   });
 
   it('returns empty summary when no attempts', () => {
