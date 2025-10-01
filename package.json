@@ -17,7 +17,9 @@
     "ci:lh": "lhci autorun",
     "score:rubric": "node scripts/score-rubric.mjs",
     "pm:pulse": "node scripts/tools/pm-pulse.mjs",
-    "pm:close-superseded": "node scripts/tools/close-superseded-prs.mjs"
+    "pm:close-superseded": "node scripts/tools/close-superseded-prs.mjs",
+    "mcp:inspector": "npx @modelcontextprotocol/inspector codex mcp",
+    "mcp:devtools": "npx chrome-devtools-mcp --target http://localhost:3000 --chrome-port 9222"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",

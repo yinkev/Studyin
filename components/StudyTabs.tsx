@@ -63,6 +63,21 @@ export function StudyTabs({
     return filtered.length ? filtered : items;
   }, [items, activeLo]);
 
+  const itemLabelMap = useMemo(() => {
+    const map = new Map<string, string>();
+    items.forEach((item) => {
+      map.set(item.id, item.stem ?? item.id);
+    });
+    return map;
+  }, [items]);
+
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
   const sortedArms = useMemo(() => {
     return schedulerArms
       .slice()
@@ -82,9 +97,9 @@ export function StudyTabs({
         items: itemsIndex,
         analytics: analytics ?? undefined,
         budgetMinutes: retentionInfo.minutes,
-        now: Date.now()
+        now
       }),
-    [learnerState, itemsIndex, analytics, retentionInfo.minutes]
+    [learnerState, itemsIndex, analytics, retentionInfo.minutes, now]
   );
 
   const [activeRetentionId, setActiveRetentionId] = useState<string | null>(retentionQueue[0]?.itemId ?? null);
@@ -171,7 +186,10 @@ export function StudyTabs({
         </div>
         <div className="flex flex-col items-end gap-2 text-sm text-gray-600">
           <div className="inline-flex items-center gap-2">
-            <button className={`btn-ghost ${tab === 'learn' ? 'ring-2 ring-green-500' : ''}`} onClick={() => setTab('learn')}>
+            <button
+              className={`btn-ghost ${tab === 'learn' ? 'ring-2 ring-green-500' : ''}`}
+              onClick={() => setTab('learn')}
+            >
               Learn
             </button>
             <button
@@ -206,12 +224,12 @@ export function StudyTabs({
               >
                 <div className="flex items-center justify-between">
                   <button className="font-medium text-emerald-700" onClick={() => setActiveRetentionId(entry.itemId)}>
-                    {entry.itemId}
+                    {itemLabelMap.get(entry.itemId) ?? entry.itemId}
                   </button>
                   <span>
                     {entry.overdue
                       ? `${entry.overdueDays.toFixed(1)}d overdue`
-                      : `${((entry.nextReviewMs - Date.now()) / (1000 * 60 * 60)).toFixed(1)}h`}
+                      : `${((entry.nextReviewMs - now) / (1000 * 60 * 60)).toFixed(1)}h`}
                   </span>
                 </div>
                 <div className="text-gray-500">{entry.estimatedMinutes.toFixed(1)} min · LOs {entry.loIds.join(', ') || '—'}</div>
@@ -260,7 +278,7 @@ export function StudyTabs({
             {dashboards.overexposedItems.slice(0, 5).map((entry) => (
               <li key={entry.itemId} className="rounded-lg bg-white px-2 py-1 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-rose-700">{entry.itemId}</span>
+                  <span className="font-medium text-rose-700">{itemLabelMap.get(entry.itemId) ?? entry.itemId}</span>
                   <span>{entry.attempts7d} attempts /7d</span>
                 </div>
                 <div className="text-gray-500">24h: {entry.attempts24h} · last {entry.lastAttemptHoursAgo}h ago</div>

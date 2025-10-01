@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
 import type { LearnerState } from '../lib/server/study-state';
 import type { CandidateItem } from '../lib/study-engine';
@@ -144,6 +144,8 @@ export function StudyView({
   const [feedback, setFeedback] = useState<ChoiceFeedback>({ correctShown: false });
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [showWhy, setShowWhy] = useState(false);
+  const whyPopoverRef = useRef<HTMLDivElement | null>(null);
+  const whyButtonRef = useRef<HTMLButtonElement | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -316,7 +318,23 @@ export function StudyView({
     };
     window.addEventListener('keydown', listener);
     return () => window.removeEventListener('keydown', listener);
-  }, [busy, current, handleNext, handlePrev, letters, submitAttempt]);
+  }, [busy, current, handleNext, handlePrev, letters, showWhy, submitAttempt]);
+
+  useEffect(() => {
+    if (!showWhy) return;
+
+    const clickListener = (event: MouseEvent) => {
+      if (!whyPopoverRef.current || whyPopoverRef.current.contains(event.target as Node)) {
+        return;
+      }
+      setShowWhy(false);
+    };
+
+    document.addEventListener('mousedown', clickListener);
+    return () => {
+      document.removeEventListener('mousedown', clickListener);
+    };
+  }, [showWhy]);
 
   if (!current) {
     return (
@@ -338,6 +356,7 @@ export function StudyView({
         </div>
         <div className="relative">
           <button
+            ref={whyButtonRef}
             onClick={() => setShowWhy((v) => !v)}
             className="flex max-w-xs flex-col gap-1 rounded-full border border-gray-300 bg-white px-4 py-2 text-left text-sm text-gray-800 shadow transition hover:bg-gray-50"
           >
@@ -345,10 +364,22 @@ export function StudyView({
             <span className="line-clamp-2 text-sm">{whyNext}</span>
           </button>
           {showWhy && (
-            <div className="absolute right-0 z-10 mt-2 w-96 rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-900 shadow-xl">
+            <div
+              ref={whyPopoverRef}
+              className="absolute right-0 z-10 mt-2 w-96 rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-900 shadow-xl"
+            >
               <h3 className="text-sm font-semibold">Focus rationale</h3>
               <p className="text-sm">{whyNext}</p>
               <p className="text-xs text-gray-500">Keyboard: E toggles evidence.</p>
+              <button
+                type="button"
+                className="mt-2 rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                onClick={() => {
+                  setShowWhy(false);
+                }}
+              >
+                Close
+              </button>
             </div>
           )}
         </div>
