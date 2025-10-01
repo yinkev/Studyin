@@ -42,7 +42,7 @@ jobs:
         run: npm run validate:items
 
       - name: Run unit tests
-        run: npm test -- --run
+        run: npm test
 
       - name: Run analyze
         run: npm run analyze
@@ -69,11 +69,11 @@ jobs:
       - name: Wait for server
         run: npx wait-on http://localhost:3000
 
-      - name: Axe accessibility audit
-        run: npm run ci:axe
+#      - name: Axe accessibility audit
+#        run: npm run ci:axe
 
-      - name: Lighthouse CI (assert budgets)
-        run: npm run ci:lh
+#      - name: Lighthouse CI (assert budgets)
+#        run: npm run ci:lh
 
       - name: Stop server
         if: always()

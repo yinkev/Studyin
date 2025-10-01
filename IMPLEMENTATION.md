@@ -1,103 +1,92 @@
-# Backend Services Implementation Plan
+# Personal Adaptive Study Engine — Implementation Plan
 
 ## Overview
-This plan translates the backend roadmap for Studyin into executable work. The goal is to unlock deterministic telemetry, blueprint-compliant exam delivery, and trustworthy analytics while preserving our local-first workflow so we can graduate to Supabase later without rework. All services must remain deterministic (no runtime LLM calls) and respect acceptance gates in `AGENTS.md`.
+This plan translates the authoritative spec in `docs/personal-adaptive-study-engine-spec.md` into concrete, testable work. We will implement Rasch/GPCM with Elo fallback, a Thompson Sampling cross‑topic scheduler, and an FSRS‑based retention lane, all deterministic and gated by blueprint rails and exposure caps. We will wire telemetry using `scripts/lib/schema.mjs` and surface transparent reasons in the UI.
 
-## High-ROI Priorities (v2)
-1. **Telemetry & Snapshots** — Keep ingestion deterministic; store attempts/sessions in Supabase, insert analytics snapshots, expose `/api/snapshots/latest`, and schedule hourly refresh.
-2. **Reliability Metrics** — Extend analyzer to compute point-biserial per item and KR‑20/α per exam form; surface drift and velocity metrics.
-3. **Temporal RAG** — Build pgvector-backed evidence index with time-aware ranking; deliver `/api/search` and offline indexer scripts.
-4. **React Flow Analytics** — Visualize confusion edges, blueprint gaps, and session traces via React Flow with full accessibility support.
-5. **Governance & Safeguards** — Harden env management, Supabase RLS, privacy scrubbing, and maintain deterministic outputs for audits.
+## Architecture
+- Ability & Scoring
+  - `scripts/lib/rasch.mjs`: Rasch 1‑PL utilities, Gauss–Hermite nodes/weights (41‑point), EAP posterior computation, information function `I(θ)`.
+  - `scripts/lib/gpcm.mjs`: GPCM PMF/log‑likelihood and category thresholds `τ` handling; EM re‑fit scaffold for weekly job.
+  - `scripts/lib/elo.mjs`: Reuse for cold‑start; add helpers to map Elo R↔Rasch θ (θ = (R−1500)/400) and blend with Rasch.
+- Selector & Scheduler
+  - `scripts/lib/selector.mjs`: In‑LO candidate scorer implementing utility `U = [I(θ̂|b,τ)/median_time] * multipliers` and randomesque K‑of‑N pick.
+  - `scripts/lib/scheduler.mjs`: Thompson Sampling over LO arms for expected `ΔSE/min`, urgency multiplier, and blueprint rail multipliers; cooldown enforcement.
+- Retention Lane
+  - `scripts/lib/fsrs.mjs`: FSRS parameter updates and next review scheduling; overdue boosts; time budgeting to ≤40% baseline, ≤60% when overdue >7d.
+- Balancing & Exposure
+  - `scripts/lib/exposure.mjs`: Item exposure ledger (≤1/day, ≤2/week, 96h cooldown), multiplier curve (0→0.5→1.0), and partial‑credit overfamiliarity clamp.
+  - `scripts/lib/blueprint.mjs`: Reuse; add functions to compute drift and multipliers per LO/system (±5% rails with clamps).
+- Telemetry & Analytics
+  - Use `AttemptEvent` and `SessionEvent` from `scripts/lib/schema.mjs:103`–`138` for training/retention/scheduler events; enrich with engine fields via an `engine` property under `metadata`.
+  - Analyzer remains in `scripts/lib/analyzer-core.mjs`; extend summary with exposure/blueprint drift counters if needed (non‑breaking, bump `ANALYTICS_SCHEMA_VERSION` at `scripts/lib/analyzer-core.mjs:4`).
+- Learner State & Actions
+  - `lib/study-engine.ts`: shared adaptive helpers (Rasch ability, scheduler arms, retention budgeting, “Why this next”).
+  - `lib/study-insights.ts`: compute dashboards (priority/stalled LOs, overexposed items) from learner state + analytics.
+  - `lib/server/study-state.ts`: file-backed learner state store (`data/state/<learner>.json`, override via `STUDY_STATE_DIR`).
+  - `app/study/actions.ts`: server action to update learner state, append telemetry, and return refreshed signals to the client.
 
-## Architecture & Files
-- **Telemetry ingestion**
-  - `app/api/attempts/route.ts`: node runtime, validates request body via shared helper, strips unknown fields, appends to `data/events.ndjson`.
-  - `app/api/sessions/route.ts`: mirrors attempts route for session events.
-  - `lib/server/events.ts`: shared helpers (`assertAttempt`, `assertSession`, `appendNdjsonLine`, token guard, basic rate limiter).
-- **Blueprint forms**
-  - `app/api/forms/route.ts`: fetches items via `lib/getItems.ts:63`, filters by status when `publishedOnly=1`, seeds RNG, builds deterministic form.
-  - `lib/server/forms.ts`: wraps blueprint derivation and item filtering for reuse (exam UI, future drills, Supabase adapters).
-- **Analytics refresh**
-  - `scripts/lib/analyzer-core.mjs`: exports `loadEvents(path)` and `summarizeAttempts(attempts)` currently inline in `scripts/analyze.mjs`.
-  - `app/api/analytics/refresh/route.ts`: admin/token-guarded endpoint that loads attempts, runs analyzer core, writes `public/analytics/latest.json`.
-  - `scripts/analyze.mjs`: refactored to reuse analyzer core to avoid double maintenance.
-- **Governance & safeguards**
-  - `.env.example`: document `WRITE_TELEMETRY`, `INGEST_TOKEN`, `EVENTS_PATH`, `ANALYTICS_OUT_PATH`, `USE_SUPABASE_INGEST`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `READ_ANALYTICS_FROM_SUPABASE`.
-  - `scripts/lib/schema.mjs`: export `stripUnknown<T>(schema, data)` helper for routes.
-  - `supabase/schema.sql`: attempts/sessions/analytics_snapshots/evidence_chunks tables with indexes and constraints.
-  - `supabase/policies.sql`: RLS rules (attempts/sessions insert-only; analytics snapshots + evidence chunks read-only for anon/auth, insert via service role).
-- **Evidence & exam hardening**
-  - `components/ExamView.tsx`: switch to consuming `/api/forms`, display blueprint progress, keep evidence locked.
-  - `README.md`, `AGENTS.md`: reinforce evidence latency (<250 ms), telemetry token usage, and blueprint expectations.
+## Data Model
+- Per‑learner state: LO‑level `θ̂`, `SE`, last probe `b` window flag, and item‑level response counts; persisted in app storage (server‑side JSON under `data/state/<user>.json`) for local dev; optional Supabase tables later.
+- Exposure ledger: per item/user timestamps for day/week counts and cooldown unlock times.
+- Retention cards: FSRS parameters per item+LO; next review timestamps.
+
+## File‑by‑File Changes (execution order)
+1. `scripts/lib/rasch.mjs` — GH nodes/weights, EAP posterior, info function, mastery probability.
+2. `scripts/lib/gpcm.mjs` — PMF/log‑likelihood, thresholds `τ`, EM re‑fit scaffold and shrinkage hooks.
+3. `scripts/lib/selector.mjs` — Utility computation, filters (time cap ≤6 min; exposure), randomesque top‑K.
+4. `scripts/lib/scheduler.mjs` — TS over LO arms with urgency and blueprint multipliers; cooldown logic.
+5. `scripts/lib/fsrs.mjs` — FSRS updates, scheduling, budgeted queue filler.
+6. `scripts/lib/exposure.mjs` — Ledger, multipliers, overfamiliarity clamp.
+7. `lib/server/study-state.ts` — Persist learner LO ability + item exposure counts (JSON with cooldown history).
+8. `lib/study-engine.ts` — Export shared helpers (difficulty→β, Thompson arms, retention budgeting, “Why this next”).
+9. `app/study/actions.ts` — Server action handling Rasch update, telemetry append, learner state persistence.
+10. `app/study/engine.ts` — Server module orchestrating selection loop; integrates telemetry writers using schemas and re-exports shared helpers.
+11. `components/StudyView.tsx` — Client view invoking the server action, rendering “Why this next,” and respecting recommended LO queue.
+12. `scripts/jobs/refit-weekly.mjs` — Weekly Rasch/GPCM refit summary (`npm run jobs:refit`); emits per-item stats (attempt totals, p-value, suggested half-life) under `data/refit-summaries/` for governance review.
+13. Docs: update `README.md`, `AGENTS.md`, `PLAN.md` with engine gates and operations.
 
 ## Interfaces & Contracts
-- `POST /api/attempts` — Request: `AttemptEvent`; token auth; 201 on success; supports Supabase sink.
-- `POST /api/sessions` — Request: `SessionEvent`; token auth; 201.
-- `GET /api/forms?length=<int>&seed=<int>&publishedOnly=<0|1>` — Deterministic blueprint form; 409 with deficits when infeasible.
-- `POST /api/analytics/refresh` — Guarded by `ANALYTICS_REFRESH_TOKEN`; writes latest.json, inserts snapshot; returns `{generated_at, totals}`.
-- `GET /api/snapshots/latest` — Returns `{generated_at, schema_version, payload}` of newest snapshot (service role only).
-- `GET /api/search?q&lo&since&k` — Temporal RAG retrieval (pgvector) returning citation-rich evidence chunks (deterministic ranking).
-- `/api/health` — Reports telemetry flags, Supabase usage, snapshot timestamps.
+- Inference loop API (internal):
+  - `selectNext({ learnerId, loId, sessionState }) -> { itemId, reason, signals }` using `selector.mjs`.
+  - `scheduleNextLo({ learnerId, eligibleLos, blueprint }) -> { loId, reason, signals }` using `scheduler.mjs`.
+  - `retentionQueue({ learnerId, sessionMinutes }) -> Array<{ itemId, dueAt }>` using `fsrs.mjs`.
+- Telemetry
+  - Reuse existing ingestion endpoints: `POST /api/attempts`, `POST /api/sessions`; keep deterministic writers; NDJSON path in `scripts/analyze.mjs:10`.
 
-## Data Model Impacts
-- **Local-first**: NDJSON append remains possible; rotation backlog.
-- **Supabase**: `attempts`, `sessions`, `analytics_snapshots`, `evidence_chunks` (pgvector). All writes via service role; RLS enforced.
-- **Snapshots**: analytics history stored as JSONB; hourly job ensures freshness.
-- **RAG**: embeddings stored as vector(768) with `ts` + `version` metadata for temporal decay.
+## Tests (unit/e2e/perf)
+- `tests/rasch.eap.test.mjs` — EAP update monotonicity and convergence on synthetic item responses.
+- `tests/gpcm.pmf.test.mjs` — PMF sums to 1; log‑likelihood increases under correct updates.
+- `tests/scheduler.ts.test` — TS prioritizes LOs with higher sampled `ΔSE/min`, respects rails and cooldowns.
+- `tests/exposure.ledger.test.mjs` — Caps enforced (≤1/day, ≤2/week) and cooldown transitions.
+- `tests/fsrs.queue.test.mjs` — Budgeted fill obeys ≤40%/≤60% rule and overdue boosts.
+- `tests/engine.state.test.ts` — Learner state persistence roundtrips, exposure counters, JSON shape.
+- UI snapshot for “Why this next” pill shows numeric components and matches engine signals.
 
-## File-by-File Changes (execution order)
-1. `lib/server/events.ts` — optional Supabase sink, rate limiting.
-2. `app/api/attempts/route.ts`, `app/api/sessions/route.ts` — ingestion routes.
-3. `scripts/lib/analyzer-core.mjs` — TTM/ELG/min, confusion, speed, reliability (point-biserial, KR‑20/α), drift.
-4. `app/api/analytics/refresh/route.ts` — refresh, Supabase loader, snapshot insert.
-5. `app/api/snapshots/latest/route.ts` — latest snapshot retrieval.
-6. `lib/server/forms.ts`, `app/api/forms/route.ts` — blueprint builder reused by Exam.
-7. `supabase/schema.sql`, `supabase/policies.sql` — attempts/sessions/snapshots/evidence_chunks and RLS.
-8. `scripts/rag/build-index.mjs`, `scripts/rag/verify-index.mjs`, `app/api/search/route.ts` — temporal RAG pipeline + API.
-9. `components/graphs/*` — React Flow graphs for confusion, blueprint gaps, session traces.
-10. `.env.example`, `README.md`, `AGENTS.md`, `PLAN.md` — documentation + milestones.
-
-## Testing & Validation
-- Unit tests (`tests/api/events.test.ts`): ingestion validation + rate limits.
-- Unit tests (`tests/api/forms.test.ts`): deterministic form builds + deficit reporting.
-- Unit tests (`tests/api/analyzer.test.ts`): analytics summary + reliability metrics.
-- Unit tests (`tests/api/search.test.ts`): RAG ranking deterministic against fixture embeddings.
-- Integration: ingestion → refresh → snapshot insertion verified; React Flow renders pass axe; RAG recall@k >= target in verify script.
-- Unit tests for analyzer core (relocate portions of `tests/engines.test.mjs` or add new `tests/analyzer.test.mjs`) to ensure identical output pre/post refactor.
-- Integration smoke: run `npm run analyze` after posting sample attempts to confirm `public/analytics/latest.json` updates `totals` correctly.
-- Acceptance: `npm run validate:items`, `npm test`, `npm run analyze`, optionally `npm run pm:pulse` after new endpoints.
-
-## Observability & Telemetry
-- Structured logging per route (`console.error({ route, error })`).
-- `/api/health` returns telemetry flags, Supabase usage, and `last_generated_at`.
-- Future: emit metrics to Supabase (counts) or external sink; maintain deterministic logs for audits.
+## Observability & Ops
+- Add structured `console.debug` with `{ engine: 'selector|scheduler|fsrs', reason, signals }` in server logs.
+- Weekly job logs EM fit status and reliability deltas; bump `ANALYTICS_SCHEMA_VERSION` only on additive fields (`scripts/lib/analyzer-core.mjs:4`).
 
 ## Security & Privacy
-- Enforce bearer token when `WRITE_TELEMETRY=1`; local dev only may relax.
-- Strip unknown fields; reject schema_version mismatches.
-- Cap request size 10 KB; respond 413 on overflow.
-- Pseudonymous IDs only; evidence chunks scrubbed for PII before indexing.
-- Supabase RLS: anon insert-only, service role for admin tasks, read-only for analytics/evidence.
+- No PII in state files; key by pseudonymous learner IDs.
+- Keep service‑role secrets server‑only; reuse existing envs in `.env.example`.
 
-## Rollout & Backout Strategy
-- Branch: `feat/backend-ingestion`.
-- Milestone order matches ROI list; merge each step behind feature flags (`WRITE_TELEMETRY`, `ANALYTICS_REFRESH_TOKEN`).
-- Backout: remove routes and helpers; restore previous `scripts/analyze.mjs` if required (keep git tag before refactor).
-- ProjectManager to update `PLAN.md` after each merge; ReleaseManager verifies validator/tests/analytics/axe/LH gates.
+## Acceptance Gates (from PRD)
+- Blueprint rails within ±5%; exposure caps enforced; stop rules met; randomesque top‑K; retention budgeting.
+- Deterministic outputs; Lighthouse budgets per `.lighthouserc.json:12`–`18`; evidence P95 <250 ms.
+- Validator clean; analytics present and deterministic; PLAN updated post‑merge.
 
-## Execution Phases (sequence, no dates)
-- Foundation: Docs sweep, ensure validator green, wire `/api/snapshots/latest`, and schedule analytics refresh.
-- Reliability: Extend analyzer for point‑biserial and KR‑20/α; add tests and update `latest.json` consumers.
-- Retrieval: Build RAG indexer and `/api/search`; create `evidence_chunks` store; add deterministic ranking tests.
-- Visualization: Enhance React Flow graphs (confusion, blueprint gaps, sessions) with OKC polish.
-- Governance: Automate rubric scoring in PRs, keep PLAN updated post‑merge, and document any perf justifications.
+## Rollout & Backout
+- Branch: `feat/adaptive-engine`.
+- Rollout in phases (selector → scheduler → retention → weekly EM fit), feature‑flagged behind `ENGINE_ENABLE=1` in server modules.
+- Backout: disable the flag and fall back to current static Study/Drill ordering; keep attempt ingestion untouched.
 
 ## Risk Register
 | Risk | Owner | Status | Mitigation |
 | --- | --- | --- | --- |
-| NDJSON growth causes slow appends | Implementation Strategist | Open | Plan rotation threshold + optional Supabase migration.
-| Token leakage in client bundle | Security/Privacy (DataSteward) | Open | Require server-side ingestion proxy for production; document in README.
-| Blueprint infeasible error confuses users | QA-Proctor | Open | Surface deficits clearly in API response; add UI messaging.
-| Analytics divergence post-refactor | AnalyticsEngineer | Open | Snapshot old/new outputs during refactor; add regression test.
-| Supabase rollout delays | ProjectManager | Open | Keep local-first workflow functional; schedule migration separately.
+| Rasch/EAP numerical instability | AnalyticsEngineer | Open | Clamp θ grid, log‑sum‑exp stabilization, unit tests.
+| Cold‑start quality | AnalyticsEngineer | Open | Elo fallback and blended warm step; sanity bounds.
+| Scheduler overfocus on long LOs | Implementation Strategist | Open | Use per‑minute objective and blueprint multipliers; cap utility.
+| Overexposure | QA‑Proctor | Open | Strict caps and cooldown enforcement; ledger tests.
+| Weekly EM maintenance load | ProjectManager | Open | Automate job with logs and guardrails; only adjust when reliability improves.
+
+Next agent: AdaptiveEngineer · Model: gpt-5-codex-high · Scope: scripts/lib/{selector,scheduler,rasch,gpcm,fsrs,exposure}.mjs app/(study)/engine.ts tests/**

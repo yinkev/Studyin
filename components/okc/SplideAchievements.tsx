@@ -30,8 +30,8 @@ export function SplideAchievements() {
       pagination: false,
       breakpoints: {
         1024: { perPage: 4 },
-        640: { perPage: 3 }
-      }
+        640: { perPage: 3 },
+      },
     });
     slider.mount();
     return () => slider.destroy();
@@ -41,22 +41,31 @@ export function SplideAchievements() {
 
   return (
     <div ref={rootRef} className="duo-card p-6">
-      <Script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js" strategy="afterInteractive" onLoad={() => setReady(true)} />
+      <Script
+        src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"
+        strategy="afterInteractive"
+        onLoad={() => setReady(true)}
+      />
+      {/* Keep heading order correct relative to the page (h2 > h3 > h4). */}
       <h3 className="text-xl font-bold mb-4">Achievements</h3>
+
       <div className="splide" aria-label="Achievements slider">
         <div className="splide__track">
-          <ul className="splide__list">
+          {/* use div+ARIA instead of ul/li to avoid aria-allowed-role on li */}
+          <div className="splide__list" role="list">
             {achievements.map((g, i) => (
-              <li className="splide__slide" key={i}>
-                <div className="achievement-badge w-20 h-20 mx-auto flex items-center justify-center text-2xl cursor-pointer" title="Achievement">
+              <div className="splide__slide" role="listitem" key={i}>
+                <div
+                  className="achievement-badge w-20 h-20 mx-auto flex items-center justify-center text-2xl cursor-pointer text-slate-800"
+                  title="Achievement"
+                >
                   {g}
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-

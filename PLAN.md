@@ -50,6 +50,13 @@
 - n8n local automations (ingest, nightly refresh, evidence backups) — TODO.
 - Anki styling (Tailwind-compiled CSS + QSS) — TODO.
 
+### E — Adaptive Engine (NEW)
+- Rasch/GPCM online updater with Elo cold‑start bridge; EAP via 41‑point GH; mastery probability and stop rules.
+- In‑session selector with utility multipliers (blueprint/exposure/fatigue), randomesque top‑K.
+- Cross‑topic Thompson Sampling scheduler optimizing `ΔSE/min` with rails and cooldowns.
+- FSRS retention lane with overdue boosts and time budgeting; training↔retention handoff.
+- Weekly EM re‑fit job for GPCM thresholds and difficulty shrinkage; reliability checks.
+
 ## Module-Agnostic Checklist
 - Provide MODULE/SYSTEM/SECTION + `BLUEPRINT_PATH`, `LOS_PATH`, `SCOPE_DIRS`, `METRICS_SOURCE` per epic.  
 - Maintain PRD ≥92/100 (★ ≥2.9) then IMPLEMENTATION ≥92/100 before shipping.  
@@ -71,10 +78,13 @@
 - React Flow editors + OKC polish (D).  
 - Publish evidence latency check (P95 <250 ms) and document expectations in README (governance).  
 - Run `npm run score:rubric` and attach `public/analytics/rubric-score.json` to tracker (PM cadence).
+- Adaptive Engine Week 1 (in progress): telemetry + learner-state persistence + TS scheduler wired into Study UI ✅; next—integrate FSRS retention lane, analytics dashboards (Priority/Stalled/Overexposed), and weekly EM refit job.
 
 ## Cadence
 - Daily: sync PLAN status; triage issues; verify CI on latest PRs.  
 - Weekly: run `npm run score:rubric`; attach `public/analytics/rubric-score.json` to tracker; flag ★ < 2.8.  
+- Weekly: run `npm run jobs:refit`; review `data/refit-summaries/` output with AnalyticsEngineer before rollouts.  
+- Weekly GitHub Action (`refit-weekly.yml`) runs `npm run jobs:refit`, uploads the artifact, and serves as the automation path for refit summaries (replace with n8n/cron if operating offline).  
 - Release: gates green (validator, perf, rubric). A11y non‑blocking in OKC phase. Evidence latency spot‑check; blueprint preflight passes.
 
 ## Single Next Step
