@@ -16,7 +16,8 @@
     "ci:axe": "axe --exit http://localhost:3000",
     "ci:lh": "lhci autorun",
     "score:rubric": "node scripts/score-rubric.mjs",
-    "pm:pulse": "node scripts/tools/pm-pulse.mjs"
+    "pm:pulse": "node scripts/tools/pm-pulse.mjs",
+    "pm:close-superseded": "node scripts/tools/close-superseded-prs.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
