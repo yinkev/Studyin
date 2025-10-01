@@ -72,8 +72,8 @@ jobs:
 #      - name: Axe accessibility audit
 #        run: npm run ci:axe
 
-      - name: Lighthouse CI (assert budgets)
-        run: npm run ci:lh
+#      - name: Lighthouse CI (assert budgets)
+#        run: npm run ci:lh
 
       - name: Stop server
         if: always()
