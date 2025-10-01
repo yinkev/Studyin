@@ -87,5 +87,10 @@
 - Weekly GitHub Action (`refit-weekly.yml`) runs `npm run jobs:refit`, uploads the artifact, and serves as the automation path for refit summaries (replace with n8n/cron if operating offline).  
 - Release: gates green (validator, perf, rubric). A11y non‑blocking in OKC phase. Evidence latency spot‑check; blueprint preflight passes.
 
+## PR Hygiene (superseded branches)
+- Merged: PR #11 (codex/complete-phase-3) — unified learner-state with adaptive engine and optimistic Study UI.
+- Superseded: PRs #1–#9 (early Codex branches) conflict with current engine/UI. Preferred path is to cherry-pick any still-useful assets (e.g., item JSONs, chart components). Most of these assets already exist on `main`.
+- Action: Close PRs #1–#9 as superseded. If any missing asset is needed, create a fresh branch from `main` and port it with minimal diffs + validators/tests.
+
 ## Single Next Step
 Run LO‑Extractor on one real PPT/PDF → update `config/los.json`. Follow with LessonSmith for 5–10 LOs and ItemSmith for 10–15 MCQs; iterate until `npm run validate:items` reports ✓.
