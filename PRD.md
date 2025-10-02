@@ -47,7 +47,7 @@
 
 ## Non‑Functional Requirements
 - Determinism: all engines and routes deterministic; no runtime LLM usage.
-- Performance: Lighthouse budgets (`.lighthouserc.json:12`–`18`) and app responsibilities; evidence P95 <250 ms; item render <100 ms.
+- Performance: Evidence P95 <250 ms; item render <100 ms. Perf budgets may be introduced later.
 - Accessibility: non‑blocking gate during OKC phase.
 - Privacy: telemetry stays pseudonymous; service role keys server‑only.
 

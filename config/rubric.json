@@ -76,18 +76,6 @@
       }
     },
     {
-      "id": "accessibility",
-      "label": "Accessibility (WCAG 2.2 AA)",
-      "critical": true,
-      "weight": 6,
-      "levels": {
-        "0": "Not considered.",
-        "1": "Partial coverage.",
-        "2": "Keyboard + contrast checks.",
-        "3": "Automated audits, no regressions."
-      }
-    },
-    {
       "id": "performance",
       "label": "Performance",
       "critical": true,
@@ -185,4 +173,3 @@
     }
   ]
 }
-
