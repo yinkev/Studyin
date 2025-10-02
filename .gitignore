@@ -8,6 +8,9 @@ coverage/
 .next_server.log
 .server_pid
 
+# Local agent artifacts
+.code/
+
 # Logs and diagnostics
 *.log
 *.tmp
@@ -26,6 +29,7 @@ yarn-error.log*
 data/events.ndjson
 data/learner-state/
 public/analytics/latest.json
+public/analytics/rubric-score.json
 
 # Env files
 .env
