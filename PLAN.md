@@ -6,6 +6,28 @@
 ## Recent Merge Log
 - Latest — OKC-heavy UI, analytics cards, lessons scaffolding landed; GLTFLoader CDN fixed; analytics regenerated.
 
+### 2025-10-02 — Health Check CI PR (#13)
+- Finalized GET `/api/health` + test; CI build green; Vercel deploy ok.
+- Outcome: added durable CI signal for future PRs.
+
+### 2025-10-02 — “Why this next” Pill UI PR (#14)
+- Added deterministic pill component (no runtime LLM); wired into StudyView; tests added.
+- Guarded exam form builder to surface deficits when published-only pool is too small.
+- Outcome: transparency increase with minimal risk; main remains green via required build check.
+
+## Milestone — 2025-10-02 · Health Check CI PR
+- Branch: `feat/health-check-ci` (local). Scope: `app/api/health/route.ts`, `tests/api/health.test.ts`.
+- Validator: ✓ 0 errors (30 items). Blueprint tracked; statuses {review: 4, draft: 26}.
+- Analyze: ✓ `public/analytics/latest.json` refreshed deterministically (primary delta `generated_at`).
+- Tests: ✓ 10 files, 33 tests passed (vitest).
+- Integrity: no item edits; `schema_version`/evidence unchanged; clinical text/rationales untouched.
+
+Next agent: ReleaseManager · Model: gpt-5-codex-high · Scope: app/api/** tests/api/**
+- Actions: open PR “feat(api): harden health check and add test”; verify CI (validate/analyze/tests) and merge if green.
+
+Next agent: ProjectManager · Model: gpt-5-codex-high · Scope: PLAN.md docs/**
+- Actions: track follow-ups — (1) LO extractor kick-off, (2) “Why this next” pill wiring using `public/analytics/latest.json`, (3) schedule analytics refresh.
+
 ## Module Inputs
 - MODULE: <fill at epic kickoff>
 - SYSTEM/SECTION: <optional>
