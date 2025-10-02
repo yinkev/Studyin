@@ -90,3 +90,77 @@ This plan translates the authoritative spec in `docs/personal-adaptive-study-eng
 | Weekly EM maintenance load | ProjectManager | Open | Automate job with logs and guardrails; only adjust when reliability improves.
 
 Next agent: AdaptiveEngineer · Model: gpt-5-codex-high · Scope: scripts/lib/{selector,scheduler,rasch,gpcm,fsrs,exposure}.mjs app/(study)/engine.ts tests/**
+
+---
+
+# Feature — “Why This Next” Pill · Implementation Plan (Scoped)
+
+Date: 2025-10-02
+Owners: UIBuilder, GraphUX, AnalyticsEngineer
+
+## 1) Architecture (deterministic, UI-only)
+- Data source: `public/analytics/latest.json` read on server via `lib/getAnalytics.ts`.
+  - Output path contract: `scripts/analyze.mjs:10–11`; generator: `scripts/analyze.mjs:13–19`.
+  - Field contract: `scripts/lib/analyzer-core.mjs:278–299` (summary root), `:194–201` (confusion_edges), `:189–193` (elg_per_min), `:146–162` (ttm_per_lo).
+- Signals formatter: `lib/study-engine.ts:220–248` (`buildWhyThisNext`), reused by the pill.
+- Placement: Study screen header next to the existing Why toggle in `components/StudyView.tsx:352–405`.
+- Rendering: Small client component that receives deterministic props (numbers) and renders pill with no network calls.
+
+## 2) Interfaces
+```ts
+// components/pills/WhyThisNextPill.tsx (new)
+export interface WhySignals {
+  info: number; blueprintMult: number; exposureMult: number; fatigue: number;
+  medianSec: number; thetaHat: number; se: number; masteryProb: number;
+  loIds: string[]; itemId: string;
+}
+export function WhyThisNextPill(props: { signals: WhySignals; onClick?: () => void }): JSX.Element
+```
+
+## 3) Data flow
+1) Server loads analytics once per request in `app/study/page.tsx` via `loadAnalyticsSummary()` (see `lib/getAnalytics.ts:1–24`).
+2) `StudyTabs` → `StudyView` receives `analytics` prop (see `app/study/page.tsx:1–22, 30–44`).
+3) `StudyView` derives per-item candidate signals using helpers:
+   - derive ability: `components/StudyView.tsx:64–93` and `lib/study-engine.ts:246–261`.
+   - score candidates: `lib/study-engine.ts:51–92`.
+   - compose rationale: `lib/study-engine.ts:220–248`.
+4) Pass structured numbers to the pill component (no string concatenation in the UI); pill renders compact chips and an accessible tooltip.
+
+## 4) File‑by‑File Changes
+1. `components/pills/WhyThisNextPill.tsx` — NEW: render compact pill with numeric chips (Info, Blueprint×, Exposure×, Median s, θ̂, SE, Mastery).
+2. `components/StudyView.tsx` — REF: replace inline string `whyNext` display with `<WhyThisNextPill signals={…} />` keeping the existing popover (lines `352–405`).
+3. `tests/why-pill.test.tsx` — NEW: unit render test verifying chips render and numbers are formatted deterministically; snapshot minimal.
+4. `tests/engine.why.test.ts` — KEEP/ADOPT: already validates `buildWhyThisNext` composition (present in repo, add to test run).
+5. `README.md` — DOC: add short usage note for the pill and analytics dependency.
+
+## 5) Tests (unit/e2e/perf)
+- Unit: `tests/why-pill.test.tsx` ensures all chips present and formatted; `tests/engine.why.test.ts` already covers string builder.
+- Integration: add Study view render smoke with mocked analytics to ensure pill mounts.
+- Perf: ensure render <1ms in jsdom by limiting chip count and using memoized formatting.
+
+## 6) Observability
+- Add `data-why-next` attributes to chips for test selectors.
+- Optional `console.debug` in dev builds gated by `NODE_ENV!=='production'`.
+
+## 7) Security/Privacy
+- Read‑only local JSON; no PII; no network calls; no runtime LLM.
+
+## 8) Accessibility/Perf
+- Non‑blocking A11y per AGENTS.md; still provide `aria-label` summarizing values.
+- No layout shift: fixed-size inline pill; clamp to 2 lines in existing popover.
+
+## 9) Rollout & Backout
+- Feature‑flag via boolean prop on `StudyView` (default ON). Backout by rendering the prior inline string.
+
+## 10) Owners & Timeline
+- Day 0: component + tests (UIBuilder, GraphUX).
+- Day 1: integrate into `StudyView`, add snapshot and smoke test; PM updates PLAN.
+
+## 11) Risks
+- Risk: analytics missing → show ghost pill with “Analytics unavailable”.
+- Risk: overlong numbers → format with fixed decimals and max-width chips.
+
+## 12) Acceptance Gates (must pass)
+- Deterministic: no runtime fetch beyond local JSON; snapshot stable.
+- Tests green; validator unaffected; CI build required by branch protection stays green.
+- PLAN updated after merge.
