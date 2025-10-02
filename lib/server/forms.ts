@@ -122,6 +122,12 @@ export async function buildExamForm({ length, seed = 1, publishedOnly = false }:
     throw new BlueprintDeficitError(blueprint.id, ['No items available matching publishedOnly filter']);
   }
 
+  // Guard: even if per-LO supply is feasible, total distinct items must meet requested length
+  if (pool.length < length) {
+    const deficits = computeDeficits(blueprint, pool, length);
+    throw new BlueprintDeficitError(blueprint.id, deficits);
+  }
+
   if (!isBlueprintFeasible(blueprint, pool, length)) {
     const deficits = computeDeficits(blueprint, pool, length);
     throw new BlueprintDeficitError(blueprint.id, deficits);

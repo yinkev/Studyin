@@ -5,6 +5,7 @@ import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
 import type { LearnerState } from '../lib/server/study-state';
 import type { CandidateItem } from '../lib/study-engine';
 import { buildWhyThisNext, difficultyToBeta, scoreCandidates } from '../lib/study-engine';
+import { WhyThisNextPill } from './pills/WhyThisNextPill';
 import { masteryProbability } from '../scripts/lib/rasch.mjs';
 import { submitStudyAttempt } from '../app/study/actions';
 import type { OptimisticLearnerStateUpdate } from '../lib/client/useLearnerState';
@@ -154,7 +155,7 @@ export function StudyView({
 
   const current = items[index];
 
-  const whyNext = useMemo(() => {
+  const { whyNext, whySignals } = useMemo(() => {
     if (!current) return 'Focus on mastery — keep practicing.';
     const loIds = current.los ?? [];
     const { thetaHat, se } = deriveAbility(loIds, learnerState, analytics);
@@ -188,10 +189,23 @@ export function StudyView({
     };
     const [score] = scoreCandidates({ thetaHat, items: [candidate] });
     if (!score || score.exposureMultiplier === 0) {
-      return fallbackWhyThisNext(current.id, loIds, analytics);
+      return { whyNext: fallbackWhyThisNext(current.id, loIds, analytics), whySignals: null as any };
     }
     const masteryProb = masteryProbability(thetaHat, se);
-    return buildWhyThisNext(score, { thetaHat, se, masteryProb });
+    const whyText = buildWhyThisNext(score, { thetaHat, se, masteryProb });
+    const signals = {
+      info: score.info,
+      blueprintMult: score.blueprintMultiplier,
+      exposureMult: score.exposureMultiplier,
+      fatigue: score.fatigueScalar,
+      medianSec: score.medianTimeSeconds,
+      thetaHat,
+      se,
+      masteryProb,
+      loIds,
+      itemId: current.id
+    };
+    return { whyNext: whyText, whySignals: signals };
   }, [analytics, current, index, learnerState]);
 
   const letters = ANSWER_LETTERS;
@@ -361,7 +375,14 @@ export function StudyView({
             className="flex max-w-xs flex-col gap-1 rounded-full border border-gray-300 bg-white px-4 py-2 text-left text-sm text-gray-800 shadow transition hover:bg-gray-50"
           >
             <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">Why this next</span>
-            <span className="line-clamp-2 text-sm">{whyNext}</span>
+            {whySignals ? (
+              <WhyThisNextPill
+                signals={whySignals}
+                onClick={() => setShowWhy((v) => !v)}
+              />
+            ) : (
+              <span className="line-clamp-2 text-sm">{whyNext}</span>
+            )}
           </button>
           {showWhy && (
             <div
