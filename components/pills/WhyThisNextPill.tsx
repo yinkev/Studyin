@@ -14,7 +14,15 @@ export interface WhySignals {
   itemId: string;
 }
 
-export function WhyThisNextPill({ signals, onClick }: { signals: WhySignals; onClick?: () => void }) {
+export function WhyThisNextPill({
+  signals,
+  onClick,
+  title
+}: {
+  signals: WhySignals;
+  onClick?: () => void;
+  title?: string;
+}) {
   const parts = [
     { label: 'Info', value: signals.info.toFixed(2), key: 'info' },
     { label: 'Blueprint×', value: signals.blueprintMult.toFixed(2), key: 'blueprint' },
@@ -37,6 +45,7 @@ export function WhyThisNextPill({ signals, onClick }: { signals: WhySignals; onC
         if (e.key === 'Enter' || e.key === ' ') onClick?.();
       }}
       aria-label={aria}
+      title={title}
       className="flex flex-wrap items-center gap-2"
     >
       {parts.map((p) => (
@@ -53,4 +62,3 @@ export function WhyThisNextPill({ signals, onClick }: { signals: WhySignals; onC
     </div>
   );
 }
-
