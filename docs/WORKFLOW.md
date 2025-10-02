@@ -22,7 +22,7 @@ Studyin Agent Workflow (Deterministic + Rubric-Gated)
   2) PRD Architect produces `PRD.md` citing repo paths (e.g., `scripts/analyze.mjs:42`).
   3) Implementation Strategist delivers `IMPLEMENTATION.md` with file-by-file plan, tests, and rollout/backout.
   4) Implement changes; keep diffs minimal and deterministic (no runtime LLM calls).
-  5) Run gates locally: `npm run validate:items`, `npm test`, `npm run analyze`, optional `npm run ci:lh`.
+  5) Run gates locally: `npm run validate:items`, `npm test`, `npm run analyze`.
   6) Open PR with analytics deltas or evidence links; PM reviews rubric scores and merges when gates pass.
 
 - Agent Invocation
@@ -40,5 +40,4 @@ Studyin Agent Workflow (Deterministic + Rubric-Gated)
   - Validator clean; rubric_score ≥2.7 on published items.
   - Analytics `public/analytics/latest.json` regenerates deterministically.
   - Perf targets monitored: TTI <2s, evidence <250 ms, CLS <0.1.
-  - A11y non-blocking during OKC-heavy phase; document known issues.
-
+  - Accessibility checks are out of scope for this phase.

@@ -13,8 +13,6 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest --run",
-    "ci:axe": "axe --exit http://localhost:3000",
-    "ci:lh": "lhci autorun",
     "score:rubric": "node scripts/score-rubric.mjs",
     "pm:pulse": "node scripts/tools/pm-pulse.mjs",
     "pm:close-superseded": "node scripts/tools/close-superseded-prs.mjs",
@@ -44,8 +42,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@axe-core/cli": "^4.9.1",
-    "@lhci/cli": "^0.12.0",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20.12.12",
     "@types/react": "^18.3.3",

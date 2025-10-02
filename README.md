@@ -41,7 +41,6 @@ supabase/                  # SQL schema + RLS policies for Supabase ingestion/in
 tests/                     # Vitest smoke tests for engines
 AGENTS.md                  # Agent SOPs, rubric gates, workflow
 PLAN.md                    # Current milestones, To‑Dos, cadence
-.lighthouserc.json         # CI Lighthouse thresholds and budgets
 ```
 
 ## Deterministic Engines (stubs)
@@ -80,8 +79,7 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 ## Tests & CI
 
 - Unit: `npm test` (Vitest).
-- CI runs: validate → unit → analyze → build → Lighthouse CI (per `.lighthouserc.json`).
-- A11y is non‑blocking during the OKC heavy‑visual phase. You may still run `npm run ci:axe` locally if desired.
+- CI runs: validate → unit → analyze → build.
 - PM pulse: `npm run score:rubric` writes `public/analytics/rubric-score.json` for tracking.
 
 ## Agents & Prompts
@@ -111,11 +109,11 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 - Codex as MCP: clients should spawn Codex via stdio (`codex mcp serve`). For quick inspection without a client, run the Inspector:
   - `npx @modelcontextprotocol/inspector codex mcp`
   - If ports 6274/6277 are busy: `CLIENT_PORT=8080 SERVER_PORT=9000 npx @modelcontextprotocol/inspector codex mcp`
-- Chrome DevTools MCP: run `npm run dev` (http://localhost:3000) and start Chrome with `--remote-debugging-port=9222`. Attach the DevTools MCP to audit accessibility/perf.
+- Chrome DevTools MCP: run `npm run dev` (http://localhost:3000) and start Chrome with `--remote-debugging-port=9222`. Attach the DevTools MCP to review performance.
 - Usage pattern:
   1. Open files or load `PLAN.md` in your MCP client to seed context.
   2. Run planner/PM/itemsmith/validator prompts with recent diffs.
-  3. Use DevTools MCP or axe for a11y/perf, log results in PLAN.md or PR.
+  3. Use DevTools MCP for performance; skip a11y checks during this phase.
 
 ### Quick setup
 1. Copy `.mcp/servers.example.json` to your MCP client config (often `~/.config/mcp/servers.json`).
@@ -217,4 +215,4 @@ Notes
 4. Iterate React Flow dashboards (confusion graph, blueprint gap explorer, session trace) with OKC polish.
 5. Broaden automated tests (Vitest + integration) to cover RAG search, reliability metrics, and snapshot endpoints.
 
-Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs. A11y gates are non‑blocking during this phase.
+Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs.

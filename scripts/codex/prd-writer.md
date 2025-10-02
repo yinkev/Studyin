@@ -33,7 +33,7 @@ Deliverable (single artifact)
 4. Key Scenarios / User Stories
 5. Functional Requirements (numbered, testable)
 6. Non‑Functional Requirements
-   - Accessibility (WCAG 2.2 AA), Performance budgets (TTI <2s, item <100ms, evidence <250ms, CLS <0.1), Determinism
+ - Performance budgets (TTI <2s, item <100ms, evidence <250ms, CLS <0.1), Determinism
 7. Evidence & Metrics
    - Baseline metrics (from `METRICS_SOURCE`) and target deltas
 8. Rollout Plan & Milestones (tie to PLAN.md)

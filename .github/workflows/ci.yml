@@ -61,30 +61,4 @@ jobs:
             public/analytics/latest.json
             public/analytics/rubric-score.json
 
-      - name: Start Next.js server
-        run: |
-          nohup npm start -- -p 3000 > .next_server.log 2>&1 &
-          echo $! > .server_pid
-
-      - name: Wait for server
-        run: npx wait-on http://localhost:3000
-
-#      - name: Axe accessibility audit
-#        run: npm run ci:axe
-
-#      - name: Lighthouse CI (assert budgets)
-#        run: npm run ci:lh
-
-      - name: Stop server
-        if: always()
-        run: |
-          if [ -f .server_pid ]; then kill $(cat .server_pid) || true; fi
-          pkill -f "next start" || true
-
-      - name: Upload Lighthouse artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lhci-results
-          path: .lighthouseci
-          if-no-files-found: ignore
+      # Lighthouse and axe disabled/removed for this phase.

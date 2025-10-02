@@ -107,7 +107,7 @@ Next agent: ProjectManager · Model: gpt-5-codex-high · Scope: PLAN.md docs/**
 - Weekly: run `npm run score:rubric`; attach `public/analytics/rubric-score.json` to tracker; flag ★ < 2.8.  
 - Weekly: run `npm run jobs:refit`; review `data/refit-summaries/` output with AnalyticsEngineer before rollouts.  
 - Weekly GitHub Action (`refit-weekly.yml`) runs `npm run jobs:refit`, uploads the artifact, and serves as the automation path for refit summaries (replace with n8n/cron if operating offline).  
-- Release: gates green (validator, perf, rubric). A11y non‑blocking in OKC phase. Evidence latency spot‑check; blueprint preflight passes.
+- Release: gates green (validator, perf, rubric). Evidence latency spot‑check; blueprint preflight passes.
 
 ## PR Hygiene (superseded branches)
 - Merged: PR #11 (codex/complete-phase-3) — unified learner-state with adaptive engine and optimistic Study UI.
