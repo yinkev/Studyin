@@ -49,7 +49,7 @@ Rubric (internal)
 - Technical Correctness ★
 - Test Coverage & Verifiability ★
 - Alignment to PRD & Gates ★
-- Performance/A11y Readiness ★
+- Performance Readiness ★
 - Risk & Rollout Safety ★
 - Clarity & Traceability ★
 
@@ -59,4 +59,3 @@ Style
 
 Stop Condition
 - Output final `IMPLEMENTATION.md` ready to commit. Await user “OK: implement” to proceed to patches.
-

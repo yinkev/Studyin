@@ -72,7 +72,7 @@ This plan translates the authoritative spec in `docs/personal-adaptive-study-eng
 
 ## Acceptance Gates (from PRD)
 - Blueprint rails within ±5%; exposure caps enforced; stop rules met; randomesque top‑K; retention budgeting.
-- Deterministic outputs; Lighthouse budgets per `.lighthouserc.json:12`–`18`; evidence P95 <250 ms.
+ - Deterministic outputs; evidence P95 <250 ms.
 - Validator clean; analytics present and deterministic; PLAN updated post‑merge.
 
 ## Rollout & Backout
@@ -124,7 +124,7 @@ export function WhyThisNextPill(props: { signals: WhySignals; onClick?: () => vo
    - derive ability: `components/StudyView.tsx:64–93` and `lib/study-engine.ts:246–261`.
    - score candidates: `lib/study-engine.ts:51–92`.
    - compose rationale: `lib/study-engine.ts:220–248`.
-4) Pass structured numbers to the pill component (no string concatenation in the UI); pill renders compact chips and an accessible tooltip.
+4) Pass structured numbers to the pill component (no string concatenation in the UI); pill renders compact chips with a simple tooltip.
 
 ## 4) File‑by‑File Changes
 1. `components/pills/WhyThisNextPill.tsx` — NEW: render compact pill with numeric chips (Info, Blueprint×, Exposure×, Median s, θ̂, SE, Mastery).
@@ -145,8 +145,8 @@ export function WhyThisNextPill(props: { signals: WhySignals; onClick?: () => vo
 ## 7) Security/Privacy
 - Read‑only local JSON; no PII; no network calls; no runtime LLM.
 
-## 8) Accessibility/Perf
-- Non‑blocking A11y per AGENTS.md; still provide `aria-label` summarizing values.
+## 8) Performance
+- Focus on render speed and stability in this phase.
 - No layout shift: fixed-size inline pill; clamp to 2 lines in existing popover.
 
 ## 9) Rollout & Backout
