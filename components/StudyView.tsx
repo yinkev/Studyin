@@ -155,7 +155,7 @@ export function StudyView({
 
   const current = items[index];
 
-  const { whyNext, whySignals } = useMemo(() => {
+  const { whyNext, whySignals, ttmTitle } = useMemo(() => {
     if (!current) return 'Focus on mastery — keep practicing.';
     const loIds = current.los ?? [];
     const { thetaHat, se } = deriveAbility(loIds, learnerState, analytics);
@@ -189,7 +189,12 @@ export function StudyView({
     };
     const [score] = scoreCandidates({ thetaHat, items: [candidate] });
     if (!score || score.exposureMultiplier === 0) {
-      return { whyNext: fallbackWhyThisNext(current.id, loIds, analytics), whySignals: null as any };
+      // Build a minimal TTM tooltip if analytics exist
+      const title = (analytics?.ttm_per_lo || [])
+        .filter((row) => loIds.includes(row.lo_id))
+        .map((row) => `${row.lo_id}: ${Number(row.projected_minutes_to_mastery ?? 0).toFixed(2)}m${row.overdue ? ' (overdue)' : ''}`)
+        .join(' · ');
+      return { whyNext: fallbackWhyThisNext(current.id, loIds, analytics), whySignals: null as any, ttmTitle: title || undefined };
     }
     const masteryProb = masteryProbability(thetaHat, se);
     const whyText = buildWhyThisNext(score, { thetaHat, se, masteryProb });
@@ -205,7 +210,11 @@ export function StudyView({
       loIds,
       itemId: current.id
     };
-    return { whyNext: whyText, whySignals: signals };
+    const title = (analytics?.ttm_per_lo || [])
+      .filter((row) => loIds.includes(row.lo_id))
+      .map((row) => `${row.lo_id}: ${Number(row.projected_minutes_to_mastery ?? 0).toFixed(2)}m${row.overdue ? ' (overdue)' : ''}`)
+      .join(' · ');
+    return { whyNext: whyText, whySignals: signals, ttmTitle: title || undefined };
   }, [analytics, current, index, learnerState]);
 
   const letters = ANSWER_LETTERS;
@@ -378,6 +387,7 @@ export function StudyView({
             {whySignals ? (
               <WhyThisNextPill
                 signals={whySignals}
+                title={ttmTitle}
                 onClick={() => setShowWhy((v) => !v)}
               />
             ) : (
