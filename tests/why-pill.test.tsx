@@ -19,6 +19,7 @@ describe('WhyThisNextPill', () => {
           loIds: ['lo.ulnar-nerve'],
           itemId: 'item.ulnar.claw-hand'
         }}
+        title={'TTM: lo.ulnar-nerve: 1.72m (overdue)'}
       />
     );
     expect(html).toContain('Info');
@@ -35,6 +36,6 @@ describe('WhyThisNextPill', () => {
     expect(html).toContain('0.30');
     expect(html).toContain('Mastery');
     expect(html).toContain('0.72');
+    expect(html).toContain('TTM: lo.ulnar-nerve: 1.72m (overdue)');
   });
 });
-
