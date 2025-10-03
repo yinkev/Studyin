@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { telemetryEnabled } from '../../../lib/server/events';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { blueprintSchema, itemSchema } from '../../../scripts/lib/schema.mjs';
+import { blueprintSchema, itemSchema } from 'lib/core/schemas';
 
 export const runtime = 'nodejs';
 

@@ -7,7 +7,7 @@ import {
   difficultyToBeta,
   rasch
 } from '../../lib/study-engine';
-import { attemptEventSchema } from '../../scripts/lib/schema.mjs';
+import { attemptEventSchema } from 'lib/core/schemas';
 import type { LearnerState } from '../../lib/server/study-state';
 
 interface Dependencies {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
 import { promises as fs } from 'fs';
-import { loadAttempts, summarizeAttempts } from '../../../../scripts/lib/analyzer-core.mjs';
+import { loadAttempts, summarizeAttempts } from 'lib/analytics/analyzerCore';
 
 export const runtime = 'nodejs';
 

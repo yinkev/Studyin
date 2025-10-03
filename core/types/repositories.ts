@@ -1,6 +1,6 @@
 import type { LearnerState } from '../../lib/server/study-state';
 import type { z } from 'zod';
-import { attemptEventSchema } from '../../scripts/lib/schema.mjs';
+import { attemptEventSchema } from 'lib/core/schemas';
 
 export type AttemptEvent = z.infer<typeof attemptEventSchema>;
 

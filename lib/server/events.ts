@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { SCHEMA_VERSIONS, attemptEventSchema, sessionEventSchema, lessonEventSchema } from '../../scripts/lib/schema.mjs';
+import { SCHEMA_VERSIONS, attemptEventSchema, sessionEventSchema, lessonEventSchema } from 'lib/core/schemas';
 
 type AttemptEvent = ReturnType<typeof attemptEventSchema.parse>;
 type SessionEvent = ReturnType<typeof sessionEventSchema.parse>;

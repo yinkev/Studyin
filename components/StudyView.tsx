@@ -6,7 +6,7 @@ import type { LearnerState } from '../lib/server/study-state';
 import type { CandidateItem } from '../lib/study-engine';
 import { buildWhyThisNext, difficultyToBeta, scoreCandidates } from '../lib/study-engine';
 import { WhyThisNextPill } from './pills/WhyThisNextPill';
-import { masteryProbability } from '../scripts/lib/rasch.mjs';
+import { masteryProbability } from 'lib/engine/shims/rasch';
 import { submitStudyAttempt } from '../app/study/actions';
 import type { OptimisticLearnerStateUpdate } from '../lib/client/useLearnerState';
 

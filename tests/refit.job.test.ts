@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
-import { runRefit } from '../scripts/jobs/refit-weekly.mjs';
+import { runRefit } from 'lib/jobs/refitWeekly';
 
 function buildAttempt({ itemId, correct }: { itemId: string; correct: boolean }) {
   return {

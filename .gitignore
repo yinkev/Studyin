@@ -34,3 +34,6 @@ public/analytics/rubric-score.json
 # Env files
 .env
 .env.*
+
+# TypeScript incremental build info (do not commit)
+tsconfig.tsbuildinfo

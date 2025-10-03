@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { summarizeAttempts } from '../../scripts/lib/analyzer-core.mjs';
+import { summarizeAttempts } from 'lib/analytics/analyzerCore';
 
 const sampleAttempts = [
   {

@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
 import { RetentionReviewInput, RetentionReviewInputSchema, RetentionReviewResult } from '../types/events';
 import { LearnerStateRepository, TelemetryService } from '../types/repositories';
-import { updateHalfLife, scheduleNextReview } from '../../scripts/lib/fsrs.mjs';
-import { attemptEventSchema } from '../../scripts/lib/schema.mjs';
+import { updateHalfLife, scheduleNextReview } from 'lib/engine/shims/fsrs';
+import { attemptEventSchema } from 'lib/core/schemas';
 
 interface Dependencies {
   repository: LearnerStateRepository;

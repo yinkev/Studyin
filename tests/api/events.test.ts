@@ -11,7 +11,7 @@ import {
   telemetryEnabled,
   validateBodySize
 } from '../../lib/server/events';
-import { SCHEMA_VERSIONS } from '../../scripts/lib/schema.mjs';
+import { SCHEMA_VERSIONS } from 'lib/core/schemas';
 
 const baseAttempt = {
   schema_version: SCHEMA_VERSIONS.attemptEvent,
