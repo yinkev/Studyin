@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin, fetchEvidenceChunks } from '../../../lib/server/supabase';
-import { generateDeterministicEmbedding, cosineSimilarity } from '../../../lib/rag/embedding.mjs';
+import { generateDeterministicEmbedding, cosineSimilarity } from 'lib/rag/embedding';
 
 export const runtime = 'nodejs';
 
@@ -90,4 +90,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'Search failed' }, { status: 500 });
   }
 }
-

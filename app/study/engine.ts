@@ -1,4 +1,4 @@
-import { attemptEventSchema, sessionEventSchema } from '../../scripts/lib/schema.mjs';
+import { attemptEventSchema, sessionEventSchema } from 'lib/core/schemas';
 import {
   STOP_RULES,
   scoreCandidates,

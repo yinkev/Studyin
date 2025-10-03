@@ -1,17 +1,14 @@
-import { gpcmPmf } from '../scripts/lib/gpcm.mjs';
-import { utility, pickRandomesque } from '../scripts/lib/selector.mjs';
-import { thompsonSchedule } from '../scripts/lib/scheduler.mjs';
-import { exposureMultiplier as baseExposureMultiplier, clampOverfamiliar } from '../scripts/lib/exposure.mjs';
-import { retentionBudget } from '../scripts/lib/fsrs.mjs';
-import { eapUpdate, masteryProbability } from '../scripts/lib/rasch.mjs';
+import { gpcmPmf } from './engine/shims/gpcm';
+import { utility, pickRandomesque } from './engine/shims/selector';
+import { thompsonSchedule } from './engine/shims/scheduler';
+import { exposureMultiplier as baseExposureMultiplier, clampOverfamiliar } from './engine/shims/exposure';
+import { retentionBudget } from './engine/shims/fsrs';
+import { eapUpdate, masteryProbability } from './engine/shims/rasch';
+import { STOP_RULES } from './engine/constants/stop-rules';
+import type { CandidateScore } from './engine/types';
+import { buildWhyThisNext } from './engine/why';
 
-export const STOP_RULES = Object.freeze({
-  minItems: 12,
-  seThreshold: 0.2,
-  deltaSeThreshold: 0.02,
-  masteryProb: 0.85,
-  probeWindow: 0.3
-});
+export { STOP_RULES };
 
 export type DifficultyCode = 'easy' | 'medium' | 'hard';
 
@@ -32,16 +29,7 @@ export interface CandidateItem {
   fatigueScalar: number;
 }
 
-export interface CandidateScore {
-  itemId: string;
-  loIds: string[];
-  utility: number;
-  info: number;
-  blueprintMultiplier: number;
-  exposureMultiplier: number;
-  fatigueScalar: number;
-  medianTimeSeconds: number;
-}
+export type { CandidateScore };
 
 export interface SelectionResult {
   itemId: string;
@@ -228,23 +216,7 @@ export async function runEapUpdate(params: {
   return eapUpdate(params);
 }
 
-export function buildWhyThisNext(signals: CandidateScore, extras: {
-  thetaHat: number;
-  se: number;
-  masteryProb: number;
-}): string {
-  const parts = [
-    `Info ${signals.info.toFixed(2)}`,
-    `Blueprint×${signals.blueprintMultiplier.toFixed(2)}`,
-    `Exposure×${signals.exposureMultiplier.toFixed(2)}`,
-    `Fatigue×${signals.fatigueScalar.toFixed(2)}`,
-    `Median ${signals.medianTimeSeconds.toFixed(1)}s`,
-    `θ̂=${extras.thetaHat.toFixed(2)}`,
-    `SE=${extras.se.toFixed(2)}`,
-    `Mastery=${extras.masteryProb.toFixed(2)}`
-  ];
-  return parts.join(' · ');
-}
+export { buildWhyThisNext };
 
 export const rasch = { masteryProbability };
 

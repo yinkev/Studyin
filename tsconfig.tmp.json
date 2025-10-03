@@ -20,10 +20,6 @@
     "types": [
       "node"
     ],
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types"
-    ],
     "incremental": true,
     "plugins": [
       {
@@ -32,21 +28,39 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["core/*"],
-      "@engine/*": ["lib/engine/*"],
-      "@engine": ["lib/engine/index.ts"],
-      "@server": ["lib/server/index.ts"],
-      "@analytics/*": ["scripts/lib/*"],
-      "@infra/*": ["services/*"],
-      "@ui/*": ["components/*"]
-    }
+      "@core/*": [
+        "core/*"
+      ],
+      "@engine/*": [
+        "lib/engine/*"
+      ],
+      "@engine": [
+        "lib/engine/index.ts"
+      ],
+      "@server": [
+        "lib/server/index.ts"
+      ],
+      "@analytics/*": [
+        "scripts/lib/*"
+      ],
+      "@infra/*": [
+        "services/*"
+      ],
+      "@ui/*": [
+        "components/*"
+      ]
+    },
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types"
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "types/**/*.d.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"
