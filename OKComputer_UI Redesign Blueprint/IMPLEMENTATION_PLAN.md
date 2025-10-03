@@ -7,7 +7,7 @@
 - **Styling**: Tailwind CSS 4 with custom components
 - **UI Components**: Radix UI primitives with shadcn-style styling
 - **Analytics**: React Flow for data visualization
-- **Testing**: Vitest for unit tests, Lighthouse CI for performance
+- **Testing**: Vitest for unit tests; monitor performance budgets without Lighthouse
 
 ### Current Design Issues
 - **Visual Inconsistency**: Bespoke Tailwind compositions without unified design system
@@ -104,7 +104,7 @@ const bounceAnimation = {
 #### Accessibility Enhancements
 - **Focus Management**: Consistent keyboard navigation
 - **Screen Reader Support**: Semantic HTML and ARIA labels
-- **Color Contrast**: WCAG 2.2 AA compliance
+<!-- Accessibility checks out of scope for this phase -->
 - **Motion Preferences**: Respect user's reduced motion settings
 
 ## Implementation Timeline
@@ -139,8 +139,8 @@ const bounceAnimation = {
 | Risk | Mitigation Strategy |
 |------|-------------------|
 | Bundle Size Increase | Tree-shake Radix primitives, lazy load animations |
-| Performance Regression | Implement performance budgets, monitor Lighthouse scores |
-| Accessibility Issues | Automated axe testing, manual keyboard navigation testing |
+| Performance Regression | Implement performance budgets and monitor render metrics |
+| Accessibility Issues | Out of scope this phase |
 | Browser Compatibility | Progressive enhancement, feature detection |
 
 ### Design Risks
@@ -154,8 +154,8 @@ const bounceAnimation = {
 ## Success Criteria
 
 ### Quantitative Metrics
-- **Performance**: Lighthouse scores >90 for all metrics
-- **Accessibility**: 0 critical axe violations, WCAG 2.2 AA compliance
+- **Performance**: Meet internal performance budgets
+<!-- Accessibility targets removed for this phase -->
 - **Bundle Size**: <200KB increase in initial load
 - **User Engagement**: 15% increase in session duration
 

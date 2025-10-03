@@ -20,7 +20,7 @@ Weekly Pulse Checklist
 - [ ] `npm run validate:items` and `npm test` on main
 - [ ] `npm run analyze` and verify `public/analytics/latest.json`
 - [ ] `npm run score:rubric` and attach rubric-score.json
-- [ ] CI perf budgets as configured (no Lighthouse)
+- [ ] CI perf budgets as configured
 - [ ] PLAN.md updated; next week’s 3 priorities listed
 
 Deliverable Format

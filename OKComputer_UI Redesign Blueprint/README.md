@@ -19,7 +19,7 @@ This project successfully overhauls the Studyin medical education platform with 
 ### 3. **Interactive Features**
 - **Gamification**: Heart system, streak counter, achievement badges
 - **Animations**: Bouncy interactions, confetti celebrations, smooth transitions
-- **Accessibility**: WCAG 2.2 AA compliance, keyboard navigation, screen reader support
+<!-- Accessibility goals deferred for this phase -->
 - **Performance**: Optimized loading, 60fps animations, responsive design
 
 ## Key Improvements
@@ -51,7 +51,7 @@ This project successfully overhauls the Studyin medical education platform with 
 - **Animation Libraries**: Anime.js for micro-interactions, ECharts.js for data viz
 
 ### Performance Metrics
-- **Lighthouse Scores**: >90 for all metrics (Performance, Accessibility, SEO)
+- **Performance**: Meet internal performance budgets (TTI, CLS, item render, evidence)
 - **Bundle Optimization**: CDN delivery, tree-shaking, lazy loading
 - **Cross-browser Support**: Works on all modern browsers with graceful degradation
 
@@ -102,12 +102,7 @@ This project successfully overhauls the Studyin medical education platform with 
 - **Edge**: 90+
 - **Mobile**: iOS Safari 14+, Chrome Mobile 90+
 
-## Accessibility Features
-- **WCAG 2.2 AA Compliance**: Color contrast, keyboard navigation
-- **Screen Reader Support**: Semantic HTML, ARIA labels
-- **Motion Preferences**: Respects `prefers-reduced-motion`
-- **Keyboard Navigation**: Full functionality without mouse
-- **Focus Management**: Clear focus indicators and logical tab order
+<!-- Accessibility features section removed for this phase -->
 
 ## Future Enhancements
 
@@ -128,7 +123,7 @@ This project successfully overhauls the Studyin medical education platform with 
 **Design & Development**: AI Assistant with Duolingo design analysis
 **Design Inspiration**: Duolingo's award-winning design team
 **Medical Content**: Studyin platform and educational experts
-**Accessibility Consulting**: WCAG guidelines and best practices
+<!-- Accessibility consulting references removed for this phase -->
 
 ## License & Usage
 

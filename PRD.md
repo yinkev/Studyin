@@ -14,7 +14,7 @@
 ## Non‑Goals (Skip Now)
 - No real‑time collaboration, adaptive evidence retrieval, or automated item writing (see spec Section 9).
 - No runtime LLMs or nondeterministic ranking.
-- No A11y blocking gate during the OKC phase.
+<!-- Accessibility gate removed for this phase -->
 
 ## Personas & Scenarios
 - Student: studies within a session; engine selects next item per LO with randomesque top‑K; sees a “Why this next” pill with SE, blueprint drift, exposure, and time estimates.

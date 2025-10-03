@@ -26,7 +26,7 @@
 - Maintains `PLAN.md` (milestones + To‑Do) and updates it after merges.
 - Coordinates agents, triages tickets, and curates the backlog.
 - Weekly pulse: run `npm run score:rubric`, attach `public/analytics/rubric-score.json` to the tracking issue, and call out any ★ < 2.8.
-- Verifies CI (validate/test/analyze/e2e). Lighthouse is optional during this OKC phase; perf budgets may be asserted when configured.
+- Verifies CI (validate/test/analyze/e2e). Performance budgets may be asserted when configured.
 
 ## Module Inputs (dynamic)
 - MODULE: free‑text module name (e.g., "OMS‑1 Upper Limb", "Physiology — Cardiac").
@@ -49,7 +49,7 @@
 
 ### New: Implementation Strategist (Agent)
 - Owns authoring `IMPLEMENTATION.md` translating PRD into a concrete, testable plan.
-- Delivers: architecture overview, interfaces, data model, file‑by‑file changes, migrations, tests (unit/e2e/perf), observability, security/privacy, a11y/perf work, rollout/backout, timeline & owners, risk register.
+- Delivers: architecture overview, interfaces, data model, file‑by‑file changes, migrations, tests (unit/e2e/perf), observability, security/privacy, performance work, rollout/backout, timeline & owners, risk register.
 - Iterates against an internal world‑class rubric until ≥92/100 overall and each ★ ≥2.9; then outputs the final `IMPLEMENTATION.md` (single artifact).
 - References acceptance gates and keeps changes deterministic (no runtime LLM calls).
 - Consumes Module Inputs; do not hard‑code module names.

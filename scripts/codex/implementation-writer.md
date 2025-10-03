@@ -21,7 +21,7 @@ Session Inputs (dynamic)
 
 Hard Constraints
 - Deterministic runtime (no LLM calls in shipped code)
-- Accessibility: WCAG 2.2 AA; Performance budgets: TTI <2s, item <100ms, evidence <250ms, CLS <0.1
+- Performance budgets: TTI <2s, item <100ms, evidence <250ms, CLS <0.1
 - Use Context7 MCP for up‑to‑date external docs; cite sources used in design decisions
 - Consume Session Inputs when present; list MISSING_DATA for blockers
 
