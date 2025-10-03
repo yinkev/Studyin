@@ -43,6 +43,33 @@ AGENTS.md                  # Agent SOPs, rubric gates, workflow
 PLAN.md                    # Current milestones, To‑Dos, cadence
 ```
 
+## Architecture Boundaries
+
+Layers and allowed imports (behavior-neutral guardrails):
+- Core (`@core/*` → `core/*`)
+  - Contains shared schemas/types and pure helpers.
+  - May import nothing outside of Node/DOM types.
+- Engine (`@engine/*` → `lib/engine/*`, public barrel `@engine`)
+  - Facade over deterministic algorithms and selectors.
+  - May depend on Core. Must not import `scripts/lib/*.mjs` directly; use shims under `lib/engine/shims/**` only.
+- Analytics (`@analytics/*` → `scripts/lib/*`)
+  - Deterministic scripts (Elo/Rasch/GPCM, scheduler, schemas) kept in `.mjs` for CLI usage.
+  - TS code must not import these directly; route through Engine shims or explicit API surfaces.
+- Server (`@server` → `lib/server/index.ts`)
+  - Server-only forms, events, state, and adapters.
+  - May import Engine and Core; must not import UI.
+- UI (`@ui/*` → `components/*` and `app/**`)
+  - React components and pages. May consume Server, Engine, and Core public APIs; never import `.mjs` modules directly.
+
+Disallowed patterns (enforced by review):
+- Domain/UI code → `scripts/lib/*.mjs` (use shims or public barrels instead).
+- Cross-imports that violate the arrow of dependencies (e.g., Core importing Engine or UI).
+
+Barrels and aliases:
+- Engine public entry: `@engine` → `lib/engine/index.ts`.
+- Server public entry: `@server` → `lib/server/index.ts`.
+- Keep internal paths private; prefer barrels for stable imports.
+
 ## Deterministic Engines (stubs)
 
 - `scripts/lib/elo.mjs` — Elo-lite with adjustable K for learn/exam.
@@ -58,6 +85,15 @@ PLAN.md                    # Current milestones, To‑Dos, cadence
 - `app/study/actions.ts` — Server action that logs attempts, updates learner state JSON, and returns refreshed ability signals.
 
 Engine behavior is covered by `npm test` smoke tests. Update these modules before wiring into the UI.
+
+## Determinism Policy
+
+- No runtime LLM/API calls in the app or engines. All analytics, selection, and scoring are deterministic.
+- Randomness must be seeded and reproducible (e.g., scheduler arms, sampling, or visual effects that influence logic).
+- Evidence and analytics produce the same outputs for the same inputs (snapshots logged in `public/analytics/`).
+- External systems (e.g., Supabase) are used only as sinks/sources; algorithms must not depend on non-deterministic responses.
+- “Why this next” explains selection using explicit numeric signals (e.g., SE, mastery probability, spacing pressure).
+- Performance budgets guide but do not alter algorithmic determinism.
 
 ## Evidence Tooling
 
@@ -110,10 +146,20 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
   - `npx @modelcontextprotocol/inspector codex mcp`
   - If ports 6274/6277 are busy: `CLIENT_PORT=8080 SERVER_PORT=9000 npx @modelcontextprotocol/inspector codex mcp`
 - Chrome DevTools MCP: run `npm run dev` (http://localhost:3000) and start Chrome with `--remote-debugging-port=9222`. Attach the DevTools MCP to review performance.
-- Usage pattern:
-  1. Open files or load `PLAN.md` in your MCP client to seed context.
-  2. Run planner/PM/itemsmith/validator prompts with recent diffs.
-  3. Use DevTools MCP for performance.
+- Usage patterns
+  - Context7 resolve → fetch → cite
+    1) Resolve canonical docs: use Context7 to locate the exact library/version references you need.
+    2) Fetch the specific sections/snippets required (minimize payloads).
+    3) Cite in PRs/issues: include doc titles + deep links; summarize key constraints you relied upon.
+    Notes: keep citations deterministic (no runtime calls from the app). Do not paste API keys or PII in PRs.
+  - Repo MCP commands (typical)
+    - Start Codex server: `codex mcp serve`
+    - Inspect via MCP Inspector: `npx @modelcontextprotocol/inspector codex mcp`
+    - Attach Chrome DevTools MCP: `npx chrome-devtools-mcp --target http://localhost:3000 --chrome-port 9222`
+  - Project flow
+    1) Seed context with `README.md`, `AGENTS.md`, and `PLAN.md`.
+    2) Ask the PRD Architect/Implementation Strategist to draft or update artifacts.
+    3) Use Context7 citations in PR descriptions for any external references.
 
 ### Quick setup
 1. Copy `.mcp/servers.example.json` to your MCP client config (often `~/.config/mcp/servers.json`).

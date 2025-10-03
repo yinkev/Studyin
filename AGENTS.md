@@ -72,8 +72,10 @@ Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run buil
 - **Exam Gate**: Blueprint feasibility verified, evidence locked, deferred feedback, keyboard-only attempt viable.
 - **Analytics Gate**: `latest.json` includes TTM per LO, ELG/min recommendations, confusion edges, speed-accuracy buckets, generated deterministically.
 <!-- A11y gate removed for this phase -->
-- **Perf (Relaxed)**: Budgets may be exceeded when justified by visuals/animations.
+ - **Perf (Relaxed)**: Budgets may be exceeded when justified by visuals/animations.
  - **Engine Gate**: For the adaptive engine, enforce: blueprint rails within ±5% (per system/LO), exposure caps (≤1/day, ≤2/week, 96h cooldown), randomesque top‑K selector, stop rules (`SE ≤ 0.20` with min items, or `ΔSE` plateau, or `mastery_prob ≥ 0.85` with probe in `b ∈ [θ̂ ± 0.3]`), retention budgeting ≤40% baseline (≤60% if overdue >7d). Log reasons/signals for each selection.
+
+
 
 ## UX Stance (OKC‑Heavy)
 - We are shipping a “wow‑first” interface. Visual richness, motion, and playful patterns come before compliance.
@@ -121,6 +123,13 @@ Keep this SOP current as tooling evolves. Changes require DocScribe + ReleaseMan
   - Use `gpt-5-codex-high` for any repo-aware work (code edits, scripts, items, analytics, CI, prompts).
   - Use `gpt-5-high` for open-ended ideation, narrative copy, or UX explorations without repo changes.
   - Optional: use `gpt-5-codex-mid` for quick triage or small, low-risk edits when cost matters.
+
+## Architecture Gates
+
+- No domain/UI imports from `scripts/lib/*.mjs`; use Engine shims (`lib/engine/shims/**`) or public barrels.
+- Deterministic‑only: no runtime LLM/API calls; seeded randomness only.
+- MCP citation policy: when external docs influenced a change, include a PR citation block (title + deep link + brief constraint notes).
+- Keep Item/Evidence/Exam/Analytics/Engine gates intact; this section adds import/determinism/MCP gates only.
 
 ## Agent Recommendation Playbook
 - Default: prefer `gpt-5-codex-high` for next steps that touch the repo.

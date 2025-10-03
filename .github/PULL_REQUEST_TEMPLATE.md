@@ -11,6 +11,10 @@
 - [ ] A11y audited (non‑blocking during OKC phase; note any known issues)
 - [ ] Rubric score meets thresholds (attach `public/analytics/rubric-score.json`)
 
+## Citations & Determinism
+- [ ] MCP citations included (Context7 resolve→fetch→cite; see `docs/WORKFLOW.md`)
+- [ ] No runtime LLMs introduced; deterministic behavior unchanged
+
 ## Evidence
 - [ ] Evidence crops committed (Git LFS) with `{file,page,(bbox|cropPath),citation}`
 - [ ] Item status updated (`draft` → `review` or `published`)
