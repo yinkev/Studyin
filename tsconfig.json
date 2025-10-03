@@ -25,7 +25,17 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["core/*"],
+      "@engine/*": ["lib/engine/*"],
+      "@engine": ["lib/engine/index.ts"],
+      "@server": ["lib/server/index.ts"],
+      "@analytics/*": ["scripts/lib/*"],
+      "@infra/*": ["services/*"],
+      "@ui/*": ["components/*"]
+    }
   },
   "include": [
     "next-env.d.ts",
