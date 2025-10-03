@@ -1,107 +1,52 @@
-# Studyin Architecture Overview (Proposed Modular Refactor)
+# Architecture Overview
 
-## Goals
-- **Deterministic adaptive engine** with clear separation between domain logic (Rasch/FSRS/TS), orchestration, and persistence.
-- **Composable services** so storage/telemetry can change (JSON → Supabase) without touching domain logic.
-- **Predictable UI** that calls typed use-cases; server/client responsibilities are explicit and testable.
-- **Auditability & operations**: refit jobs, analytics, and dashboards rely on shared contracts and emit structured logs.
+Behavior-neutral description of Studyin layers, allowed imports, and examples. See README (Architecture Boundaries, Determinism Policy) and AGENTS.md (Architecture Gates) for gates and workflow.
 
-## Layering Strategy
+## Layers
+
+- Core (`core/**`)
+  - Pure types and use-cases. No direct `scripts/lib/*.mjs` imports in new code.
+  - May consume Engine (`@engine`) and Server types where needed.
+- Engine (`lib/engine/**`, public barrel `@engine`)
+  - Facade over deterministic algorithms; exposes stable APIs for UI/Core/Server.
+  - If algorithms live in `scripts/lib/*.mjs`, access them only via `lib/engine/shims/**`.
+- Server (`lib/server/**`) and Services (`services/**`)
+  - Server-only forms, events, state, adapters. Services provide repository/service abstractions.
+  - Prefer Engine/Core APIs. Avoid direct `scripts/lib/*.mjs` imports in new code.
+- UI (`app/**`, `components/**`)
+  - Next.js pages/components. Depends on Server and Engine public APIs only.
+- Scripts (`scripts/lib/*.mjs`, `scripts/**`)
+  - Deterministic CLIs and engines; used by jobs and analysis. Not imported directly from domain TS/TSX code.
+
+## Allowed Imports (→)
 
 ```
-/core
-  /domain          # Pure business logic (math, scheduling, retention)
-  /types           # Zod schemas + TypeScript types for all contracts
-  /use-cases       # Stateless orchestrators (study attempt, retention review, scheduler) consuming domain + services
-
-/services
-  /state           # Persistence adapters (JSON, Supabase)
-  /telemetry       # Attempt/session logging
-  /analytics       # Scripts (analyze.mjs, refit) reusing core/domain functions
-
-/ui
-  /app             # Next.js routes/components/hooks (Study, Summary, Drill, Exam)
-  /components
-  /hooks
-
-/scripts          # CLI jobs reusing /core and /services
-/tests            # Unit + integration tests organized by layer
+Core → Engine → Server/Services → UI
+Scripts/lib .mjs ⇐(via Engine shims) Engine
 ```
 
-## Use-Case Contracts (examples)
+Forbidden (new code)
+- UI/Core/Services → `scripts/lib/*.mjs` (import through Engine/shims instead)
+- Upward imports against the arrow (e.g., Engine importing UI)
 
-```ts
-// core/types/useCase.ts
-export interface UseCase<Input, Output> {
-  execute(input: Input): Promise<Output>;
-}
+## Examples (in-repo)
 
-// core/types/events.ts (Zod)
-export const StudyAttemptInputSchema = z.object({
-  learnerId: z.string(),
-  sessionId: z.string(),
-  itemId: z.string(),
-  loIds: z.array(z.string()),
-  difficulty: z.enum(['easy', 'medium', 'hard']),
-  \u2026
-});
-export type StudyAttemptInput = z.infer<typeof StudyAttemptInputSchema>;
-export interface StudyAttemptResult { learnerState: LearnerState; signals: StudySignals; }
-```
+- Core using Engine facade
+  - `core/use-cases/executeStudyAttempt.ts:4-9` imports from `../../lib/study-engine` for STOP_RULES/EAP helpers.
+- Services using Server helpers
+  - `services/state/jsonRepository.ts:1-5` uses `lib/server/study-state` to load/save learner state.
+- Engine algorithm access (current pattern)
+  - `lib/study-engine.ts:1-6` imports deterministic helpers from `scripts/lib/*.mjs`.
+  - Target: wrap these via `lib/engine/shims/**` and re-export from `@engine` for domain consumers.
+- UI depending on Core/Services
+  - `app/study/actions.ts:3-7` wires use-cases and repositories without importing `scripts/lib`.
 
-### Example: `ExecuteStudyAttempt`
-- Validate input via schema.
-- Load learner state using injected persistence adapter.
-- Run Rasch update via domain functions.
-- Apply FSRS/retention hand-off rules.
-- Persist new state + log telemetry.
-- Return state + signals for UI.
+## Determinism Notes
 
-## Storage/Persistence Interfaces
+- Engines and analytics are deterministic. Randomness is seeded; external systems do not affect algorithmic results.
+- “Why this next” should derive from explicit numeric signals (SE, mastery, spacing, exposure) available via Engine APIs.
 
-```ts
-export interface LearnerStateRepository {
-  load(learnerId: string): Promise<LearnerState>;
-  save(state: LearnerState): Promise<void>;
-}
+## Migration Notes
 
-export interface TelemetryService {
-  recordAttempt(event: AttemptEvent): Promise<void>;
-  recordSession?(event: SessionEvent): Promise<void>;
-}
-```
-
-Adapters implement these using JSON (current) or Supabase (future). Use-cases receive adapters via constructor injection to keep tests pure.
-
-## Analytics & Jobs
-- `analyze.mjs` becomes a composition of `loadEvents` (services), `summarizeAttempts` (core/domain), and `writeSummary` (services/analytics).
-- `refit-weekly.mjs` uses core/domain functions to compute summary and writes to storage via adapters.
-
-## UI Integration
-- Components call use-cases via Next.js actions or API routes, receiving typed results. Example: the Study view dispatches `executeStudyAttempt` and `executeRetentionReview`.
-- React Query/SWR can wrap these actions for caching and optimistic updates.
-
-## Testing Strategy
-- Unit tests target domain functions (+ use-cases with mock adapters).
-- Service tests ensure adapters handle file/DB operations.
-- Integration tests ensure Next.js actions wire adapters correctly.
-- Snapshot tests for analytics outputs & dashboards.
-
-## Migration Plan
-1. Implement `core/types` (`LearnerState`, `StudyAttemptInput`, `RetentionReviewInput`), minimal use-case interface, JSON repository adapter.
-2. Refactor `submitStudyAttempt` & `submitRetentionReview` to use new use-cases. Keep existing directories until all actions migrate.
-3. Move Rasch/FSRS helpers into `/core/domain/adaptive` with tests.
-4. Update scripts to import from `/core` and `/services` instead of `/lib` (with barrel files for compatibility).
-5. Gradually adopt new structure for other flows (Drill, Exam, analytics).
-
-## Observability & Ops
-- All use-cases emit structured logs (level, learnerId, useCase, duration).
-- `@acme/logger` (or pino) configured once in services; silent in tests.
-- Weekly GitHub Action triggers refit use-case, uploads artifact. Optional: n8n workflow hitting `/api/jobs/refit` endpoint.
-
-## Future Enhancements
-- Supabase adapter implementing `LearnerStateRepository`.
-- Event sourcing pipeline (append-only events + derived state).
-- Domain-driven analytics (retention trends, blueprint drift) via core/domain functions.
-- Gating features (multi-tenant modules, real-time notifications) once persistent store is shared.
+- Existing domain→scripts imports are slated for migration to Engine shims/public APIs. Do not introduce new ones. Track deltas in PLAN.md.
 
