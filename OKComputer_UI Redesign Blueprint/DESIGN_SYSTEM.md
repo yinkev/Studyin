@@ -90,13 +90,8 @@
 - **Progress Indicators**: Animated progress bars with Duolingo colors
 - **Achievement Badges**: Playful, exaggerated designs
 
-## Accessibility & Usability
-
-### WCAG 2.2 AA Compliance
-- **Color Contrast**: Minimum 4.5:1 ratio for all text
-- **Focus Management**: Clear focus indicators for keyboard navigation
-- **Screen Reader Support**: Semantic HTML and ARIA labels
-- **Alternative Text**: Descriptive alt text for all illustrations
+## Usability
+<!-- Accessibility guidance removed for this phase -->
 
 ### Educational UX
 - **Clear Information Hierarchy**: Logical flow of educational content
@@ -109,7 +104,7 @@
 ### Phase 1: Foundation
 1. Establish color palette and typography system
 2. Create base component library with rounded, friendly aesthetics
-3. Implement accessibility features and focus management
+3. Implement usability features and focus management
 
 ### Phase 2: Interactive Elements
 1. Redesign buttons, forms, and navigation with bouncy animations
@@ -124,18 +119,17 @@
 ### Phase 4: Polish & Optimization
 1. Fine-tune animations and performance
 2. Add advanced visual effects and shaders
-3. Conduct accessibility audit and user testing
+3. Conduct user testing
 
 ## Success Metrics
 
 ### Design Excellence
 - **Visual Consistency**: 95%+ adherence to design system
-- **Accessibility Score**: WCAG 2.2 AA compliance with 0 critical issues
-- **Performance**: Lighthouse scores >90 for all metrics
+- **Performance**: Meet internal budgets (TTI, CLS, item render, evidence)
 - **User Engagement**: Increased completion rates and session duration
 
 ### Educational Effectiveness
 - **Learning Retention**: Improved knowledge retention through visual aids
 - **User Satisfaction**: Positive feedback on interface intuitiveness
-- **Accessibility Usage**: Successful navigation by users with disabilities
+<!-- Accessibility usage metrics removed for this phase -->
 - **Cross-platform Consistency**: Seamless experience across devices

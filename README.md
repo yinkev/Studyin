@@ -113,7 +113,7 @@ Engine behavior is covered by `npm test` smoke tests. Update these modules befor
 - Usage pattern:
   1. Open files or load `PLAN.md` in your MCP client to seed context.
   2. Run planner/PM/itemsmith/validator prompts with recent diffs.
-  3. Use DevTools MCP for performance; skip a11y checks during this phase.
+  3. Use DevTools MCP for performance.
 
 ### Quick setup
 1. Copy `.mcp/servers.example.json` to your MCP client config (often `~/.config/mcp/servers.json`).
