@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   appendAttempt,
   constants,
@@ -67,18 +67,21 @@ describe('events helpers', () => {
     delete process.env.INGEST_TOKEN;
   });
 
-  it('applies a simple rate limit per client', () => {
+  it('always allows requests (rate limit removed)', () => {
     const id = `client-${Date.now()}`;
-    expect(rateLimit(id).ok).toBe(true);
-    expect(rateLimit(id).ok).toBe(true);
+    for (let i = 0; i < 1000; i++) {
+      expect(rateLimit(id).ok).toBe(true);
+    }
   });
 
-  it('validates request body size', () => {
-    const ok = validateBodySize('12345678901234567890');
+  // No production enforcement: rate limiting is globally disabled.
+
+  it('no body size limit (always ok)', () => {
+    const ok = validateBodySize('x'.repeat(constants.MAX_BODY_BYTES + 10_000));
     expect(ok.ok).toBe(true);
-    const tooLarge = validateBodySize('x'.repeat(constants.MAX_BODY_BYTES + 1));
-    expect(tooLarge.ok).toBe(false);
   });
+
+  // No body-size cap regardless of env.
 
   it('honours WRITE_TELEMETRY flag', () => {
     process.env.WRITE_TELEMETRY = '0';

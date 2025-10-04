@@ -78,17 +78,9 @@ export function difficultyToBeta(difficulty: DifficultyCode): number {
   return DIFFICULTY_TO_BETA[difficulty] ?? 0;
 }
 
-function computeExposureMultiplier(exposure: CandidateItem['exposure']): number {
-  const base = baseExposureMultiplier({
-    last24h: exposure.last24h,
-    last7d: exposure.last7d,
-    hoursSinceLast: exposure.hoursSinceLast
-  });
-  return clampOverfamiliar({
-    meanScore: exposure.meanScore,
-    se: exposure.se,
-    base
-  });
+function computeExposureMultiplier(_exposure: CandidateItem['exposure']): number {
+  // Caps and familiarity clamps removed globally
+  return 1.0;
 }
 
 function computeItemInfo(thetaHat: number, difficulty: number, thresholds?: number[]): number {
@@ -344,6 +336,8 @@ export function buildThompsonArms(params: {
   cooldownHours?: number;
 }): ThompsonArm[] {
   const { learnerState, analytics, blueprint, items, now = Date.now(), cooldownHours = 96 } = params;
+  const disableCaps = true; // cooldown eligibility removed globally
+  const effectiveCooldownHours = disableCaps ? 0 : cooldownHours;
   const loIds = new Set<string>();
   Object.keys(learnerState.los).forEach((loId) => loIds.add(loId));
   analytics?.ttm_per_lo?.forEach((entry) => loIds.add(entry.lo_id));
@@ -359,7 +353,7 @@ export function buildThompsonArms(params: {
     const daysSinceLastRaw = Number.isFinite(cooldown) ? cooldown / 24 : 14;
     const urgency = computeUrgency(daysSinceLastRaw);
     const blueprintMult = computeBlueprintMultiplierForLo({ loId, learnerState, blueprint });
-    const eligible = !Number.isFinite(cooldown) || cooldown >= cooldownHours;
+    const eligible = true;
 
     arms.push({
       loId,
