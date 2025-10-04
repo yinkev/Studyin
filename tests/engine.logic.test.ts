@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   STOP_RULES,
   scoreCandidates,
@@ -58,6 +58,36 @@ describe('scoreCandidates & selectNextItem', () => {
     expect(selection?.itemId).toBe('item-open');
     expect(selection?.signals.utility).toBeGreaterThan(0);
   });
+
+  it('disables exposure caps when STUDY_NO_CAPS=1 but still clamps overfamiliar', () => {
+    vi.stubEnv('STUDY_NO_CAPS', '1');
+    vi.stubEnv('NODE_ENV', 'development');
+      const items = [
+        {
+          id: 'blocked-now-open',
+          loIds: ['lo.alpha'],
+          difficulty: 0,
+          thresholds: undefined,
+          medianTimeSeconds: 120,
+          blueprintMultiplier: 1,
+          exposure: {
+            last24h: 1,
+            last7d: 2,
+            hoursSinceLast: 10,
+            meanScore: 0.95,
+            se: 0.1
+          },
+          fatigueScalar: 1
+        }
+      ];
+      const scored = scoreCandidates({ thetaHat: 0, items });
+      const s = scored[0];
+      // Caps disabled: exposureMultiplier not zero
+      expect(s.exposureMultiplier).toBeGreaterThan(0);
+      // Overfamiliar clamp still applies (<= 0.6)
+      expect(s.exposureMultiplier).toBeLessThanOrEqual(0.6);
+    vi.unstubAllEnvs();
+  });
 });
 
 describe('scheduleNextLo', () => {
@@ -116,6 +146,24 @@ describe('scheduleNextLo', () => {
     expect(alphaArm).toBeDefined();
     expect(alphaArm?.eligible).toBe(true);
     expect(alphaArm?.mu).toBeGreaterThan(0);
+  });
+
+  it('ignores cooldown eligibility when STUDY_NO_CAPS=1', () => {
+    vi.stubEnv('STUDY_NO_CAPS', '1');
+    vi.stubEnv('NODE_ENV', 'development');
+      const learnerState = {
+        los: { 'lo.alpha': { thetaHat: 0.1, se: 0.25, itemsAttempted: 1, recentSes: [], priorMu: 0.1, priorSigma: 0.3 } },
+        items: { 'item-1': { attempts: 1, correct: 1, lastAttemptTs: Date.now() - 1 * 60 * 60 * 1000 } }
+      };
+      const arms = buildThompsonArms({
+        learnerState,
+        items: [{ id: 'item-1', los: ['lo.alpha'] }],
+        now: Date.now(),
+        cooldownHours: 96
+      });
+      const arm = arms.find((a) => a.loId === 'lo.alpha');
+      expect(arm?.eligible).toBe(true);
+    vi.unstubAllEnvs();
   });
 });
 

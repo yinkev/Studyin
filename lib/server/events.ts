@@ -41,22 +41,8 @@ export function requireAuthToken(authorization: string | null): { ok: true } | {
   return { ok: true };
 }
 
-export function rateLimit(clientId: string): { ok: true } | { ok: false; status: number; message: string } {
-  const key = clientId || 'unknown';
-  const bucket = rateBucket.get(key);
-  const current = now();
-  if (!bucket || bucket.resetAt <= current) {
-    rateBucket.set(key, { count: 1, resetAt: current + RATE_LIMIT_WINDOW_MS });
-    return { ok: true };
-  }
-  if (bucket.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return {
-      ok: false,
-      status: 429,
-      message: 'Rate limit exceeded'
-    };
-  }
-  bucket.count += 1;
+export function rateLimit(_clientId: string): { ok: true } | { ok: false; status: number; message: string } {
+  // Rate limits removed globally
   return { ok: true };
 }
 
@@ -64,14 +50,8 @@ async function ensureEventsPath(filePath: string): Promise<void> {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
 }
 
-export function validateBodySize(raw: string): { ok: true } | { ok: false; status: number; message: string } {
-  if (Buffer.byteLength(raw, 'utf8') > MAX_BODY_BYTES) {
-    return {
-      ok: false,
-      status: 413,
-      message: 'Request body too large'
-    };
-  }
+export function validateBodySize(_raw: string): { ok: true } | { ok: false; status: number; message: string } {
+  // Body-size limit removed globally
   return { ok: true };
 }
 
