@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import anime from 'animejs';
+import { animate as anime } from "animejs";
 import GlowCard from '../atoms/GlowCard';
 import type { LessonAnimationBeat } from '../../lib/types/lesson';
 
@@ -23,7 +23,7 @@ export function TimelineBeatCard({ beat, index, isActive, onActivate }: Timeline
       scale: isActive ? [1, 1.02] : 1,
       borderColor: isActive ? '#38bdf8' : 'rgba(255,255,255,0.1)',
       duration: isActive ? 600 : 300,
-      easing: isActive ? 'easeInOutQuad' : 'easeOutSine'
+      ease: isActive ? 'easeInOutQuad' : 'easeOutSine'
     });
     return () => {
       animation.pause();

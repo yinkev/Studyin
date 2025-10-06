@@ -1,7 +1,7 @@
 'use client';
 
 import { PropsWithChildren, useEffect, useRef } from 'react';
-import anime from 'animejs';
+import { animate as anime } from "animejs";
 import clsx from 'clsx';
 
 interface GlowCardProps {
@@ -31,7 +31,7 @@ export function GlowCard({
       ],
       duration: 900,
       delay: delayMs,
-      easing: 'easeOutExpo'
+      ease: 'easeOutExpo'
     });
     return () => {
       animation.pause();

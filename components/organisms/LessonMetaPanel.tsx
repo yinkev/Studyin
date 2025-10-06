@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import anime from 'animejs';
+import { animate as anime } from "animejs";
 import GlowCard from '../atoms/GlowCard';
 import type { InteractiveLesson } from '../../lib/types/lesson';
 
@@ -15,16 +15,18 @@ export function LessonMetaPanel({ lesson }: LessonMetaPanelProps) {
   useEffect(() => {
     if (!listRef.current) return;
     const items = listRef.current.querySelectorAll('li');
-    const timeline = anime.timeline({ easing: 'easeOutExpo' });
-    timeline.add({
-      targets: items,
-      translateX: [-20, 0],
-      opacity: [0, 1],
-      delay: anime.stagger(80)
-    });
-    return () => {
-      timeline.pause();
-    };
+    const timeline = (anime as any).timeline ? (anime as any).timeline({ ease: 'easeOutExpo' }) : null;
+    if (timeline) {
+      timeline.add({
+        targets: items,
+        translateX: [-20, 0],
+        opacity: [0, 1],
+        delay: (anime as any).stagger ? (anime as any).stagger(80) : 0
+      });
+      return () => {
+        timeline.pause();
+      };
+    }
   }, [lesson.id]);
 
   return (

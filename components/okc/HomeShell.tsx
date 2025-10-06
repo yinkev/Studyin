@@ -39,7 +39,7 @@ export function HomeShell({ analytics }: { analytics: AnalyticsSummary | null })
         if (e.isIntersecting) {
           const anime = (window as any).anime;
           if (anime) {
-            anime({ targets: e.target, translateY: [20,0], opacity: [0,1], duration: 600, easing: 'easeOutQuad' });
+            anime(e.target, { translateY: [20,0], opacity: [0,1], duration: 600, ease: 'outQuad' });
           } else {
             (e.target as HTMLElement).style.opacity = '1';
             (e.target as HTMLElement).style.transform = 'translateY(0)';
