@@ -14,6 +14,8 @@ import { KeyboardShortcutsOverlay } from './study/KeyboardShortcutsOverlay';
 import { EvidencePanel, type EvidenceData } from './study/EvidencePanel';
 import { MasteryBurst, StarBurst } from './effects/MasteryBurst';
 import { AbilityTrackerGraph, type AbilityDataPoint } from './study/AbilityTrackerGraph';
+import { useXP } from './XPProvider';
+import { XP_REWARDS } from '../lib/xp-system';
 
 interface InteractiveLessonViewerProps {
   lesson: InteractiveLesson;
@@ -52,6 +54,10 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
   const [abilityData, setAbilityData] = useState<AbilityDataPoint[]>([]);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const responseStartTime = useRef<number>(Date.now());
+
+  const { awardXPWithFeedback } = useXP();
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [totalAnswered, setTotalAnswered] = useState(0);
 
   useEffect(() => {
     if (!hasTimeline) return;
@@ -119,6 +125,15 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
 
     setAnswerState(correct ? 'correct' : 'incorrect');
 
+    setTotalAnswered(prev => prev + 1);
+    if (correct) {
+      setCorrectAnswers(prev => prev + 1);
+      const isFast = durationMs < 5000;
+      const xpAmount = isFast ? XP_REWARDS.QUESTION_CORRECT_FAST : XP_REWARDS.QUESTION_CORRECT;
+      const reason = isFast ? 'Fast & Correct! ⚡' : 'Correct! ✓';
+      awardXPWithFeedback(xpAmount, reason);
+    }
+
     // Update ability tracker data (mock Rasch update for demo)
     const prevTheta = abilityData.length > 0 ? abilityData[abilityData.length - 1].theta : 0.0;
     const prevSE = abilityData.length > 0 ? abilityData[abilityData.length - 1].se : 0.8;
@@ -174,9 +189,16 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
     if (activeIndex < mcqs.length - 1) {
       setActiveIndex(activeIndex + 1);
     } else if (onLessonComplete) {
+      const accuracy = totalAnswered > 0 ? correctAnswers / totalAnswered : 0;
+      const isPerfect = accuracy === 1.0;
+      const xpAmount = isPerfect ? XP_REWARDS.LESSON_PERFECT : XP_REWARDS.LESSON_COMPLETE;
+      const reason = isPerfect
+        ? `Perfect Lesson! 🎯 ${correctAnswers}/${totalAnswered}`
+        : `Lesson Complete! 📚 ${correctAnswers}/${totalAnswered}`;
+      awardXPWithFeedback(xpAmount, reason);
       onLessonComplete();
     }
-  }, [activeIndex, mcqs.length, onLessonComplete]);
+  }, [activeIndex, mcqs.length, onLessonComplete, correctAnswers, totalAnswered, awardXPWithFeedback]);
 
   // Keyboard shortcuts
   useEffect(() => {
