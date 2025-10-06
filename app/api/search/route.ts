@@ -4,6 +4,18 @@ import { generateDeterministicEmbedding, cosineSimilarity } from 'lib/rag/embedd
 
 export const runtime = 'nodejs';
 
+interface EvidenceChunkRow {
+  item_id: string;
+  lo_ids: string[] | null;
+  source_file: string | null;
+  page: number | null;
+  version: string | null;
+  ts: number | null;
+  text: string;
+  embedding: number[] | string | null;
+}
+
+
 function parseArrayParam(value: string | null): string[] {
   if (!value) return [];
   return value
@@ -33,12 +45,20 @@ function temporalDecay(ts: number, now: number, halfLifeDays = 90) {
   return Math.exp(-lambda * Math.max(0, deltaDays));
 }
 
-function parseEmbedding(value: any) {
-  if (Array.isArray(value)) return value.map(Number);
+function sanitizeLoIds(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0);
+}
+
+function parseEmbedding(value: unknown): number[] {
+  if (Array.isArray(value)) return value.map((num) => Number(num)).filter((num) => Number.isFinite(num));
   if (typeof value === 'string') {
     const trimmed = value.replace(/[()]/g, '');
     if (!trimmed) return [];
-    return trimmed.split(',').map((num) => Number(num));
+    return trimmed
+      .split(',')
+      .map((num) => Number(num))
+      .filter((num) => Number.isFinite(num));
   }
   return [];
 }
@@ -59,19 +79,20 @@ export async function GET(request: Request) {
   }
 
   try {
-    const chunks = await fetchEvidenceChunks(client, { loIds, limit: 500 });
+    const rawChunks = (await fetchEvidenceChunks(client, { loIds, limit: 500 })) as EvidenceChunkRow[];
     const queryEmbedding = generateDeterministicEmbedding(query);
     const now = Date.now();
-    const scored = chunks
+    const scored = rawChunks
       .map((chunk) => {
+        const chunkLoIds = sanitizeLoIds(chunk.lo_ids);
         const embedding = parseEmbedding(chunk.embedding);
         const similarity = cosineSimilarity(queryEmbedding, embedding);
         const decay = temporalDecay(chunk.ts ?? now, since ?? now);
-        const loMatchBoost = loIds.length && chunk.lo_ids ? chunk.lo_ids.filter((lo) => loIds.includes(lo)).length : 0;
+        const loMatchBoost = loIds.length ? chunkLoIds.filter((lo) => loIds.includes(lo)).length : 0;
         const score = similarity * decay + loMatchBoost * 0.05;
         return {
           item_id: chunk.item_id,
-          lo_ids: chunk.lo_ids,
+          lo_ids: chunkLoIds,
           source_file: chunk.source_file,
           page: chunk.page,
           version: chunk.version,

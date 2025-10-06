@@ -5,7 +5,7 @@ import { buildFormGreedy, deriveLoTargets, isBlueprintFeasible } from '../../scr
 type Choice = 'A' | 'B' | 'C' | 'D' | 'E';
 
 const ROOT = process.cwd();
-const BANK_DIR = path.join(ROOT, 'content', 'banks', 'upper-limb-oms1');
+const BANK_DIR = path.join(ROOT, 'content', 'banks');
 const BLUEPRINT_PATH = path.join(ROOT, 'config', 'blueprint.json');
 
 interface BankItem {
@@ -68,11 +68,33 @@ async function loadBlueprint(): Promise<Blueprint> {
   return readJson<Blueprint>(BLUEPRINT_PATH);
 }
 
+async function walkForItems(dir: string, out: string[]): Promise<void> {
+  let entries: (string | undefined)[] = [];
+  try {
+    entries = await fs.readdir(dir);
+  } catch {
+    return;
+  }
+  for (const name of entries) {
+    if (!name) continue;
+    const p = path.join(dir, name);
+    try {
+      const stat = await fs.stat(p);
+      if (stat.isDirectory()) await walkForItems(p, out);
+      else if (stat.isFile() && name.endsWith('.item.json')) out.push(p);
+    } catch {
+      // ignore
+    }
+  }
+}
+
 async function loadBankItems(): Promise<BankItem[]> {
-  const files = (await fs.readdir(BANK_DIR)).filter((file) => file.endsWith('.item.json')).sort();
+  const files: string[] = [];
+  await walkForItems(BANK_DIR, files);
+  files.sort();
   const items: BankItem[] = [];
   for (const file of files) {
-    const json = await readJson<BankItem & Record<string, unknown>>(path.join(BANK_DIR, file));
+    const json = await readJson<BankItem & Record<string, unknown>>(file);
     items.push(json as BankItem);
   }
   return items;

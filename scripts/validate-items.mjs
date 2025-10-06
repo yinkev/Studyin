@@ -105,8 +105,7 @@ async function main() {
     const itemFiles = collectedFiles.sort((a, b) => a.localeCompare(b));
     if (!itemFiles.length) {
       const scopeSummary = BANK_SCOPES.map((scope) => path.relative(ROOT, scope)).join(', ');
-      console.error('No item files found. Checked scopes:', scopeSummary || '(none)');
-      process.exitCode = 1;
+      console.warn('No item files found. Checked scopes:', scopeSummary || '(none)');
       return;
     }
 

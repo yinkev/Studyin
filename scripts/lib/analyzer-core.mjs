@@ -42,6 +42,7 @@ export function summarizeAttempts(attempts, now = Date.now()) {
       has_events: false,
       totals: { attempts: 0, learners: 0 },
       ttm_per_lo: [],
+      mastery_per_lo: {},
       elg_per_min: [],
       confusion_edges: [],
       speed_accuracy: {
@@ -160,6 +161,8 @@ export function summarizeAttempts(attempts, now = Date.now()) {
       };
     })
     .sort((a, b) => b.projected_minutes_to_mastery - a.projected_minutes_to_mastery);
+
+  const mastery_per_lo = Object.fromEntries(ttm_per_lo.map(lo => [lo.lo_id, lo.current_accuracy]));
 
   const elgCandidates = [];
   for (const [itemId, metrics] of itemMetrics.entries()) {
@@ -281,6 +284,7 @@ export function summarizeAttempts(attempts, now = Date.now()) {
     has_events: true,
     totals: { attempts: attempts.length, learners: learnerIds.size },
     ttm_per_lo,
+    mastery_per_lo,
     elg_per_min,
     confusion_edges,
     speed_accuracy: speedBuckets,

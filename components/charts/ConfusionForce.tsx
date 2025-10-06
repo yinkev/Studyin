@@ -29,16 +29,17 @@ export function ConfusionForce({ analytics, width = 680, height = 340 }: { analy
   }, [analytics]);
 
   useEffect(() => {
-    const svg = d3.select(ref.current);
+    const svgElement = ref.current;
+    if (!svgElement) return;
+    const svg = d3.select<SVGSVGElement, unknown>(svgElement);
     svg.selectAll('*').remove();
     svg.attr('width', width).attr('height', height);
 
     const g = svg.append('g');
-    svg.call(
-      d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.7, 2]).on('zoom', (event) => {
-        g.attr('transform', String(event.transform));
-      })
-    );
+    const zoomBehavior = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.7, 2]).on('zoom', (event) => {
+      g.attr('transform', String(event.transform));
+    });
+    svg.call(zoomBehavior);
 
     if (nodes.length === 0) {
       svg.append('text').text('No confusion edges yet').attr('x', 16).attr('y', 20).attr('fill', '#64748b');

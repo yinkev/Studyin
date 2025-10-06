@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1.0",
+  "id": "item.mi.ecg.stemi.01",
+  "created_at": "2025-10-03T10:00:00Z",
+  "updated_at": "2025-10-03T10:00:00Z",
+  "los": ["lo.mi-diagnosis.ecg-changes"],
+  "type": "mcq",
+  "stem": "A 65-year-old male with a history of hypertension and hyperlipidemia presents to the emergency department with 2 hours of severe, crushing substernal chest pain radiating to his left arm. An ECG is performed and shows 3 mm of ST-segment elevation in leads V2, V3, and V4. Which of the following is the most likely diagnosis?",
+  "options": [
+    {
+      "id": "opt_a",
+      "text": "Pericarditis",
+      "correct": false
+    },
+    {
+      "id": "opt_b",
+      "text": "ST-Elevation Myocardial Infarction (STEMI)",
+      "correct": true
+    },
+    {
+      "id": "opt_c",
+      "text": "Non-ST-Elevation Myocardial Infarction (NSTEMI)",
+      "correct": false
+    },
+    {
+      "id": "opt_d",
+      "text": "Unstable Angina",
+      "correct": false
+    }
+  ],
+  "rationale_correct": "The patient's presentation of acute chest pain combined with ST-segment elevation (≥ 2mm in V2-V3 for males > 40) in contiguous precordial leads (V2-V4) is the classic presentation for an anterior wall ST-Elevation Myocardial Infarction (STEMI).",
+  "rationales_distractors": {
+    "opt_a": "Pericarditis typically presents with diffuse, concave ST elevation across multiple territories, not localized to an anatomical distribution like this case.",
+    "opt_c": "NSTEMI is characterized by ischemic symptoms and elevated cardiac biomarkers, but without significant ST-segment elevation on the ECG. It may present with ST depression or T-wave inversions.",
+    "opt_d": "Unstable angina presents similarly but is distinguished by the absence of cardiac biomarker elevation, and it does not typically cause ST-segment elevation."
+  },
+  "evidence": {
+    "file": "lectures/cardiology/Intro_to_Cardiology_MI.pptx",
+    "slide": 27,
+    "citation": "ACC/AHA Guideline for the Management of Patients With ST-Elevation Myocardial Infarction, 2013"
+  }
+}

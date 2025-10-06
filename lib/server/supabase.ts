@@ -82,7 +82,11 @@ export async function insertSnapshot(client: any, summary: any) {
   if (error) throw new Error(`Supabase insert snapshot failed: ${error.message}`);
 }
 
-export async function fetchEvidenceChunks(client: any, { loIds = [], limit = 200 } = {}) {
+export async function fetchEvidenceChunks(
+  client: any,
+  params: { loIds?: string[]; limit?: number } = {}
+) {
+  const { loIds = [], limit = 200 } = params;
   let query = client
     .from('evidence_chunks')
     .select('item_id,lo_ids,source_file,page,version,ts,text,embedding')
