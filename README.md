@@ -50,6 +50,13 @@ The application is built around a simple, powerful loop:
 - The worker script consumes the queue deterministically. Restarting it is safe; jobs are persisted.
 - Failed jobs retain their error message; fix the root cause, delete the line from `jobs.json` if needed, and re-upload.
 
+### Environment Flags (Dev)
+
+- `NEXT_PUBLIC_DEV_UPLOAD=1` — enables `/upload` and dev pages.
+- `WRITE_TELEMETRY=1` — writes local NDJSON to `data/events.ndjson`.
+- `INGEST_TOKEN=...` — optional bearer token to guard ingest routes.
+- `USE_SUPABASE_INGEST=0` — keep off unless following `docs/SUPABASE_SETUP.md`.
+
 ---
 
 > ## Archived README (For Historical Context)

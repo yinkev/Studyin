@@ -1,5 +1,7 @@
 # Personal Adaptive Study Engine — PRD
 
+> Consensus Note (2025-10-06): Validated via Zen MCP (Gemini) against repo state. No scope change. Minor clarifications are enumerated below; architecture remains deterministic with shims and seeded randomness only.
+
 ## Context & Problem Statement
 - We are introducing a personal adaptive study engine that selects items in-session, schedules across topics, and hands off mastered content to a retention lane. The authoritative behavior is defined in `docs/personal-adaptive-study-engine-spec.md` and its delivery prompt. We must implement the engine deterministically, respecting blueprint rails, exposure caps, and stop rules articulated in the spec, while aligning with our existing validator, analytics, and governance stack.
 - Determinism is non‑negotiable: no runtime LLM calls; all scoring and scheduling must be reproducible from local data streams (`data/events.ndjson` via `scripts/analyze.mjs:10`–`11`). Evidence must remain fast (<250 ms) and traceable to source.
@@ -10,6 +12,13 @@
 3. Integrate an FSRS‑based retention lane with time budgeting, overdue boosts, and training↔retention handoff criteria (Section 3).
 4. Enforce content balancing and exposure caps (≤1/day, ≤2/week, 96h cooldown) with multipliers feeding the selector utility (Section 4).
 5. Provide “Why this next” transparency with numeric backing from analytics and engine signals; maintain determinism and performance budgets.
+
+Consensus Clarifications
+- Hybrid cold-start: explicitly blend Elo→Rasch on first warm step (70/30) then full Rasch per LO and per item once thresholds met (`docs/personal-adaptive-study-engine-spec.md`).
+- Randomesque selector: rank by utility and choose uniformly from top K=5; enforce time cap ≤6 min unless pool empty.
+- Telemetry: add optional `engine` signals to attempt/session events for transparency and audits (schema v1.1.0).
+- Module loading: Study view auto-detects new banks under `content/banks/**` and exposes them in a module picker; scheduler uses base blueprint plus optional `config/blueprint-dev.json` in development to include new LOs without hard-coding.
+- Dev ingestion: `/upload` is a development-only route gated by `NEXT_PUBLIC_DEV_UPLOAD=1`; it enqueues a background job processed by a local worker (`scripts/worker.ts`). Generated content must pass the validator before entering the study engine.
 
 ## Non‑Goals (Skip Now)
 - No real‑time collaboration, adaptive evidence retrieval, or automated item writing (see spec Section 9).
