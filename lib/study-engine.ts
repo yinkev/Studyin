@@ -78,9 +78,13 @@ export function difficultyToBeta(difficulty: DifficultyCode): number {
   return DIFFICULTY_TO_BETA[difficulty] ?? 0;
 }
 
-function computeExposureMultiplier(_exposure: CandidateItem['exposure']): number {
-  // Caps and familiarity clamps removed globally
-  return 1.0;
+function computeExposureMultiplier(exposure: CandidateItem['exposure']): number {
+  const base = baseExposureMultiplier(exposure);
+  return clampOverfamiliar({
+    base,
+    meanScore: exposure.meanScore,
+    se: exposure.se
+  });
 }
 
 function computeItemInfo(thetaHat: number, difficulty: number, thresholds?: number[]): number {
@@ -90,8 +94,8 @@ function computeItemInfo(thetaHat: number, difficulty: number, thresholds?: numb
     return expected * (1 - expected);
   }
   const pmf = gpcmPmf(thetaHat, difficulty, thresholds, thresholds.length);
-  const expected = pmf.reduce((sum, prob, idx) => sum + prob * idx, 0);
-  const variance = pmf.reduce((sum, prob, idx) => sum + prob * (idx - expected) ** 2, 0);
+  const expected = pmf.reduce((sum: number, prob: number, idx: number) => sum + prob * idx, 0);
+  const variance = pmf.reduce((sum: number, prob: number, idx: number) => sum + prob * (idx - expected) ** 2, 0);
   return variance;
 }
 
@@ -199,12 +203,12 @@ export function computeRetentionBudget(params: { maxDaysOverdue: number; session
   return { minutes, fraction };
 }
 
-export async function runEapUpdate(params: {
+export function runEapUpdate(params: {
   priorMu: number;
   priorSigma: number;
   response: { k: number; m: number };
   difficulty: number;
-}): Promise<{ thetaHat: number; se: number }> {
+}): { thetaHat: number; se: number } {
   return eapUpdate(params);
 }
 

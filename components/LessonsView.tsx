@@ -1,30 +1,61 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { LessonDoc } from '../lib/getLessons';
 import { Card, CardContent, CardHeader, CardFooter } from './ui/card';
 import { Button } from './ui/button';
+import { submitLessonEvent } from '../app/study/actions';
 
 interface LessonsViewProps {
   lessons: LessonDoc[];
+  learnerId: string;
+  sessionId: string;
   onPractice?: (loId: string) => void;
 }
 
-export function LessonsView({ lessons, onPractice }: LessonsViewProps) {
+export function LessonsView({ lessons, learnerId, sessionId, onPractice }: LessonsViewProps) {
   const [idx, setIdx] = useState(0);
   const current = lessons[idx];
   const beats = current?.animation_timeline ?? [];
   const [beatIndex, setBeatIndex] = useState(0);
+  const [startTime, setStartTime] = useState(Date.now());
 
   const nav = useMemo(
     () => ({
-      nextLesson: () => setIdx((i) => (i + 1) % Math.max(lessons.length, 1)),
-      prevLesson: () => setIdx((i) => (i - 1 + Math.max(lessons.length, 1)) % Math.max(lessons.length, 1)),
+      nextLesson: () => {
+        setIdx((i) => (i + 1) % Math.max(lessons.length, 1));
+        setBeatIndex(0);
+        setStartTime(Date.now());
+      },
+      prevLesson: () => {
+        setIdx((i) => (i - 1 + Math.max(lessons.length, 1)) % Math.max(lessons.length, 1));
+        setBeatIndex(0);
+        setStartTime(Date.now());
+      },
       nextBeat: () => setBeatIndex((b) => Math.min(b + 1, Math.max(beats.length - 1, 0))),
       prevBeat: () => setBeatIndex((b) => Math.max(b - 1, 0))
     }),
     [beats.length, lessons.length]
   );
+
+  useEffect(() => {
+    if (!current) return;
+
+    const payload = {
+      app_version: process.env.NEXT_PUBLIC_APP_VERSION ?? '0.0.0',
+      session_id: sessionId,
+      user_id: learnerId,
+      lo_id: current.lo_id,
+      card_id: current.id,
+      action: beatIndex === 0 ? 'reveal' : 'seek',
+      ts: Date.now(),
+      dwell_ms: Date.now() - startTime
+    } as const;
+
+    submitLessonEvent(payload).catch((err) => {
+      console.error('Failed to submit lesson event', err);
+    });
+  }, [current, beatIndex, learnerId, sessionId, startTime]);
 
   if (!lessons.length) {
     return (

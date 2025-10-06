@@ -5,7 +5,7 @@ import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
 import type { LearnerState } from '../lib/server/study-state';
 import type { CandidateItem } from '../lib/study-engine';
 import { buildWhyThisNext, difficultyToBeta, scoreCandidates } from '../lib/study-engine';
-import { WhyThisNextPill } from './pills/WhyThisNextPill';
+import { WhyThisNextPill, type WhySignals } from './pills/WhyThisNextPill';
 import { masteryProbability } from 'lib/engine/shims/rasch';
 import { submitStudyAttempt } from '../app/study/actions';
 import type { OptimisticLearnerStateUpdate } from '../lib/client/useLearnerState';
@@ -24,6 +24,21 @@ interface ChoiceFeedback {
   selected?: 'A' | 'B' | 'C' | 'D' | 'E';
   correctShown: boolean;
 }
+
+interface RagResult {
+  itemId: string;
+  loIds: string[];
+  text: string;
+  score: number;
+  similarity: number;
+  decay: number;
+}
+
+type WhyContext = {
+  whyNext: string;
+  whySignals: WhySignals | null;
+  ttmTitle?: string;
+};
 
 const ANSWER_LETTERS = ['A', 'B', 'C', 'D', 'E'] as const;
 
@@ -152,11 +167,17 @@ export function StudyView({
   const [isPending, startTransition] = useTransition();
   const [sessionId] = useState(() => crypto.randomUUID());
   const [questionStart, setQuestionStart] = useState(() => Date.now());
+  const [ragCache, setRagCache] = useState<Record<string, RagResult | null>>({});
+  const [ragLoading, setRagLoading] = useState(false);
+  const [ragError, setRagError] = useState<string | null>(null);
 
   const current = items[index];
+  const ragResult = current ? ragCache[current.id] ?? null : null;
 
-  const { whyNext, whySignals, ttmTitle } = useMemo(() => {
-    if (!current) return 'Focus on mastery — keep practicing.';
+  const { whyNext, whySignals, ttmTitle } = useMemo<WhyContext>(() => {
+    if (!current) {
+      return { whyNext: 'Focus on mastery — keep practicing.', whySignals: null, ttmTitle: undefined };
+    }
     const loIds = current.los ?? [];
     const { thetaHat, se } = deriveAbility(loIds, learnerState, analytics);
     const stats = learnerState.items[current.id];
@@ -194,11 +215,15 @@ export function StudyView({
         .filter((row) => loIds.includes(row.lo_id))
         .map((row) => `${row.lo_id}: ${Number(row.projected_minutes_to_mastery ?? 0).toFixed(2)}m${row.overdue ? ' (overdue)' : ''}`)
         .join(' · ');
-      return { whyNext: fallbackWhyThisNext(current.id, loIds, analytics), whySignals: null as any, ttmTitle: title || undefined };
+      return {
+        whyNext: fallbackWhyThisNext(current.id, loIds, analytics),
+        whySignals: null,
+        ttmTitle: title || undefined
+      } satisfies WhyContext;
     }
     const masteryProb = masteryProbability(thetaHat, se);
     const whyText = buildWhyThisNext(score, { thetaHat, se, masteryProb });
-    const signals = {
+    const signals: WhySignals = {
       info: score.info,
       blueprintMult: score.blueprintMultiplier,
       exposureMult: score.exposureMultiplier,
@@ -214,7 +239,7 @@ export function StudyView({
       .filter((row) => loIds.includes(row.lo_id))
       .map((row) => `${row.lo_id}: ${Number(row.projected_minutes_to_mastery ?? 0).toFixed(2)}m${row.overdue ? ' (overdue)' : ''}`)
       .join(' · ');
-    return { whyNext: whyText, whySignals: signals, ttmTitle: title || undefined };
+    return { whyNext: whyText, whySignals: signals, ttmTitle: title || undefined } satisfies WhyContext;
   }, [analytics, current, index, learnerState]);
 
   const letters = ANSWER_LETTERS;
@@ -232,6 +257,60 @@ export function StudyView({
     }
     return parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }, [learnerState.updatedAt]);
+
+  useEffect(() => {
+    if (!current) return;
+    if (ragCache[current.id] !== undefined) {
+      setRagError(null);
+      return;
+    }
+    const itemId = current.id;
+    const loIds = current.los ?? [];
+    const query = current.stem?.slice(0, 200) ?? '';
+    const params = new URLSearchParams({ q: query, k: '1' });
+    if (loIds.length) {
+      params.set('lo', loIds.join(','));
+    }
+
+    const controller = new AbortController();
+    let cancelled = false;
+    setRagLoading(true);
+    setRagError(null);
+
+    fetch(`/api/search?${params.toString()}`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        const top = data?.results?.[0];
+        setRagCache((prev) => ({
+          ...prev,
+          [itemId]: top
+            ? {
+                itemId: top.item_id ?? itemId,
+                loIds: top.lo_ids ?? [],
+                text: top.text ?? '',
+                score: Number(top.score ?? 0),
+                similarity: Number(top.similarity ?? 0),
+                decay: Number(top.decay ?? 0)
+              }
+            : null
+        }));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setRagError(err instanceof Error ? err.message : 'Temporal search failed');
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setRagLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [current, ragCache]);
 
   const submitAttempt = useCallback(
     (choice: (typeof letters)[number]) => {
@@ -256,17 +335,42 @@ export function StudyView({
           startTransition(() => {
             (async () => {
               try {
+                const enginePayload = whySignals
+                  ? {
+                      notes: whyNext,
+                      selector: {
+                        ...(whySignals.loIds.length ? { lo_ids: whySignals.loIds } : {}),
+                        item_id: current.id,
+                        info: Number.isFinite(whySignals.info) ? whySignals.info : undefined,
+                        blueprint_multiplier: Number.isFinite(whySignals.blueprintMult) ? whySignals.blueprintMult : undefined,
+                        exposure_multiplier: Number.isFinite(whySignals.exposureMult) ? whySignals.exposureMult : undefined,
+                        fatigue_scalar: Number.isFinite(whySignals.fatigue) ? whySignals.fatigue : undefined,
+                        median_seconds: Number.isFinite(whySignals.medianSec) ? whySignals.medianSec : undefined,
+                        theta_hat: Number.isFinite(whySignals.thetaHat) ? whySignals.thetaHat : undefined,
+                        se: Number.isFinite(whySignals.se) ? whySignals.se : undefined,
+                        mastery_probability: Number.isFinite(whySignals.masteryProb) ? whySignals.masteryProb : undefined,
+                        reason: whyNext
+                      }
+                    }
+                  : whyNext
+                    ? {
+                        notes: whyNext
+                      }
+                    : undefined;
+                const baseLoIds = current.los && current.los.length > 0 ? current.los : whySignals?.loIds ?? [];
+                const loIdsForAttempt = (baseLoIds.length ? baseLoIds : ['unmapped']) as [string, ...string[]];
                 const result = await submitStudyAttempt({
                   learnerId,
                   sessionId,
                   itemId: current.id,
-                  loIds: current.los ?? [],
+                  loIds: loIdsForAttempt,
                   difficulty: current.difficulty,
                   choice,
                   correct,
                   durationMs,
                   openedEvidence: evidenceOpen,
-                  appVersion: process.env.NEXT_PUBLIC_APP_VERSION
+                  appVersion: process.env.NEXT_PUBLIC_APP_VERSION,
+                  engine: enginePayload
                 });
                 if (result?.learnerState) {
                   onLearnerStateChange(result.learnerState);
@@ -294,7 +398,7 @@ export function StudyView({
           setError('Something went wrong updating your progress. Try again.');
         });
     },
-    [busy, current, evidenceOpen, feedback.correctShown, invalidateLearnerState, learnerId, optimisticLearnerStateUpdate, onLearnerStateChange, questionStart, sessionId]
+    [busy, current, evidenceOpen, feedback.correctShown, invalidateLearnerState, learnerId, onLearnerStateChange, optimisticLearnerStateUpdate, questionStart, sessionId, whySignals, whyNext]
   );
 
   const handleNext = useCallback(() => {
@@ -401,6 +505,27 @@ export function StudyView({
             >
               <h3 className="text-sm font-semibold">Focus rationale</h3>
               <p className="text-sm">{whyNext}</p>
+              <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs text-indigo-800">
+                <p className="font-semibold uppercase tracking-wide text-[10px]">Temporal search signal</p>
+                {ragLoading ? (
+                  <p className="mt-1 text-indigo-700">Looking up supporting evidence…</p>
+                ) : ragError ? (
+                  <p className="mt-1 text-rose-600">{ragError}</p>
+                ) : ragResult ? (
+                  ragResult.text ? (
+                    <div className="mt-1 space-y-1">
+                      <p className="text-indigo-900">{ragResult.text}</p>
+                      <p className="text-indigo-600">
+                        Score {ragResult.score.toFixed(3)} · similarity {ragResult.similarity.toFixed(3)} · decay {ragResult.decay.toFixed(3)}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-indigo-700">No matching evidence surfaced yet for this prompt.</p>
+                  )
+                ) : (
+                  <p className="mt-1 text-indigo-700">No matching evidence surfaced yet for this prompt.</p>
+                )}
+              </div>
               <p className="text-xs text-gray-500">Keyboard: E toggles evidence.</p>
               <button
                 type="button"

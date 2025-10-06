@@ -8,8 +8,8 @@ export const SCHEMA_VERSIONS = Object.freeze({
   blueprint: '1.0.0',
   learningObjective: '1.0.0',
   errorTaxonomy: '1.0.0',
-  attemptEvent: '1.0.0',
-  sessionEvent: '1.0.0',
+  attemptEvent: '1.1.0',
+  sessionEvent: '1.1.0',
   lessonEvent: '1.0.0'
 });
 
@@ -70,6 +70,45 @@ export const itemSchema = z.object({
   reviewer_ids: z.array(z.string().min(1)).optional()
 });
 
+const engineSelectorSignalsSchema = z.object({
+  item_id: z.string().min(1).optional(),
+  lo_ids: z.array(z.string().min(1)).nonempty().optional(),
+  info: z.number().min(0).optional(),
+  blueprint_multiplier: z.number().min(0).optional(),
+  exposure_multiplier: z.number().min(0).optional(),
+  fatigue_scalar: z.number().min(0).optional(),
+  median_seconds: z.number().min(0).optional(),
+  theta_hat: z.number().optional(),
+  se: z.number().min(0).optional(),
+  mastery_probability: z.number().min(0).max(1).optional(),
+  reason: z.string().min(1).optional()
+});
+
+const engineSchedulerSignalsSchema = z.object({
+  lo_id: z.string().min(1).optional(),
+  sample: z.number().optional(),
+  score: z.number().optional(),
+  blueprint_multiplier: z.number().optional(),
+  urgency: z.number().optional(),
+  reason: z.string().min(1).optional()
+});
+
+const engineRetentionSignalsSchema = z.object({
+  minutes: z.number().min(0).optional(),
+  fraction: z.number().min(0).max(1).optional(),
+  max_days_overdue: z.number().min(0).optional(),
+  reason: z.string().min(1).optional()
+});
+
+export const engineMetadataSchema = z
+  .object({
+    selector: engineSelectorSignalsSchema.optional(),
+    scheduler: engineSchedulerSignalsSchema.optional(),
+    retention: engineRetentionSignalsSchema.optional(),
+    notes: z.string().min(1).optional()
+  })
+  .optional();
+
 export const blueprintSchema = z.object({
   schema_version: schemaVersionSchema.default(SCHEMA_VERSIONS.blueprint),
   id: z.string().min(1),
@@ -85,7 +124,7 @@ export const learningObjectiveSchema = z.object({
 
 export const learningObjectivesDocumentSchema = z.object({
   schema_version: schemaVersionSchema,
-  learning_objectives: z.array(learningObjectiveSchema.omit({ schema_version: true })).nonempty()
+  learning_objectives: z.array(learningObjectiveSchema.omit({ schema_version: true }))
 });
 
 export const errorTaxonomySchema = z.object({
@@ -121,7 +160,8 @@ export const attemptEventSchema = z.object({
   device_class: z.enum(['mobile', 'tablet', 'desktop']).optional(),
   net_state: z.enum(['online', 'offline']).optional(),
   paused_ms: z.number().nonnegative().optional(),
-  hint_used: z.boolean().optional()
+  hint_used: z.boolean().optional(),
+  engine: engineMetadataSchema
 });
 
 export const sessionEventSchema = z.object({
@@ -134,7 +174,8 @@ export const sessionEventSchema = z.object({
   start_ts: z.number().int().nonnegative(),
   end_ts: z.number().int().nonnegative().optional(),
   completed: z.boolean().optional(),
-  mastery_by_lo: z.record(z.number()).optional()
+  mastery_by_lo: z.record(z.number()).optional(),
+  engine: engineMetadataSchema
 });
 
 export const lessonEventSchema = z.object({
@@ -166,6 +207,7 @@ export function parseNdjsonLine(line, schema) {
  * @typedef {import('zod').infer<typeof learningObjectivesDocumentSchema>} LearningObjectivesDocument
  * @typedef {import('zod').infer<typeof errorTaxonomySchema>} ErrorTaxonomy
  * @typedef {import('zod').infer<typeof attemptEventSchema>} AttemptEvent
+ * @typedef {import('zod').infer<typeof engineMetadataSchema>} EngineMetadata
  * @typedef {import('zod').infer<typeof sessionEventSchema>} SessionEvent
  * @typedef {import('zod').infer<typeof lessonEventSchema>} LessonEvent
  */

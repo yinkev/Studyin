@@ -11,7 +11,7 @@ import {
   telemetryEnabled,
   validateBodySize
 } from '../../lib/server/events';
-import { SCHEMA_VERSIONS } from 'lib/core/schemas';
+import { SCHEMA_VERSIONS } from '../../lib/core/schemas';
 
 const baseAttempt = {
   schema_version: SCHEMA_VERSIONS.attemptEvent,
@@ -57,7 +57,9 @@ describe('events helpers', () => {
     process.env.INGEST_TOKEN = 'secret';
     const missing = requireAuthToken(null);
     expect(missing.ok).toBe(false);
-    expect(missing.status).toBe(401);
+    if (!missing.ok) {
+      expect(missing.status).toBe(401);
+    }
 
     const wrong = requireAuthToken('Bearer nope');
     expect(wrong.ok).toBe(false);

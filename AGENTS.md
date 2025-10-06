@@ -6,20 +6,24 @@
 - **EvidenceCurator** — Produce crops/PDF references (`content/evidence/**`), record page/figure/bbox/citation, verify crop loads <250 ms and dimensions stored (`cropPath` preferred, AVIF/WebP + fallback).
 - **ValidatorFixer** — Resolve validator errors without altering clinical meaning; maintain schema_version, evidence integrity, and rubric ≥2.7 for published items.
 - **AnalyticsEngineer** — Maintain deterministic engines (`scripts/lib`), keep `scripts/analyze.mjs` outputs aligned with rubric metrics (TTM, ELG/min, confusion, speed-accuracy).
-- **UIBuilder** — Implement Study/Exam/Drill/Summary flows (Next.js + Tailwind + Radix UI wrappers with shadcn patterns) with keyboard paths and “Why this next” transparency.
+- **UXResearcher** — Capture qualitative user feedback to understand the *why* behind user behavior. Periodically prompts for feedback on session engagement, confusion, and value. Logs findings in `docs/templates/QualitativeInsights.md`.
+- **UIBuilder** — Implement UI flows (Next.js + Tailwind + Radix UI wrappers with shadcn patterns) that consume use cases from `core/`. Ensures keyboard paths and “Why this next” transparency.
 <!-- Accessibility auditor role removed for this phase -->
 - **PerformanceTuner** — Guard budgets (TTI <2s, item render <100 ms, evidence <250 ms, CLS <0.1). Instrument Web Vitals.
 - **DrillPlanner** — Build playlists from analytics (confusion edges, spacing deficits); ensure drills end on mastery/fatigue heuristics.
 - **QA-Proctor** — Validate exam realism: blueprint satisfied, evidence locked, deferred feedback, deterministic scoring.
 - **ReleaseManager** — Own GitHub Flow, PR previews (Vercel), Conventional Commits, changelog, and rubric score ≥92 with ★ categories ≥2.8.
-- **DocScribe** — Keep README, AGENTS.md, rubric docs, prompts, and changelog accurate.
+- **DocScribe** — Keep README, AGENTS.md, rubric docs, prompts, and changelog accurate. Document queue/worker changes within 24 hours of merge.
 - **DataSteward** — Ensure telemetry (`data/events.ndjson`) is pseudonymous, export-ready, and schema_version aligned.
   - Configure ingestion tokens/env flags (`WRITE_TELEMETRY`, `INGEST_TOKEN`, rate limits) before enabling remote writes.
   - For Supabase sink and snapshots: keep `SUPABASE_SERVICE_ROLE_KEY` server-only, monitor `analytics_snapshots` retention, and scrub any PII before RAG indexing.
+  - Optional cloud stub lives in `docs/SUPABASE_SETUP.md`; do not enable `USE_SUPABASE_INGEST` outside vetted environments.
 - **RAGEngineer** — Maintain evidence chunk pipelines (`scripts/rag/*`), pgvector embeddings, deterministic ranking (`GET /api/search`), and recall@k quality checks.
 - **GraphUX** — Own React Flow visualizations (confusion graph, blueprint drift, session traces); ensure keyboard navigation, screen reader labels, and render <100 ms.
 - **TemporalAnalyst** — Track long-term analytics signals (TTM velocity, item drift, reliability metrics); validate hourly refresh cadence and snapshots health.
-- **AdaptiveEngineer (Agent)** — Own the Personal Adaptive Study Engine end‑to‑end: Rasch/GPCM + Elo fallback, in‑session selector, cross‑topic Thompson Sampling scheduler, FSRS retention lane, blueprint rails (±5%), exposure caps (≤1/day, ≤2/week, 96h cooldown), and stop rules. Maintain deterministic behavior, telemetry logging, and “Why this next” transparency.
+- **AdaptiveEngineer (Agent)** — Own the Personal Adaptive Study Engine end‑to‑end: Rasch/GPCM + Elo fallback, in‑session selector, cross-topic Thompson Sampling scheduler, FSRS retention lane, blueprint rails (±5%), exposure caps (≤1/day, ≤2/week, 96h cooldown enforced via utilities), and stop rules. Maintain deterministic behavior, telemetry logging (attempt/session `engine` metadata), and “Why this next” transparency.
+- Development guardrail: the `/upload` ingestion route is dev-only (`NEXT_PUBLIC_DEV_UPLOAD=1`) and must never run in production. Generated assets require validator + human review before entering the item bank.
+- Dev-only content factory: the job queue (`data/queue/jobs.json`) and `scripts/worker.ts` must remain local-only. Confirm the worker is stopped before production deploys and scrub persisted jobs if they include sensitive data.
 
 ### New: ProjectManager (Studyin PM)
 - Drives execution and cadence. Keeps the plan current, raises risks, and enforces gates.
@@ -61,6 +65,7 @@ npm install          # Install deps (zod, vitest)
 npm run validate:items  # Validate all items (blocking gate)
 npm run analyze         # Generate public/analytics/latest.json
 npm test                # Run Vitest engine smoke tests
+npx tsx scripts/worker.ts  # Dev content factory worker (run alongside npm run dev when using /upload)
 ```
 
 Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run build`, `npm run pm:pulse`.
@@ -73,7 +78,7 @@ Optional: `npm run dev` (auto-opens browser), `npm run dev:start`, `npm run buil
 - **Analytics Gate**: `latest.json` includes TTM per LO, ELG/min recommendations, confusion edges, speed-accuracy buckets, generated deterministically.
 <!-- A11y gate removed for this phase -->
  - **Perf (Relaxed)**: Budgets may be exceeded when justified by visuals/animations.
- - **Engine Gate**: For the adaptive engine, enforce: blueprint rails within ±5% (per system/LO), exposure caps (≤1/day, ≤2/week, 96h cooldown), randomesque top‑K selector, stop rules (`SE ≤ 0.20` with min items, or `ΔSE` plateau, or `mastery_prob ≥ 0.85` with probe in `b ∈ [θ̂ ± 0.3]`), retention budgeting ≤40% baseline (≤60% if overdue >7d). Log reasons/signals for each selection.
+- **Engine Gate**: For the adaptive engine, enforce: blueprint rails within ±5% (per system/LO), exposure caps (≤1/day, ≤2/week, 96h cooldown) with optional `STUDY_NO_CAPS` development override, randomesque top‑K selector, stop rules (`SE ≤ 0.20` with min items, or `ΔSE` plateau, or `mastery_prob ≥ 0.85` with probe in `b ∈ [θ̂ ± 0.3]`), retention budgeting ≤40% baseline (≤60% if overdue >7d). Log reasons/signals for each selection in the attempt/session `engine` metadata.
 
 
 
@@ -170,6 +175,16 @@ Keep this SOP current as tooling evolves. Changes require DocScribe + ReleaseMan
   - Review staging: `git status -sb`.
   - Commit: `git commit -m "feat(scope): summary"` (e.g., `feat(items): add radial nerve set`).
   - Push via GitHub Flow (feature branch → PR → review → merge → deploy).
+
+- **Staged Process (CRITICAL)**: Governs documentation and planning overhead.
+  - **Stage 1 (Milestones A-C): Minimum Viable Process.**
+    - **Goal:** Maximize velocity to a working MVP.
+    - **Process:** No formal `PRD.md` or `IMPLEMENTATION.md` required.
+    - **Requirement:** A clear objective must be stated in the PR description or a lightweight `DECISION_RECORD.md`. Focus on the core agent loop: `ItemSmith`, `ValidatorFixer`, `UIBuilder`, `ProjectManager`.
+  - **Stage 2 (Milestones D-E): Full Process.**
+    - **Goal:** Ensure stability and rigor for the complex Adaptive Engine.
+    - **Process:** Re-introduce the full `PRD.md` and `IMPLEMENTATION.md` workflow as defined in "Planning Orchestration".
+    - **Trigger:** This stage begins when we start work on Milestone D or E.
 
 - **Item status lifecycle**
   - `draft` → authored; awaiting SME review.

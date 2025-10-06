@@ -28,6 +28,8 @@ yarn-error.log*
 # Local data / outputs
 data/events.ndjson
 data/learner-state/
+data/uploads/
+data/queue/
 public/analytics/latest.json
 public/analytics/rubric-score.json
 

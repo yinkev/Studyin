@@ -16,6 +16,13 @@ import { computeStudyDashboards } from '../../lib/study-insights';
 import { loadLearnerState } from '../../lib/server/study-state';
 import { SummaryDashboards } from '../../components/SummaryDashboards';
 
+type AttemptRow = {
+  session_id: string | null;
+  item_id: string | null;
+  correct: boolean | null;
+  ts_submit: number | string | null;
+};
+
 async function readJsonIfExists<T = any>(p: string): Promise<T | null> {
   try {
     const raw = await fs.readFile(p, 'utf8');
@@ -33,14 +40,13 @@ async function loadRecentAttempts(limit = 25) {
     .select('session_id,item_id,correct,ts_submit')
     .order('ts_submit', { ascending: false })
     .limit(limit);
-  return (
-    data?.map((row) => ({
-      session_id: row.session_id,
-      item_id: row.item_id,
-      correct: Boolean(row.correct),
-      ts_submit: Number(row.ts_submit ?? 0)
-    })) ?? []
-  );
+  const rows: AttemptRow[] = Array.isArray(data) ? (data as AttemptRow[]) : [];
+  return rows.map((row) => ({
+    session_id: row.session_id ?? '',
+    item_id: row.item_id ?? '',
+    correct: Boolean(row.correct),
+    ts_submit: Number(row.ts_submit ?? 0)
+  }));
 }
 
 export default async function SummaryPage() {

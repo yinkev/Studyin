@@ -1,264 +1,131 @@
-# Studyin Module Arcade (Skeleton)
+# Studyin: The Personal Learning Companion (MVP)
 
-Deterministic, evidence-first scaffold for Studyin modules. It ships with an OMS-1 upper-limb sample bank today, but the prompts, CI, and agents are module-agnostic so you can retarget new systems without retooling.
-
-UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + OKC (Duolingo‑inspired) design. Heavy visuals via anime.js (micro‑motion), ECharts (charts), Splide (carousels), and Three.js (3D viewer). React Flow powers the custom graphs.
+This project is a local-first, AI-powered learning application designed to help you study your own materials more effectively. You can upload documents, have them automatically transformed into interactive lessons, and get personalized recommendations on what to study next.
 
 ## Quick Start
 
-```bash
-npm install
-npm run validate:items   # Validate sample bank (A–E gate)
-npm run analyze          # Generate public/analytics/latest.json
-npm run jobs:refit       # (manual) Run weekly Rasch/GPCM refit summary (writes data/refit-summaries)
-npm test                 # Run engine smoke tests (Vitest)
+1.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
 
-# Dev server (auto opens http://localhost:3000)
-npm run dev
-```
+2.  **Run the Development Server**
+    ```bash
+    npm run dev
+    ```
+    This will open the application in your browser at `http://localhost:3000`.
 
-Requirements: Node 20.14.x LTS (set via `.nvmrc`). Install Git LFS for evidence assets.
+3.  **(Optional) Start the Content Factory Worker**
+    ```bash
+    npx tsx scripts/worker.ts
+    ```
+    The worker polls `data/queue/jobs.json` and writes finished lessons to `data/lessons/`. Keep it running while you iterate on uploads; stop with `Ctrl+C` when finished.
 
-## Repository Layout
+## Core Workflow
 
-```
-public/analytics/          # Generated analytics JSON (latest.json)
-config/                    # Blueprint, LO hierarchy, error taxonomy
-content/banks/upper-limb-oms1/  # One JSON per item (A–E only)
-content/evidence/          # PDFs/crops (tracked via Git LFS)
-data/                      # Local telemetry (events.ndjson)
-data/state/                # Learner ability & exposure snapshots (override via STUDY_STATE_DIR)
-data/refit-summaries/      # Weekly Rasch refit outputs (`npm run jobs:refit`)
-app/api/                   # Next.js API routes (telemetry, analytics, forms, health)
-app/study/                 # Study flow (server props + actions)
-lib/server/                # Server-only helpers (forms, telemetry, Supabase adapters)
-lib/rag/                   # Deterministic embedding helpers (no external calls)
-scripts/lib/               # Deterministic engines + shared schemas
-scripts/rag/               # Evidence indexing + recall verification scripts
-scripts/validate-items.mjs # Validator CLI gate (Zod-based)
-scripts/analyze.mjs        # Analytics pipeline → latest.json + Supabase snapshot
-supabase/                  # SQL schema + RLS policies for Supabase ingestion/index
-tests/                     # Vitest smoke tests for engines
-AGENTS.md                  # Agent SOPs, rubric gates, workflow
-PLAN.md                    # Current milestones, To‑Dos, cadence
-```
+The application is built around a simple, powerful loop:
 
-## Architecture Boundaries
+1.  **Upload & Process:**
+    - Navigate to the `/upload` page.
+    - Select a document (PDF, PPT, etc.) from your computer and click "Upload and Process".
+    - The upload enqueues a background job via `POST /api/queue/enqueue`.
+    - The UI polls `GET /api/queue/status/:jobId`; once the worker finishes, it fetches the lesson with `GET /api/lessons/:lessonId` and shows the confirmation state.
+    - Confirm the tags to save the new lesson (persisted under `data/lessons/`).
 
-Layers and allowed imports (behavior-neutral guardrails):
-- Core (`@core/*` → `core/*`)
-  - Contains shared schemas/types and pure helpers.
-  - May import nothing outside of Node/DOM types.
-- Engine (`@engine/*` → `lib/engine/*`, public barrel `@engine`)
-  - Facade over deterministic algorithms and selectors.
-  - May depend on Core. Must not import `scripts/lib/*.mjs` directly; use shims under `lib/engine/shims/**` only.
-- Analytics (`@analytics/*` → `scripts/lib/*`)
-  - Deterministic scripts (Elo/Rasch/GPCM, scheduler, schemas) kept in `.mjs` for CLI usage.
-  - TS code must not import these directly; route through Engine shims or explicit API surfaces.
-- Server (`@server` → `lib/server/index.ts`)
-  - Server-only forms, events, state, and adapters.
-  - May import Engine and Core; must not import UI.
-- UI (`@ui/*` → `components/*` and `app/**`)
-  - React components and pages. May consume Server, Engine, and Core public APIs; never import `.mjs` modules directly.
+2.  **Study:**
+    - Navigate to the `/study` page.
+    - Here you will find the AI Coach's suggestion for what to study next.
+    - You can also enter "Manual Mode" to browse your entire library and choose any lesson you wish.
 
-Disallowed patterns (enforced by review):
-- Domain/UI code → `scripts/lib/*.mjs` (use shims or public barrels instead).
-- Cross-imports that violate the arrow of dependencies (e.g., Core importing Engine or UI).
+3.  **Learn:**
+    - As you complete lessons and answer questions, the Personalization Coach learns about your strengths and weaknesses, improving its future recommendations.
 
-Barrels and aliases:
-- Engine public entry: `@engine` → `lib/engine/index.ts`.
-- Server public entry: `@server` → `lib/server/index.ts`.
-- Keep internal paths private; prefer barrels for stable imports.
+### Background Queue & Worker (Dev)
 
-## Deterministic Engines (stubs)
+- Jobs live in `data/queue/jobs.json` and move `queued → processing → completed|failed`.
+- API endpoints:
+  - `POST /api/queue/enqueue` — create a job (called by `/upload`).
+  - `GET /api/queue/status/:jobId` — poll state from the client.
+  - `GET /api/lessons/:lessonId` — fetch the generated lesson JSON.
+- The worker script consumes the queue deterministically. Restarting it is safe; jobs are persisted.
+- Failed jobs retain their error message; fix the root cause, delete the line from `jobs.json` if needed, and re-upload.
 
-- `scripts/lib/elo.mjs` — Elo-lite with adjustable K for learn/exam.
-- `scripts/lib/rasch.mjs` — Rasch 1‑PL helpers (EAP via GH quadrature, info, mastery probability).
-- `scripts/lib/gpcm.mjs` — GPCM PMF scaffolding (extend thresholds `τ`).
-- `scripts/lib/selector.mjs` — In‑session utility and randomesque top‑K.
-- `scripts/lib/scheduler.mjs` — Thompson Sampling over LOs optimizing ΔSE/min with seeded RNG.
-- `scripts/lib/fsrs.mjs` — FSRS‑inspired updates and budgeting helpers.
-- `scripts/lib/exposure.mjs` — Caps and multipliers enforcing ≤1/day, ≤2/week, 96h cooldown.
-- `scripts/lib/spacing.mjs` — Half-life updates + next review scheduling.
-- `scripts/lib/blueprint.mjs` — Feasibility checks and greedy form builder.
-- `lib/study-engine.ts` — Shared adaptive engine (Rasch EAP, scheduler arms, retention budgeting, “Why this next”).
-- `app/study/actions.ts` — Server action that logs attempts, updates learner state JSON, and returns refreshed ability signals.
+### Environment Flags (Dev)
 
-Engine behavior is covered by `npm test` smoke tests. Update these modules before wiring into the UI.
-
-## Determinism Policy
-
-- No runtime LLM/API calls in the app or engines. All analytics, selection, and scoring are deterministic.
-- Randomness must be seeded and reproducible (e.g., scheduler arms, sampling, or visual effects that influence logic).
-- Evidence and analytics produce the same outputs for the same inputs (snapshots logged in `public/analytics/`).
-- External systems (e.g., Supabase) are used only as sinks/sources; algorithms must not depend on non-deterministic responses.
-- “Why this next” explains selection using explicit numeric signals (e.g., SE, mastery probability, spacing pressure).
-- Performance budgets guide but do not alter algorithmic determinism.
-
-## Evidence Tooling
-
-- Generate (OpenAI): `node scripts/tools/generate-image.mjs --prompt "ulnar nerve diagram" --out content/evidence/.../img.png`
-- Fetch: `node scripts/tools/fetch-evidence.mjs --url https://... --out content/evidence/.../img.png`
-- Link to item: `node scripts/tools/link-evidence.mjs --id item.ulnar.claw-hand --path content/evidence/.../img.png --review`
-- Relax evidence during setup: `REQUIRE_EVIDENCE_CROP=0 npm run validate:items` (requires `citation` or `source_url`).
-
-## Temporal RAG Tooling
-
-- `node scripts/rag/build-index.mjs` — deterministic chunker that reads item stems/rationales and upserts embeddings into Supabase `evidence_chunks` (requires Supabase env vars).
-- `node scripts/rag/verify-index.mjs` — recall@k smoke test that ensures target items appear at the top of results.
-- Query top-k evidence:
-  ```bash
-  curl "http://localhost:3000/api/search?q=ulnar%20nerve&lo=lo.ulnar-nerve&k=5" \
-    -H "Authorization: Bearer dev-analytics-refresh"
-  ```
-
-## Tests & CI
-
-- Unit: `npm test` (Vitest).
-- CI runs: validate → unit → analyze → build.
-- PM pulse: `npm run score:rubric` writes `public/analytics/rubric-score.json` for tracking.
-
-## Agents & Prompts
-
-- See `scripts/codex/` for prompts:
-  - `studyin-planner.md` — planning agent (consumes MODULE inputs)
-  - `prd-writer.md` — world-class PRD author with internal rubric
-  - `implementation-writer.md` — translates PRD into deterministic IMPLEMENTATION.md
-  - `itemsmith.md` — author MCQs
-  - `validator-fixer.md` — fix validator failures
-  - `studyin-pm.md` — project manager agent
-  - Recommendation: see `AGENTS.md` → Agent Recommendation Playbook for which agent and model to use next (tiers: `gpt-5 {minimal,low,medium,high}` and `gpt-5-codex {low,medium,high}`).
-
-## Model Tiers & Configuration
-- Configure defaults in `~/.codex/config.toml`:
-  - `model = "gpt-5" | "gpt-5-codex"`
-  - `model_reasoning_effort = "minimal" | "low" | "medium" | "high"`
-- Recommended defaults for this repo:
-  - Repo-aware work: `gpt-5-codex` + `high`
-  - Narrative docs: `gpt-5` + `high` (or `medium` for speed)
-  - Cheap triage: `gpt-5-codex` + `low`
-- Override per run via CLI flags or project profiles if supported by your Codex client.
-
-## MCP Tooling (Context7, Codex MCP, Chrome DevTools MCP)
-
-- Context7 docs: prefer Context7 MCP for library documentation and syntax help. Export `CONTEXT7_API_KEY` in your shell; never hard‑code secrets in configs.
-- Codex as MCP: clients should spawn Codex via stdio (`codex mcp serve`). For quick inspection without a client, run the Inspector:
-  - `npx @modelcontextprotocol/inspector codex mcp`
-  - If ports 6274/6277 are busy: `CLIENT_PORT=8080 SERVER_PORT=9000 npx @modelcontextprotocol/inspector codex mcp`
-- Chrome DevTools MCP: run `npm run dev` (http://localhost:3000) and start Chrome with `--remote-debugging-port=9222`. Attach the DevTools MCP to review performance.
-- Usage patterns
-  - Context7 resolve → fetch → cite
-    1) Resolve canonical docs: use Context7 to locate the exact library/version references you need.
-    2) Fetch the specific sections/snippets required (minimize payloads).
-    3) Cite in PRs/issues: include doc titles + deep links; summarize key constraints you relied upon.
-    Notes: keep citations deterministic (no runtime calls from the app). Do not paste API keys or PII in PRs.
-  - Repo MCP commands (typical)
-    - Start Codex server: `codex mcp serve`
-    - Inspect via MCP Inspector: `npx @modelcontextprotocol/inspector codex mcp`
-    - Attach Chrome DevTools MCP: `npx chrome-devtools-mcp --target http://localhost:3000 --chrome-port 9222`
-  - Project flow
-    1) Seed context with `README.md`, `AGENTS.md`, and `PLAN.md`.
-    2) Ask the PRD Architect/Implementation Strategist to draft or update artifacts.
-    3) Use Context7 citations in PR descriptions for any external references.
-
-### Quick setup
-1. Copy `.mcp/servers.example.json` to your MCP client config (often `~/.config/mcp/servers.json`).
-2. Adjust paths if the repo lives elsewhere.
-3. Example server entries (STDIO transport):
-```
-{
-  "mcpServers": {
-    "codex": {
-      "type": "stdio",
-      "command": "codex",
-      "args": ["mcp", "serve"]
-    },
-    "chrome-devtools": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["chrome-devtools-mcp", "--target", "http://localhost:3000", "--chrome-port", "9222"]
-    }
-  }
-}
-```
-Notes
-- `codex mcp serve` exits immediately if no client is attached; your MCP client is responsible for spawning and maintaining the stdio pipes.
+- `NEXT_PUBLIC_DEV_UPLOAD=1` — enables `/upload` and dev pages.
+- `WRITE_TELEMETRY=1` — writes local NDJSON to `data/events.ndjson`.
+- `INGEST_TOKEN=...` — optional bearer token to guard ingest routes.
+- `USE_SUPABASE_INGEST=0` — keep off unless following `docs/SUPABASE_SETUP.md`.
 
 
-## Working With Codex & Git
+## Documentation Map
 
-- Use `gpt-5-codex-high` for repo-aware tasks (code, items, analytics). Switch to `gpt-5-high` only for narrative ideation.
-- Stage intentionally: `git add <path>`; review via `git status -sb`; commit with Conventional Commits (`feat(scope): summary`).
-- Follow GitHub Flow: feature branch → PR → review → merge → deploy.
-- See `AGENTS.md` for role responsibilities, SOPs, and evidence checklists.
- - See `docs/WORKFLOW.md` for the agent invocation playbook and gates.
- - See `docs/TAILWIND_V4_RUNBOOK.md` for Tailwind v4 compliance steps.
-
-## Data & Validation Pipeline
-
-- `scripts/lib/schema.mjs` defines shared Zod schemas for items, blueprint, LOS, events.
-- `npm run validate:items` enforces:
-  - schema_version alignment
-  - ABCDE choices with unique text
-  - per-choice rationales (correct + distractors)
-  - evidence includes `file`, `page`, and by default `bbox` or `cropPath`
-  - LO IDs exist in `config/los.json`
-  - published items must have `rubric_score ≥ 2.7`
-  - To relax evidence during setup: run with `REQUIRE_EVIDENCE_CROP=0` to allow citation‑only (must include `citation` or `source_url`)
-- `npm run analyze` reads `data/events.ndjson` (if present) and writes placeholder analytics to `public/analytics/latest.json`.
-- `npm run dev` auto-opens the app in your default browser (set `DEV_URL` to override) — use `npm run dev:start` to run without auto-opening.
-- Analytics output now includes `retention_summary` (total reviews, correct/incorrect counts, success rate) derived from FSRS retention events.
-
-## Telemetry & Analytics APIs
-
-- `POST /api/attempts` — ingest attempt events (schema `AttemptEvent`); token required (`Authorization: Bearer <INGEST_TOKEN>`). Rate limited (10 KB, 60 req/min). Writes to NDJSON unless `USE_SUPABASE_INGEST=1`, in which case rows land in Supabase `attempts`.
-- `POST /api/sessions` — session lifecycle events; same validation + token path (`SessionEvent`).
-- `POST /api/analytics/refresh` — recomputes analytics. With `READ_ANALYTICS_FROM_SUPABASE=1` (default when Supabase ingest enabled) it pulls attempts from Supabase and writes both `public/analytics/latest.json` and the `analytics_snapshots` table.
-- `GET /api/snapshots/latest` — returns metadata + payload for the most recent analytics snapshot (service-role required).
-- `GET /api/forms` — deterministic blueprint form builder (`length`, `seed`, `publishedOnly`). Returns items without evidence crops.
-- `GET /api/search` — temporal RAG endpoint (query, LO filters, recency). Returns top-k evidence snippets with citations.
-- `GET /api/health` — reports telemetry + analytics flags, `last_generated_at`, and file existence.
-
-- Study server actions persist learner state under `data/state/<learnerId>.json`; set `STUDY_STATE_DIR` to relocate (e.g., RAM disk or Supabase mount). Each file stores LO ability (`thetaHat`, `SE`), recent stop-rule metrics, and per-item exposure timestamps for scheduler cooldowns.
-- `lib/study-insights.ts` computes dashboard data (Priority/Stalled LOs, Overexposed items) surfaced in the Study UI, combining learner state and `public/analytics/latest.json`.
-- Weekly Rasch refit: `npm run jobs:refit` (or cron/n8n call) writes JSON to `data/refit-summaries/`; review with AnalyticsEngineer and archive older files. A GitHub Action (`.github/workflows/refit-weekly.yml`) runs every Monday at 07:00 UTC and uploads the latest summary artifact.
-
-### Environments
-- Copy `.env.example` to `.env.local` and populate:
-  - `WRITE_TELEMETRY`, `INGEST_TOKEN`, `ANALYTICS_REFRESH_TOKEN`
-  - `USE_SUPABASE_INGEST`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-  - `READ_ANALYTICS_FROM_SUPABASE` (default auto-follows `USE_SUPABASE_INGEST`)
-  - Optional NDJSON fallbacks (`EVENTS_PATH`, `ANALYTICS_OUT_PATH`)
-- Install Supabase client: `npm i @supabase/supabase-js`
-- Apply Supabase schema & policies (`supabase/schema.sql`, `supabase/policies.sql`)
-
-## Exam Form API
-
-- Request a deterministic blueprint-aligned form via `GET /api/forms?length=20&seed=42&publishedOnly=1`.
-- The endpoint returns `{ id, blueprint_id, length, seed, items[] }` where each item omits evidence crops to keep exams locked.
-- If `publishedOnly=1` removes too many items to satisfy the blueprint, the route responds `409` with a deficit report so QA-Proctor can triage gaps.
-- Server components can import `buildExamForm` from `lib/server/forms` directly to avoid extra HTTP hops inside the app.
-
-## Analytics & Snapshots
-
-- `scripts/lib/analyzer-core.mjs` exports deterministic summarizers (TTM, ELG/min, confusion, speed×accuracy, reliability scores, temporal drift).
-- `npm run analyze` reuses the core and writes `public/analytics/latest.json` (and inserts into `analytics_snapshots` when Supabase configured).
-- Snapshots table retains history; fetch via `/api/snapshots/latest` or directly in Supabase for reporting.
-- Schedule hourly refresh (cron hitting `/api/analytics/refresh`) so latest.json stays current.
-
-## Supabase Integration
-
-- Apply SQL: `supabase/schema.sql` + `supabase/policies.sql` (attempts, sessions, analytics_snapshots, evidence_chunks + RLS).
-- Vector search for RAG relies on pgvector; ensure `create extension if not exists vector;` is run (included in schema script).
-- Keep `SUPABASE_SERVICE_ROLE_KEY` server-only; clients never see it.
-- Evidence stays in Git LFS; the RAG index stores chunk text + metadata only.
-
-## Next Steps
-
-1. Seed Supabase `attempts` with historical telemetry (use `scripts/tools/seed-attempts.mjs`) and verify analytics snapshots.
-2. Monitor hourly refresh job and `/api/health` (`last_generated_at` should be recent).
-3. Expand RAG coverage (chunk more evidence sources; run `scripts/rag/build-index.mjs`).
-4. Iterate React Flow dashboards (confusion graph, blueprint gap explorer, session trace) with OKC polish.
-5. Broaden automated tests (Vitest + integration) to cover RAG search, reliability metrics, and snapshot endpoints.
-
-Refer to `AGENTS.md` for role expectations, acceptance gates, and workflow SOPs.
+- Queue & Worker Runbook: see “Background Queue & Worker (Dev)”.
+- Authoring Automations: docs/AUTHORING_AUTOMATION.md
+- Engine Spec & Prompts: docs/personal-adaptive-study-engine-spec.md
+- Optional Cloud Setup: docs/SUPABASE_SETUP.md
+- Archived history: docs/archive/README_HISTORY.md, docs/archive/IMPLEMENTATION_HISTORY.md, docs/archive/ui-blueprint/
+> 
+> ### Optional Cloud (Supabase)
+> 
+> Supabase integration remains opt-in. To mirror telemetry/evidence into Supabase:
+> 
+> 1. Create a Supabase project and run `supabase/schema.sql` then `supabase/policies.sql` to create tables and enable Row Level Security.
+> 2. Set env vars (server-only):
+> 
+>    ```bash
+>    USE_SUPABASE_INGEST=1
+>    SUPABASE_URL=https://<project>.supabase.co
+>    SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+>    ```
+> 
+>    Leaving `USE_SUPABASE_INGEST` unset keeps the app in local-only mode.
+> 
+> 3. Consume helpers in `lib/server/supabase.ts` and `scripts/lib/supabase-ingest.mjs` from jobs or CLI scripts (`scripts/analyze.mjs`, `scripts/rag/build-index.mjs`) to insert telemetry or fetch evidence chunks.
+> 4. A scheduled workflow (`.github/workflows/analytics-sync.yml`) runs `npm run analyze` daily at 07:00 UTC (and on-demand via workflow_dispatch). When Supabase secrets are present it automatically inserts the analytics snapshot.
+> 
+> Detailed steps live in `docs/SUPABASE_SETUP.md`. Do not enable the flag in production until policies are hardened and credentials are secured.
+> 
+> ### Dev Tooling
+> 
+> - `/dev/authoring` — React Flow workbench for LessonSmith timelines with live JSON preview (requires the dev flag noted above).
+> - `/dev/rag-inspector` — Query `/api/search` to inspect deterministic temporal retrieval signals.
+> - `docs/AUTHORING_AUTOMATION.md` — n8n automation stubs (upload trigger, validator sweep, analytics sync).
+> 
+> ## Architecture Boundaries
+> 
+> Layers and allowed imports (behavior-neutral guardrails):
+> - Core (`@core/*` → `core/*`)
+>   - Contains shared types, schemas, and business logic use cases.
+>   - May import nothing outside of Node/DOM types.
+> - Engine (`@engine/*` → `lib/engine/*`, public barrel `@engine`)
+>   - Facade over deterministic algorithms and selectors.
+>   - May depend on Core. Must not import `scripts/lib/*.mjs` directly; use shims under `lib/engine/shims/**` only.
+> - Analytics (`@analytics/*` → `scripts/lib/*`)
+>   - Deterministic scripts (Elo/Rasch/GPCM, scheduler, schemas) kept in `.mjs` for CLI usage.
+>   - TS code must not import these directly; route through Engine shims or explicit API surfaces.
+> - Server (`@server` → `lib/server/index.ts`)
+>   - Server-only forms, events, state, and adapters.
+>   - May import Engine and Core; must not import UI.
+> - UI (`@ui/*` → `components/*` and `app/**`)
+>   - React components and pages. May consume Server, Engine, and Core public APIs; never import `.mjs` modules directly.
+> 
+> ## Deterministic Engines (stubs)
+> 
+> - `scripts/lib/elo.mjs` — Elo-lite with adjustable K for learn/exam.
+> - `scripts/lib/rasch.mjs` — Rasch 1‑PL helpers (EAP via GH quadrature, info, mastery probability).
+> - `scripts/lib/gpcm.mjs` — GPCM PMF scaffolding (extend thresholds `τ`).
+> - `scripts/lib/selector.mjs` — In‑session utility and randomesque top‑K.
+> - `scripts/lib/scheduler.mjs` — Thompson Sampling over LOs optimizing ΔSE/min with seeded RNG.
+> - `scripts/lib/fsrs.mjs` — FSRS‑inspired updates and budgeting helpers.
+> - `lib/study-engine.ts` — Shared adaptive engine (Rasch EAP, scheduler arms, retention budgeting, “Why this next”).
+> 
+> ## Determinism Policy
+> 
+> - No runtime LLM/API calls in the app or engines. All analytics, selection, and scoring are deterministic.
+> - Randomness must be seeded and reproducible.
+> 
+> ### TypeScript Bridge Notes
+> 
+> - `types/scripts-modules.d.ts` centralizes declaration stubs for deterministic `.mjs` helpers used by the engine and server layers. Extend this file whenever you add a new script so TypeScript callers avoid `any`/`unknown` cascades.
+> - `types/animejs.d.ts` provides the minimal default export expected by our animated UI components; update it if you rely on additional APIs (e.g., timelines or easing helpers).
