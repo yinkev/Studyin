@@ -1,4 +1,4 @@
-import { attemptEventSchema } from 'lib/core/schemas';
+import { attemptEventSchema } from '../../lib/core/schemas';
 import { appendAttempt } from '../../lib/server/events';
 import { TelemetryService } from '../../core/types/repositories';
 import type { z } from 'zod';

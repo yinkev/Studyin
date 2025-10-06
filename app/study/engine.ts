@@ -1,4 +1,10 @@
-import { attemptEventSchema, sessionEventSchema } from 'lib/core/schemas';
+import {
+  attemptEventSchema,
+  sessionEventSchema,
+  SCHEMA_VERSIONS,
+  type AttemptEvent,
+  type SessionEvent
+} from '../../lib/core/schemas';
 import {
   STOP_RULES,
   scoreCandidates,
@@ -17,6 +23,7 @@ import {
   type LearnerLoState,
   rasch
 } from '../../lib/study-engine';
+import type { EngineMetadata } from '../../core/types/events';
 import {
   loadLearnerState,
   saveLearnerState,
@@ -35,9 +42,6 @@ async function writeSessionDefault(event: SessionEvent) {
   await appendSession(event);
 }
 
-type AttemptEvent = ReturnType<typeof attemptEventSchema.parse>;
-type SessionEvent = ReturnType<typeof sessionEventSchema.parse>;
-
 export interface EngineTelemetry {
   writeAttempt(event: AttemptEvent): Promise<void>;
   writeSession(event: SessionEvent): Promise<void>;
@@ -48,13 +52,42 @@ const defaultTelemetry: EngineTelemetry = {
   writeSession: writeSessionDefault
 };
 
-export async function logAttemptEvent(event: AttemptEvent, telemetry: EngineTelemetry = defaultTelemetry) {
-  const parsed = attemptEventSchema.parse(event);
+interface LogAttemptParams {
+  event: Omit<AttemptEvent, 'schema_version' | 'app_version' | 'engine'>;
+  engine?: EngineMetadata;
+  appVersion?: string;
+  telemetry?: EngineTelemetry;
+}
+
+export async function logAttemptEvent({
+  event,
+  engine,
+  appVersion = '0.1.0-dev',
+  telemetry = defaultTelemetry
+}: LogAttemptParams) {
+  const payload: AttemptEvent = {
+    ...event,
+    schema_version: SCHEMA_VERSIONS.attemptEvent,
+    app_version: appVersion,
+    engine
+  };
+  const parsed = attemptEventSchema.parse(payload);
   await telemetry.writeAttempt(parsed);
 }
 
-export async function logSessionEvent(event: SessionEvent, telemetry: EngineTelemetry = defaultTelemetry) {
-  const parsed = sessionEventSchema.parse(event);
+export async function logSessionEvent({
+  event,
+  engine,
+  appVersion = '0.1.0-dev',
+  telemetry = defaultTelemetry
+}: {
+  event: Omit<SessionEvent, 'schema_version' | 'app_version' | 'engine'>;
+  engine?: EngineMetadata;
+  appVersion?: string;
+  telemetry?: EngineTelemetry;
+}) {
+  const payload: SessionEvent = { ...event, schema_version: SCHEMA_VERSIONS.sessionEvent, app_version: appVersion, engine };
+  const parsed = sessionEventSchema.parse(payload);
   await telemetry.writeSession(parsed);
 }
 

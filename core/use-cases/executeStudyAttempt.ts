@@ -7,7 +7,7 @@ import {
   difficultyToBeta,
   rasch
 } from '../../lib/study-engine';
-import { attemptEventSchema } from 'lib/core/schemas';
+import { attemptEventSchema } from '../../lib/core/schemas';
 import type { LearnerState } from '../../lib/server/study-state';
 
 interface Dependencies {
@@ -34,6 +34,10 @@ export class ExecuteStudyAttempt {
 
     const beta = difficultyToBeta(data.difficulty);
 
+    let aggregateTheta = 0;
+    let aggregateSe = 0;
+    let countedLos = 0;
+
     for (const loId of data.loIds) {
       const current = los[loId] ?? {
         thetaHat: 0,
@@ -50,6 +54,10 @@ export class ExecuteStudyAttempt {
         response: { k: data.correct ? 1 : 0, m: 1 },
         difficulty: beta
       });
+
+      aggregateTheta += thetaHat;
+      aggregateSe += se;
+      countedLos += 1;
 
       const mastery = rasch.masteryProbability(thetaHat, se);
       los[loId] = {
@@ -86,6 +94,21 @@ export class ExecuteStudyAttempt {
     const duration = typeof data.durationMs === 'number' ? Math.max(0, data.durationMs) : 60_000;
     const tsSubmit = now;
     const tsStart = tsSubmit - duration;
+    const avgThetaHat = countedLos > 0 ? aggregateTheta / countedLos : 0;
+    const avgSe = countedLos > 0 ? Math.max(0.0001, aggregateSe / countedLos) : 0.8;
+    const masteryProb = rasch.masteryProbability(avgThetaHat, avgSe);
+    const selectorMetadata = {
+      ...(data.engine?.selector ?? {}),
+      item_id: data.itemId,
+      lo_ids: data.loIds,
+      theta_hat: avgThetaHat,
+      se: avgSe,
+      mastery_probability: masteryProb
+    };
+    const engineMetadata = {
+      ...(data.engine ?? {}),
+      selector: selectorMetadata
+    };
     const attemptEvent = attemptEventSchema.parse({
       app_version: data.appVersion ?? 'dev',
       session_id: data.sessionId ?? randomUUID(),
@@ -98,7 +121,8 @@ export class ExecuteStudyAttempt {
       mode: 'learn',
       choice: data.choice,
       correct: data.correct,
-      opened_evidence: data.openedEvidence ?? false
+      opened_evidence: data.openedEvidence ?? false,
+      engine: engineMetadata
     });
 
     await this.telemetry.recordAttempt(attemptEvent);

@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
 import { RetentionReviewInput, RetentionReviewInputSchema, RetentionReviewResult } from '../types/events';
 import { LearnerStateRepository, TelemetryService } from '../types/repositories';
-import { updateHalfLife, scheduleNextReview } from 'lib/engine/shims/fsrs';
-import { attemptEventSchema } from 'lib/core/schemas';
+import { updateHalfLife, scheduleNextReview } from '../../lib/engine/shims/fsrs';
+import { attemptEventSchema } from '../../lib/core/schemas';
 
 interface Dependencies {
   repository: LearnerStateRepository;
@@ -52,6 +52,17 @@ export class ExecuteRetentionReview {
       retention
     });
 
+    const overdueDays = card.nextReviewMs ? Math.max(0, now - card.nextReviewMs) / (1000 * 60 * 60 * 24) : 0;
+    const retentionMetadata = {
+      ...(data.engine?.retention ?? {}),
+      max_days_overdue: Number.isFinite(overdueDays) ? overdueDays : undefined,
+      reason: data.engine?.retention?.reason ?? (data.correct ? 'retention-success' : 'retention-lapse')
+    };
+    const engineMetadata = {
+      ...(data.engine ?? {}),
+      retention: retentionMetadata
+    };
+
     const attemptEvent = attemptEventSchema.parse({
       app_version: data.appVersion ?? 'dev',
       session_id: data.sessionId ?? randomUUID(),
@@ -64,7 +75,8 @@ export class ExecuteRetentionReview {
       mode: 'spotter',
       choice: data.correct ? 'A' : 'B',
       correct: data.correct,
-      opened_evidence: false
+      opened_evidence: false,
+      engine: engineMetadata
     });
 
     await this.telemetry.recordAttempt(attemptEvent);
