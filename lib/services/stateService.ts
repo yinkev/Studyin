@@ -27,11 +27,13 @@ export class StateService {
     this.engine = options?.engine ?? createPersonalizationEngine();
     this.repository = options?.repository ?? new JsonLearnerStateRepository();
 
-    this.unsubs.push(this.bus.on('ANSWER_SUBMITTED', (event) => this.handleAnswerSubmitted(event)));
+    this.unsubs.push(
+      this.bus.on('ANSWER_SUBMITTED', (event: AnswerSubmittedEvent) => this.handleAnswerSubmitted(event))
+    );
   }
 
   private async handleAnswerSubmitted(event: AnswerSubmittedEvent): Promise<void> {
-    const parsed = answerSubmittedEventSchema.parse(event);
+    const parsed = answerSubmittedEventSchema.parse(event) as AnswerSubmittedEvent;
     const learnerState = await this.repository.load(parsed.learnerId);
     const result = this.engine.update({
       learnerId: parsed.learnerId,

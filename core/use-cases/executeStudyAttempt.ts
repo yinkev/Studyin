@@ -25,7 +25,7 @@ export class ExecuteStudyAttempt {
   }
 
   async execute(input: StudyAttemptInput): Promise<StudyAttemptResult> {
-    const data = StudyAttemptInputSchema.parse(input);
+    const data = StudyAttemptInputSchema.parse(input) as StudyAttemptInput;
     const learnerState = await this.repository.load(data.learnerId);
 
     const los = { ...learnerState.los };
@@ -48,7 +48,7 @@ export class ExecuteStudyAttempt {
         priorSigma: 0.8
       } as LearnerState['los'][string];
 
-      const { thetaHat, se } = await runEapUpdate({
+      const { thetaHat, se } = runEapUpdate({
         priorMu: current.priorMu ?? current.thetaHat,
         priorSigma: current.priorSigma ?? 0.8,
         response: { k: data.correct ? 1 : 0, m: 1 },

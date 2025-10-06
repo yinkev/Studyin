@@ -5,6 +5,7 @@ import anime from 'animejs';
 import type { InteractiveLesson, LessonAnimationBeat, LessonMultipleChoiceBlock } from '../lib/types/lesson';
 import { submitStudyAttempt } from '../app/study/actions';
 import { StudyAttemptInputSchema } from '../core/types/events';
+import type { StudyAttemptInput } from '../core/types/events';
 import TimelineBeatCard from './molecules/TimelineBeatCard';
 import LessonMetaPanel from './organisms/LessonMetaPanel';
 import GlowCard from './atoms/GlowCard';
@@ -84,18 +85,19 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
     const correct = selectedChoice === currentQuestion.correctChoice;
     setAnswerState('locked');
 
+    const primaryLo = currentQuestion.learningObjective ?? lesson.lo_id;
     const payload = StudyAttemptInputSchema.parse({
       learnerId,
       sessionId: `session-${learnerId}`,
       appVersion: 'dev-ui',
       itemId: currentQuestion.id,
-      loIds: [currentQuestion.learningObjective ?? lesson.lo_id].filter(Boolean),
+      loIds: [primaryLo] as [string, ...string[]],
       difficulty: 'medium',
       choice: normalizeChoiceId(selectedChoice),
       correct,
       openedEvidence: false,
       durationMs: 15_000
-    });
+    }) as StudyAttemptInput;
 
     await submitStudyAttempt(payload);
 

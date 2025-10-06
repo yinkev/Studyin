@@ -1,8 +1,5 @@
 import type { LearnerState } from '../../lib/server/study-state';
-import type { z } from 'zod';
-import { attemptEventSchema } from '../../lib/core/schemas';
-
-export type AttemptEvent = z.infer<typeof attemptEventSchema>;
+import type { AttemptEvent } from './events';
 
 export interface LearnerStateRepository {
   load(learnerId: string): Promise<LearnerState>;

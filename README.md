@@ -124,3 +124,8 @@ The application is built around a simple, powerful loop:
 > 
 > - No runtime LLM/API calls in the app or engines. All analytics, selection, and scoring are deterministic.
 > - Randomness must be seeded and reproducible.
+> 
+> ### TypeScript Bridge Notes
+> 
+> - `types/scripts-modules.d.ts` centralizes declaration stubs for deterministic `.mjs` helpers used by the engine and server layers. Extend this file whenever you add a new script so TypeScript callers avoid `any`/`unknown` cascades.
+> - `types/animejs.d.ts` provides the minimal default export expected by our animated UI components; update it if you rely on additional APIs (e.g., timelines or easing helpers).

@@ -88,7 +88,9 @@ export class LessonService {
   constructor(options?: LessonServiceOptions) {
     this.bus = options?.bus ?? globalEventBus;
     this.storage = options?.storage ?? new FileSystemLessonStorage();
-    this.unsubs.push(this.bus.on('SAVE_LESSON_REQUESTED', (event) => this.handleSaveLesson(event)));
+    this.unsubs.push(
+      this.bus.on('SAVE_LESSON_REQUESTED', (event: SaveLessonRequestedEvent) => this.handleSaveLesson(event))
+    );
   }
 
   async handleSaveLesson(event: SaveLessonRequestedEvent): Promise<void> {

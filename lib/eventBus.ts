@@ -22,7 +22,7 @@ export class EventBus {
   on<TType extends EventType>(type: TType, listener: EventListener<TType>): () => void {
     const set = this.listeners.get(type) ?? new Set();
     // Cast to EventListener<EventType> for storage while preserving runtime identity.
-    set.add(listener as EventListener<EventType>);
+    set.add(listener as unknown as EventListener<EventType>);
     this.listeners.set(type, set);
     return () => this.off(type, listener);
   }
@@ -41,7 +41,7 @@ export class EventBus {
   off<TType extends EventType>(type: TType, listener: EventListener<TType>): void {
     const set = this.listeners.get(type);
     if (!set) return;
-    set.delete(listener as EventListener<EventType>);
+    set.delete(listener as unknown as EventListener<EventType>);
     if (!set.size) {
       this.listeners.delete(type);
     }

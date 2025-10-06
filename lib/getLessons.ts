@@ -20,6 +20,9 @@ export interface LessonDoc {
   los: string[];
   type: string;
   title: string;
+  summary?: string;
+  high_yield?: string[];
+  pitfalls?: string[];
   timeline: TimelineEvent[];
   animation_timeline?: LessonBeat[];
   lo_id: string; // for filtering

@@ -19,7 +19,7 @@ export class ExecuteRetentionReview {
   }
 
   async execute(input: RetentionReviewInput): Promise<RetentionReviewResult> {
-    const data = RetentionReviewInputSchema.parse(input);
+    const data = RetentionReviewInputSchema.parse(input) as RetentionReviewInput;
     const state = await this.repository.load(data.learnerId);
     const retention = { ...state.retention };
     const card = retention[data.itemId] ?? {
@@ -29,6 +29,7 @@ export class ExecuteRetentionReview {
       lastReviewMs: undefined,
       lapses: 0
     };
+    const loIds = data.loIds.length ? data.loIds : card.loIds ?? [];
 
     const expected = data.correct ? 0.8 : 0.4;
     const { halfLifeHours } = updateHalfLife({
@@ -40,7 +41,7 @@ export class ExecuteRetentionReview {
     const { nextReviewMs } = scheduleNextReview({ halfLifeHours, nowMs: now });
 
     retention[data.itemId] = {
-      loIds: data.loIds,
+      loIds,
       halfLifeHours,
       nextReviewMs,
       lastReviewMs: now,
@@ -68,7 +69,7 @@ export class ExecuteRetentionReview {
       session_id: data.sessionId ?? randomUUID(),
       user_id: data.learnerId,
       item_id: data.itemId,
-      lo_ids: data.loIds.length ? data.loIds : ['unmapped'],
+      lo_ids: loIds.length ? loIds : ['unmapped'],
       ts_start: now - 30_000,
       ts_submit: now,
       duration_ms: 30_000,

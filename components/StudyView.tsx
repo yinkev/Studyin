@@ -5,7 +5,7 @@ import type { AnalyticsSummary, StudyItem } from '../lib/getItems';
 import type { LearnerState } from '../lib/server/study-state';
 import type { CandidateItem } from '../lib/study-engine';
 import { buildWhyThisNext, difficultyToBeta, scoreCandidates } from '../lib/study-engine';
-import { WhyThisNextPill } from './pills/WhyThisNextPill';
+import { WhyThisNextPill, type WhySignals } from './pills/WhyThisNextPill';
 import { masteryProbability } from 'lib/engine/shims/rasch';
 import { submitStudyAttempt } from '../app/study/actions';
 import type { OptimisticLearnerStateUpdate } from '../lib/client/useLearnerState';
@@ -33,6 +33,12 @@ interface RagResult {
   similarity: number;
   decay: number;
 }
+
+type WhyContext = {
+  whyNext: string;
+  whySignals: WhySignals | null;
+  ttmTitle?: string;
+};
 
 const ANSWER_LETTERS = ['A', 'B', 'C', 'D', 'E'] as const;
 
@@ -168,8 +174,10 @@ export function StudyView({
   const current = items[index];
   const ragResult = current ? ragCache[current.id] ?? null : null;
 
-  const { whyNext, whySignals, ttmTitle } = useMemo(() => {
-    if (!current) return 'Focus on mastery — keep practicing.';
+  const { whyNext, whySignals, ttmTitle } = useMemo<WhyContext>(() => {
+    if (!current) {
+      return { whyNext: 'Focus on mastery — keep practicing.', whySignals: null, ttmTitle: undefined };
+    }
     const loIds = current.los ?? [];
     const { thetaHat, se } = deriveAbility(loIds, learnerState, analytics);
     const stats = learnerState.items[current.id];
@@ -207,11 +215,15 @@ export function StudyView({
         .filter((row) => loIds.includes(row.lo_id))
         .map((row) => `${row.lo_id}: ${Number(row.projected_minutes_to_mastery ?? 0).toFixed(2)}m${row.overdue ? ' (overdue)' : ''}`)
         .join(' · ');
-      return { whyNext: fallbackWhyThisNext(current.id, loIds, analytics), whySignals: null as any, ttmTitle: title || undefined };
+      return {
+        whyNext: fallbackWhyThisNext(current.id, loIds, analytics),
+        whySignals: null,
+        ttmTitle: title || undefined
+      } satisfies WhyContext;
     }
     const masteryProb = masteryProbability(thetaHat, se);
     const whyText = buildWhyThisNext(score, { thetaHat, se, masteryProb });
-    const signals = {
+    const signals: WhySignals = {
       info: score.info,
       blueprintMult: score.blueprintMultiplier,
       exposureMult: score.exposureMultiplier,
@@ -227,7 +239,7 @@ export function StudyView({
       .filter((row) => loIds.includes(row.lo_id))
       .map((row) => `${row.lo_id}: ${Number(row.projected_minutes_to_mastery ?? 0).toFixed(2)}m${row.overdue ? ' (overdue)' : ''}`)
       .join(' · ');
-    return { whyNext: whyText, whySignals: signals, ttmTitle: title || undefined };
+    return { whyNext: whyText, whySignals: signals, ttmTitle: title || undefined } satisfies WhyContext;
   }, [analytics, current, index, learnerState]);
 
   const letters = ANSWER_LETTERS;
@@ -345,11 +357,13 @@ export function StudyView({
                         notes: whyNext
                       }
                     : undefined;
+                const baseLoIds = current.los && current.los.length > 0 ? current.los : whySignals?.loIds ?? [];
+                const loIdsForAttempt = (baseLoIds.length ? baseLoIds : ['unmapped']) as [string, ...string[]];
                 const result = await submitStudyAttempt({
                   learnerId,
                   sessionId,
                   itemId: current.id,
-                  loIds: current.los ?? [],
+                  loIds: loIdsForAttempt,
                   difficulty: current.difficulty,
                   choice,
                   correct,

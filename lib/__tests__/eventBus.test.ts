@@ -1,20 +1,25 @@
 import { describe, it, expect } from 'vitest';
 import { EventBus } from '../eventBus';
-import { answerSubmittedEventSchema, stateUpdatedEventSchema } from '../../core/types/events';
+import {
+  answerSubmittedEventSchema,
+  stateUpdatedEventSchema,
+  type AnswerSubmittedEvent,
+  type StateUpdatedEvent
+} from '../../core/types/events';
 
-function buildAnswerEvent() {
+function buildAnswerEvent(): AnswerSubmittedEvent {
   return answerSubmittedEventSchema.parse({
     type: 'ANSWER_SUBMITTED',
     learnerId: 'learner-1',
     sessionId: 'session-1',
     appVersion: 'test',
     itemId: 'item-1',
-    loIds: ['lo-1'],
+    loIds: ['lo-1'] as [string, ...string[]],
     difficulty: 'medium',
     choice: 'A',
     correct: true,
     ts: 1730870400000
-  });
+  }) as AnswerSubmittedEvent;
 }
 
 describe('EventBus', () => {
@@ -22,10 +27,10 @@ describe('EventBus', () => {
     const bus = new EventBus();
     const calls: string[] = [];
 
-    bus.on('ANSWER_SUBMITTED', async (event) => {
+    bus.on('ANSWER_SUBMITTED', async (event: AnswerSubmittedEvent) => {
       calls.push(`first:${event.itemId}`);
     });
-    bus.on('ANSWER_SUBMITTED', async (event) => {
+    bus.on('ANSWER_SUBMITTED', async (event: AnswerSubmittedEvent) => {
       calls.push(`second:${event.itemId}`);
     });
 
@@ -63,7 +68,7 @@ describe('EventBus', () => {
     const bus = new EventBus();
     const updated: string[] = [];
 
-    bus.on('ANSWER_SUBMITTED', async (event) => {
+    bus.on('ANSWER_SUBMITTED', async (event: AnswerSubmittedEvent) => {
       const stateEvent = stateUpdatedEventSchema.parse({
         type: 'STATE_UPDATED',
         learnerId: event.learnerId,
@@ -76,11 +81,11 @@ describe('EventBus', () => {
         },
         ts: event.ts,
         reason: 'attempt'
-      });
+      }) as StateUpdatedEvent;
       await bus.emit(stateEvent);
     });
 
-    bus.on('STATE_UPDATED', async (event) => {
+    bus.on('STATE_UPDATED', async (event: StateUpdatedEvent) => {
       updated.push(event.learnerId);
     });
 

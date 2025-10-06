@@ -1,10 +1,4 @@
-import {
-  attemptEventSchema,
-  sessionEventSchema,
-  SCHEMA_VERSIONS,
-  type AttemptEvent,
-  type SessionEvent
-} from '../../lib/core/schemas';
+import { attemptEventSchema, sessionEventSchema, SCHEMA_VERSIONS } from '../../lib/core/schemas';
 import {
   STOP_RULES,
   scoreCandidates,
@@ -23,7 +17,7 @@ import {
   type LearnerLoState,
   rasch
 } from '../../lib/study-engine';
-import type { EngineMetadata } from '../../core/types/events';
+import type { AttemptEvent, EngineMetadata, SessionEvent } from '../../core/types/events';
 import {
   loadLearnerState,
   saveLearnerState,
@@ -71,7 +65,7 @@ export async function logAttemptEvent({
     app_version: appVersion,
     engine
   };
-  const parsed = attemptEventSchema.parse(payload);
+  const parsed = attemptEventSchema.parse(payload) as AttemptEvent;
   await telemetry.writeAttempt(parsed);
 }
 
@@ -87,7 +81,7 @@ export async function logSessionEvent({
   telemetry?: EngineTelemetry;
 }) {
   const payload: SessionEvent = { ...event, schema_version: SCHEMA_VERSIONS.sessionEvent, app_version: appVersion, engine };
-  const parsed = sessionEventSchema.parse(payload);
+  const parsed = sessionEventSchema.parse(payload) as SessionEvent;
   await telemetry.writeSession(parsed);
 }
 

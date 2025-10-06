@@ -57,7 +57,9 @@ describe('events helpers', () => {
     process.env.INGEST_TOKEN = 'secret';
     const missing = requireAuthToken(null);
     expect(missing.ok).toBe(false);
-    expect(missing.status).toBe(401);
+    if (!missing.ok) {
+      expect(missing.status).toBe(401);
+    }
 
     const wrong = requireAuthToken('Bearer nope');
     expect(wrong.ok).toBe(false);

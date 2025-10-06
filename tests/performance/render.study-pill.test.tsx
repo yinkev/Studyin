@@ -15,9 +15,9 @@ describe('WhyThisNextPill performance', () => {
       thetaHat: 0.24,
       se: 0.28,
       masteryProb: 0.79,
-      loIds: ['lo.ulnar-nerve'],
+      loIds: ['lo.ulnar-nerve'] as string[],
       itemId: 'item.ulnar.claw-hand'
-    } as const;
+    };
 
     const iterations = 200;
     const start = performance.now();
