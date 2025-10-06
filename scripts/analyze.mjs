@@ -4,6 +4,7 @@ import path from 'path';
 import process from 'process';
 import { fileURLToPath } from 'url';
 import { loadAttempts, summarizeAttempts } from './lib/analyzer-core.mjs';
+import { pushAnalyticsSnapshot, supabaseConfigured } from './lib/supabase-ingest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -17,6 +18,14 @@ async function main() {
     await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
     await fs.writeFile(OUTPUT_PATH, JSON.stringify(summary, null, 2) + '\n');
     console.log(`✓ analytics written to ${path.relative(ROOT, OUTPUT_PATH)}`);
+    if (supabaseConfigured()) {
+      try {
+        await pushAnalyticsSnapshot(summary);
+        console.log('↳ Supabase analytics snapshot inserted');
+      } catch (error) {
+        console.warn('Supabase snapshot insert failed:', error instanceof Error ? error.message : error);
+      }
+    }
   } catch (error) {
     console.error('Analyze script error:', error instanceof Error ? error.message : error);
     process.exitCode = 1;

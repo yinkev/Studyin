@@ -6,6 +6,7 @@ export {
   blueprintSchema,
   learningObjectiveSchema,
   errorTaxonomySchema,
+  engineMetadataSchema,
   attemptEventSchema,
   sessionEventSchema,
   lessonEventSchema,

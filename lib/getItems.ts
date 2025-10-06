@@ -11,6 +11,7 @@ export interface StudyItem {
   rationale_distractors: Partial<Record<'A' | 'B' | 'C' | 'D' | 'E', string>>;
   difficulty: 'easy' | 'medium' | 'hard';
   los: string[];
+  module?: string;
   evidence?: {
     citation?: string;
     cropPath?: string;
@@ -84,6 +85,9 @@ export async function loadStudyItems(): Promise<StudyItem[]> {
   for (const filePath of files) {
     const raw = await fs.readFile(filePath, 'utf8');
     const json = JSON.parse(raw);
+    const segments = filePath.split(path.sep);
+    const banksIdx = segments.lastIndexOf('banks');
+    const moduleId = banksIdx >= 0 && banksIdx + 1 < segments.length ? segments[banksIdx + 1] : undefined;
     const evidence = json.evidence ?? {};
     const dataUri = await loadEvidenceData(evidence.cropPath);
     items.push({
@@ -95,6 +99,7 @@ export async function loadStudyItems(): Promise<StudyItem[]> {
       rationale_distractors: json.rationale_distractors ?? {},
       difficulty: json.difficulty,
       los: json.los,
+      module: moduleId,
       evidence: {
         citation: evidence.citation,
         cropPath: evidence.cropPath,

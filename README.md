@@ -57,88 +57,14 @@ The application is built around a simple, powerful loop:
 - `INGEST_TOKEN=...` — optional bearer token to guard ingest routes.
 - `USE_SUPABASE_INGEST=0` — keep off unless following `docs/SUPABASE_SETUP.md`.
 
----
 
-> ## Archived README (For Historical Context)
-> 
-> *The original README is preserved below for historical context. The information above reflects the current state of the MVP.*
-> 
-> # Studyin Module Arcade (Skeleton)
-> 
-> Deterministic, evidence-first scaffold for Studyin modules. It ships with an OMS-1 upper-limb sample bank today, but the prompts, CI, and agents are module-agnostic so you can retarget new systems without retooling.
-> 
-> UI stack: Next.js App Router + Tailwind CSS 4 (via `@tailwindcss/postcss`) + OKC (Duolingo‑inspired) design. Heavy visuals via anime.js (micro‑motion), ECharts (charts), Splide (carousels), and Three.js (3D viewer). React Flow powers the custom graphs.
-> 
-> ## Quick Start
-> 
-> ```bash
-> npm install
-> npm run validate:items   # Validate sample bank (A–E gate)
-> npm run analyze          # Generate public/analytics/latest.json
-> npm run jobs:refit       # (manual) Run weekly Rasch/GPCM refit summary (writes data/refit-summaries)
-> npm test                 # Run engine smoke tests (Vitest)
-> # Optional: npm test -- --include=tests/e2e-js/** to execute Playwright smoke tests (default Vitest run excludes tests/e2e-js/**)
-> 
-> # Dev server (auto opens http://localhost:3000)
-> npm run dev
-> ```
-> 
-> Requirements: Node 20.14.x LTS (set via `.nvmrc`). Install Git LFS for evidence assets.
->
-> Before running validators, define your own learning objectives and blueprint:
-> 1. Edit `config/los.json` and add each LO you plan to assess.
-> 2. Populate `config/blueprint.json` with weights that sum to 1.0 (or leave empty until content exists).
-> 3. Optional: use `config/blueprint-dev.json` for temporary weights while iterating on new modules.
-> 
-> ## Repository Layout
-> 
-> ```
-> public/analytics/          # Generated analytics JSON (latest.json)
-> config/                    # Blueprint, LO hierarchy, error taxonomy
-> content/banks/             # Place new `*.item.json` files by module (empty by default)
-> content/evidence/          # PDFs/crops (tracked via Git LFS)
-> data/                      # Local telemetry (events.ndjson, state snapshots)
-> data/refit-summaries/      # Weekly Rasch refit outputs (`npm run jobs:refit`)
-> scripts/perf/              # Deterministic profiling scripts (e.g., sample-events-latency)
-> app/api/                   # Next.js API routes (telemetry, analytics, forms, health)
-> core/                      # Core types, schemas, and use cases
-> app/study/                 # Study flow (UI components and server actions)
-> lib/server/                # Server-only helpers (forms, telemetry, Supabase adapters)
-> lib/rag/                   # Deterministic embedding helpers (no external calls)
-> scripts/lib/               # Deterministic engines + shared schemas
-> scripts/rag/               # Evidence indexing + recall verification scripts
-> scripts/validate-items.mjs # Validator CLI gate (Zod-based)
-> scripts/analyze.mjs        # Analytics pipeline → latest.json + Supabase snapshot
-> supabase/                  # SQL schema + RLS policies for Supabase ingestion/index
-> tests/                     # Vitest smoke tests for engines
-> tests/e2e-js/              # Playwright smoke tests (run manually via Playwright CLI)
-> AGENTS.md                  # Agent SOPs, rubric gates, workflow
-> PLAN.md                    # Current milestones, To‑Dos, cadence
-> ```
-> 
-> ### Local Dev Ingestion (`/upload`)
-> 
-> The `/upload` route is an optional development-only workflow that triggers the local CLI via a custom URL scheme. It is **disabled by default**.
-> 
-> - Enable it by setting `NEXT_PUBLIC_DEV_UPLOAD=1` (or `NEXT_PUBLIC_DEV_TOOLS=1`) in `.env.local` and restarting `npm run dev`.
-> - Upload files must already exist under `data/uploads/`. The page only accepts filenames containing `[A-Za-z0-9_.-]`.
-> - Clicking “Click Here to Process File” opens a `studyin-cli://process?file=<name>` URL. On macOS you can register this scheme with Automator (see in-app instructions) to run:
-> 
->   ```bash
->   clink gemini -r planner -f data/uploads/<file>
->   # …prompt omitted for brevity…
->   npm run validate:items
->   ```
-> 
-> - Always review and whitelist the Automator script before use; the workflow is meant for trusted local experiments only. Generated modules must still pass the validator and manual review before inclusion in the study experience.
-> - To validate only the generated module:
->
->   ```bash
->   BLUEPRINT_PATH=config/blueprint-dev.json \
->   SCOPE_DIRS=content/banks/new-module \
->   VALIDATION_FORM_LENGTH=2 \
->   npm run validate:items
->   ```
+## Documentation Map
+
+- Queue & Worker Runbook: see “Background Queue & Worker (Dev)”.
+- Authoring Automations: docs/AUTHORING_AUTOMATION.md
+- Engine Spec & Prompts: docs/personal-adaptive-study-engine-spec.md
+- Optional Cloud Setup: docs/SUPABASE_SETUP.md
+- Archived history: docs/archive/README_HISTORY.md, docs/archive/IMPLEMENTATION_HISTORY.md, docs/archive/ui-blueprint/
 > 
 > ### Optional Cloud (Supabase)
 > 

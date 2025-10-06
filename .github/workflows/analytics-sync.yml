@@ -1,0 +1,30 @@
+name: analytics-sync
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL || '' }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
+      USE_SUPABASE_INGEST: ${{ secrets.SUPABASE_URL && secrets.SUPABASE_SERVICE_ROLE_KEY && '1' || '0' }}
+      WRITE_TELEMETRY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Refresh analytics
+        run: npm run analyze
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
+          USE_SUPABASE_INGEST: ${{ env.USE_SUPABASE_INGEST }}
+          WRITE_TELEMETRY: '1'

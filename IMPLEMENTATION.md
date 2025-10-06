@@ -146,13 +146,7 @@ This workflow covers the user's interaction with the lessons.
 - If a queue job fails (status `failed`) or the worker produces invalid lesson JSON, the UI shows: **"Processing failed. Please try again."** and retains the error string for inspection in the Activity list.
 
 ---
----
-
-> ## Archived Implementation Plan (Superseded by Phase 1 MVP)
-> 
-> *The following content is preserved for historical context. The official implementation plan for the current development cycle is detailed in the blueprint above.*
-> 
-> # Personal Adaptive Study Engine — Implementation Plan
+> Archived plan moved to `docs/archive/IMPLEMENTATION_HISTORY.md`.
 > 
 > Consensus Deltas (2025-10-06)
 > - Confirm server action integration: keep `app/study/actions.ts` as the single entry for attempts/reviews; no new route needed beyond `/api/attempts` and `/api/search`.

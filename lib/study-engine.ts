@@ -78,9 +78,13 @@ export function difficultyToBeta(difficulty: DifficultyCode): number {
   return DIFFICULTY_TO_BETA[difficulty] ?? 0;
 }
 
-function computeExposureMultiplier(_exposure: CandidateItem['exposure']): number {
-  // Caps and familiarity clamps removed globally
-  return 1.0;
+function computeExposureMultiplier(exposure: CandidateItem['exposure']): number {
+  const base = baseExposureMultiplier(exposure);
+  return clampOverfamiliar({
+    base,
+    meanScore: exposure.meanScore,
+    se: exposure.se
+  });
 }
 
 function computeItemInfo(thetaHat: number, difficulty: number, thresholds?: number[]): number {

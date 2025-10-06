@@ -13,6 +13,8 @@ import { buildRetentionQueue } from '../lib/study-engine';
 import { submitRetentionReview } from '../app/study/actions';
 import { useLearnerState } from '../lib/client/useLearnerState';
 
+const ALL_MODULES = '__all__';
+
 interface StudyTabsProps {
   items: StudyItem[];
   lessons: LessonDoc[];
@@ -27,6 +29,26 @@ interface StudyTabsProps {
     maxDaysOverdue: number;
   };
   dashboards: StudyDashboards;
+}
+
+interface ModuleStat {
+  id: string;
+  label: string;
+  items: number;
+  lessons: number;
+}
+
+function toModuleId(raw?: string): string {
+  return raw ?? 'default';
+}
+
+function toModuleLabel(id: string): string {
+  if (id === 'default') return 'General';
+  return id
+    .split(/[\-_]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 }
 
 export function StudyTabs({
@@ -54,22 +76,93 @@ export function StudyTabs({
     syncLearnerState(initialLearnerState);
   }, [initialLearnerState, syncLearnerState]);
 
-  const [activeLo, setActiveLo] = useState<string | null>(recommendedLoId ?? lessons[0]?.lo_id ?? null);
+  const moduleStats = useMemo<ModuleStat[]>(() => {
+    const stats = new Map<string, { items: number; lessons: number }>();
+    const ensure = (id: string) => {
+      if (!stats.has(id)) stats.set(id, { items: 0, lessons: 0 });
+      return stats.get(id)!;
+    };
+
+    items.forEach((item) => {
+      const entry = ensure(toModuleId(item.module));
+      entry.items += 1;
+    });
+    lessons.forEach((lesson) => {
+      const entry = ensure(toModuleId(lesson.module));
+      entry.lessons += 1;
+    });
+
+    return Array.from(stats.entries())
+      .map(([id, stat]) => ({
+        id,
+        label: toModuleLabel(id),
+        items: stat.items,
+        lessons: stat.lessons
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [items, lessons]);
+
+  const [activeModule, setActiveModule] = useState<string>(ALL_MODULES);
+
+  const filteredItems = useMemo(() => {
+    if (activeModule === ALL_MODULES) return items;
+    return items.filter((item) => toModuleId(item.module) === activeModule);
+  }, [items, activeModule]);
+
+  const filteredLessons = useMemo(() => {
+    if (activeModule === ALL_MODULES) return lessons;
+    return lessons.filter((lesson) => toModuleId(lesson.module) === activeModule);
+  }, [lessons, activeModule]);
+
+  const moduleLos = useMemo(() => {
+    const set = new Set<string>();
+    filteredItems.forEach((item) => {
+      (item.los ?? []).forEach((lo) => set.add(lo));
+    });
+    return set;
+  }, [filteredItems]);
+
+  const filteredArms = useMemo(() => {
+    if (!moduleLos.size) return schedulerArms;
+    return schedulerArms.filter((arm) => moduleLos.has(arm.loId));
+  }, [schedulerArms, moduleLos]);
+
+  const effectiveRecommendedLo = useMemo(() => {
+    if (recommendedLoId && moduleLos.has(recommendedLoId)) return recommendedLoId;
+    if (filteredLessons[0]?.lo_id) return filteredLessons[0].lo_id;
+    for (const item of filteredItems) {
+      if (item.los?.length) return item.los[0];
+    }
+    return null;
+  }, [recommendedLoId, moduleLos, filteredLessons, filteredItems]);
+
+  const [activeLo, setActiveLo] = useState<string | null>(effectiveRecommendedLo);
+
+  useEffect(() => {
+    if (!effectiveRecommendedLo) {
+      setActiveLo(null);
+      return;
+    }
+    if (!activeLo || !moduleLos.has(activeLo)) {
+      setActiveLo(effectiveRecommendedLo);
+    }
+  }, [effectiveRecommendedLo, moduleLos, activeLo]);
+
   const [tab, setTab] = useState<'learn' | 'practice'>('learn');
 
   const practiceItems = useMemo(() => {
-    if (!activeLo) return items;
-    const filtered = items.filter((it) => (it.los ?? []).includes(activeLo));
-    return filtered.length ? filtered : items;
-  }, [items, activeLo]);
+    if (!activeLo) return filteredItems;
+    const filtered = filteredItems.filter((it) => (it.los ?? []).includes(activeLo));
+    return filtered.length ? filtered : filteredItems;
+  }, [filteredItems, activeLo]);
 
   const itemLabelMap = useMemo(() => {
     const map = new Map<string, string>();
-    items.forEach((item) => {
+    filteredItems.forEach((item) => {
       map.set(item.id, item.stem ?? item.id);
     });
     return map;
-  }, [items]);
+  }, [filteredItems]);
 
   const [now, setNow] = useState(() => Date.now());
 
@@ -79,15 +172,15 @@ export function StudyTabs({
   }, []);
 
   const sortedArms = useMemo(() => {
-    return schedulerArms
+    return filteredArms
       .slice()
       .sort((a, b) => b.mu * b.urgency * b.blueprintMultiplier - a.mu * a.urgency * a.blueprintMultiplier)
       .slice(0, 6);
-  }, [schedulerArms]);
+  }, [filteredArms]);
 
   const itemsIndex = useMemo(
-    () => items.map((item) => ({ id: item.id, los: item.los })),
-    [items]
+    () => filteredItems.map((item) => ({ id: item.id, los: item.los })),
+    [filteredItems]
   );
 
   const retentionQueue = useMemo(
@@ -114,6 +207,7 @@ export function StudyTabs({
     }
   }, [retentionQueue, activeRetentionId]);
 
+  const [lessonSessionId] = useState(() => crypto.randomUUID());
   const [retentionSessionId] = useState(() => crypto.randomUUID());
   const [isReviewPending, startReviewTransition] = useTransition();
   const activeRetentionEntry = useMemo(
@@ -121,8 +215,8 @@ export function StudyTabs({
     [retentionQueue, activeRetentionId]
   );
   const activeRetentionItem = useMemo(
-    () => items.find((item) => item.id === activeRetentionEntry?.itemId),
-    [items, activeRetentionEntry?.itemId]
+    () => filteredItems.find((item) => item.id === activeRetentionEntry?.itemId),
+    [filteredItems, activeRetentionEntry?.itemId]
   );
   const activeRetentionIndex = retentionQueue.findIndex((entry) => entry.itemId === activeRetentionEntry?.itemId);
 
@@ -166,18 +260,54 @@ export function StudyTabs({
     [syncLearnerState]
   );
 
+  const filteredDashboards = useMemo(() => {
+    const losFilter = moduleLos.size ? moduleLos : null;
+    const itemFilter = new Set(filteredItems.map((item) => item.id));
+    return {
+      priorityLos: losFilter ? dashboards.priorityLos.filter((entry) => losFilter.has(entry.loId)) : dashboards.priorityLos,
+      stalledLos: losFilter ? dashboards.stalledLos.filter((entry) => losFilter.has(entry.loId)) : dashboards.stalledLos,
+      overexposedItems: itemFilter.size
+        ? dashboards.overexposedItems.filter((entry) => itemFilter.has(entry.itemId))
+        : dashboards.overexposedItems
+    } satisfies StudyDashboards;
+  }, [dashboards, moduleLos, filteredItems]);
+
   return (
     <section className="space-y-6 px-4 py-10 max-w-6xl mx-auto text-gray-900">
+      {moduleStats.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+          <button
+            className={`rounded-full border px-3 py-1 transition ${
+              activeModule === ALL_MODULES ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-100 hover:bg-white'
+            }`}
+            onClick={() => setActiveModule(ALL_MODULES)}
+          >
+            All Modules
+          </button>
+          {moduleStats.map((module) => (
+            <button
+              key={module.id}
+              className={`rounded-full border px-3 py-1 transition ${
+                activeModule === module.id ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-100 hover:bg-white'
+              }`}
+              onClick={() => setActiveModule(module.id)}
+            >
+              {module.label}
+              <span className="ml-1 text-gray-400">({module.items} items / {module.lessons} lessons)</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-gray-500">Mastery cockpit</p>
           <h1 className="text-3xl font-extrabold">Study</h1>
-          {recommendedLoId && (
+          {effectiveRecommendedLo && (
             <div className="mt-2 inline-flex items-center gap-2 text-sm text-gray-600">
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">Next LO: {recommendedLoId}</span>
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">Next LO: {effectiveRecommendedLo}</span>
               <button
                 className="btn-ghost"
-                onClick={() => setActiveLo(recommendedLoId)}
+                onClick={() => setActiveLo(effectiveRecommendedLo)}
               >
                 Jump to LO
               </button>
@@ -241,7 +371,7 @@ export function StudyTabs({
         <div className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
           <span className="text-blue-800 font-semibold">Priority LOs</span>
           <ul className="mt-1 space-y-1">
-            {dashboards.priorityLos.slice(0, 5).map((entry) => (
+            {filteredDashboards.priorityLos.slice(0, 5).map((entry) => (
               <li key={entry.loId} className="rounded-lg bg-white px-2 py-1 shadow-sm">
                 <div className="flex items-center justify-between">
                   <button className="font-medium text-blue-700" onClick={() => setActiveLo(entry.loId)}>
@@ -252,13 +382,13 @@ export function StudyTabs({
                 <div className="text-gray-500">Attempts {entry.attempts} · {entry.overdue ? 'Overdue' : 'On track'}</div>
               </li>
             ))}
-            {dashboards.priorityLos.length === 0 && <li className="text-blue-700">No outstanding mastery deficits.</li>}
+            {filteredDashboards.priorityLos.length === 0 && <li className="text-blue-700">No outstanding mastery deficits.</li>}
           </ul>
         </div>
         <div className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-2">
           <span className="text-amber-800 font-semibold">Stalled LOs</span>
           <ul className="mt-1 space-y-1">
-            {dashboards.stalledLos.slice(0, 5).map((entry) => (
+            {filteredDashboards.stalledLos.slice(0, 5).map((entry) => (
               <li key={entry.loId} className="rounded-lg bg-white px-2 py-1 shadow-sm">
                 <div className="flex items-center justify-between">
                   <button className="font-medium text-amber-700" onClick={() => setActiveLo(entry.loId)}>
@@ -269,13 +399,13 @@ export function StudyTabs({
                 <div className="text-gray-500">Attempts {entry.attempts}</div>
               </li>
             ))}
-            {dashboards.stalledLos.length === 0 && <li className="text-amber-700">No stalled LOs detected.</li>}
+            {filteredDashboards.stalledLos.length === 0 && <li className="text-amber-700">No stalled LOs detected.</li>}
           </ul>
         </div>
         <div className="rounded-xl border border-rose-100 bg-rose-50 px-3 py-2">
           <span className="text-rose-800 font-semibold">Overexposed items</span>
           <ul className="mt-1 space-y-1">
-            {dashboards.overexposedItems.slice(0, 5).map((entry) => (
+            {filteredDashboards.overexposedItems.slice(0, 5).map((entry) => (
               <li key={entry.itemId} className="rounded-lg bg-white px-2 py-1 shadow-sm">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-rose-700">{itemLabelMap.get(entry.itemId) ?? entry.itemId}</span>
@@ -284,7 +414,7 @@ export function StudyTabs({
                 <div className="text-gray-500">24h: {entry.attempts24h} · last {entry.lastAttemptHoursAgo}h ago</div>
               </li>
             ))}
-            {dashboards.overexposedItems.length === 0 && <li className="text-rose-700">No overexposed items.</li>}
+            {filteredDashboards.overexposedItems.length === 0 && <li className="text-rose-700">No overexposed items.</li>}
           </ul>
         </div>
       </div>
@@ -343,7 +473,12 @@ export function StudyTabs({
         </div>
       )}
       {tab === 'learn' ? (
-        <LessonsView lessons={lessons} onPractice={handlePractice} />
+        <LessonsView
+          lessons={filteredLessons}
+          onPractice={handlePractice}
+          learnerId={learnerId}
+          sessionId={lessonSessionId}
+        />
       ) : (
         <StudyView
           items={practiceItems}

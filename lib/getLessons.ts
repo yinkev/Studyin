@@ -8,15 +8,22 @@ export interface LessonBeat {
   visual?: string;
 }
 
+export interface TimelineEvent {
+  type: 'text' | 'evidence';
+  duration_ms: number;
+  value: string | { file: string; page: number };
+}
+
 export interface LessonDoc {
   schema_version: string;
   id: string;
-  lo_id: string;
+  los: string[];
+  type: string;
   title: string;
-  summary?: string;
-  high_yield?: string[];
-  pitfalls?: string[];
+  timeline: TimelineEvent[];
   animation_timeline?: LessonBeat[];
+  lo_id: string; // for filtering
+  module?: string;
 }
 
 const LESSONS_ROOT = path.join(process.cwd(), 'content', 'lessons');
@@ -45,12 +52,29 @@ export async function loadLessons(loFilter?: string[]): Promise<LessonDoc[]> {
     try {
       const raw = await fs.readFile(file, 'utf8');
       const json = JSON.parse(raw);
+      json.lo_id = json.los?.[0] ?? ''; // for filtering
+      const rel = path.relative(LESSONS_ROOT, file);
+      const moduleId = rel.split(path.sep)[0] ?? undefined;
+      json.module = moduleId;
       if (loFilter && loFilter.length && !loFilter.includes(json.lo_id)) continue;
+
+      if (json.timeline) {
+        json.animation_timeline = json.timeline.map((event: TimelineEvent, index: number) => {
+          const narration = typeof event.value === 'string' ? event.value : `Evidence: ${event.value.file}, page ${event.value.page}`;
+          return {
+            beat: index + 1,
+            duration_s: event.duration_ms / 1000,
+            narration: narration,
+            visual: typeof event.value === 'string' ? 'Text' : 'Evidence'
+          };
+        });
+      }
+
       docs.push(json);
-    } catch {
+    } catch(e) {
+      console.error(`Error processing lesson file: ${file}`, e)
       // ignore malformed files in early authoring
     }
   }
   return docs;
 }
-
