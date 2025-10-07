@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HeroUIProvider } from '@heroui/react';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { XPProvider } from '../components/XPProvider';
 
@@ -23,9 +24,11 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <XPProvider>{children}</XPProvider>
-      </ThemeProvider>
+      <HeroUIProvider>
+        <ThemeProvider>
+          <XPProvider>{children}</XPProvider>
+        </ThemeProvider>
+      </HeroUIProvider>
     </QueryClientProvider>
   );
 }

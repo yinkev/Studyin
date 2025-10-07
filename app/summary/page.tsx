@@ -15,6 +15,7 @@ import { getSupabaseAdmin } from '../../lib/server/supabase';
 import { computeStudyDashboards } from '../../lib/study-insights';
 import { loadLearnerState } from '../../lib/server/study-state';
 import { SummaryDashboards } from '../../components/SummaryDashboards';
+import { InsightsView } from '../../components/InsightsView';
 
 type AttemptRow = {
   session_id: string | null;
@@ -59,15 +60,18 @@ export default async function SummaryPage() {
   const blueprint = await readJsonIfExists<{ weights: Record<string, number> }>(blueprintPath);
   const rubric = await readJsonIfExists<{ overall_score: number; overall_pass: boolean; critical_ok: boolean; threshold: number }>(rubricPath);
   const attempts = await loadRecentAttempts();
+  const masteryScores = analytics?.mastery_per_lo
+    ? Object.entries(analytics.mastery_per_lo).map(([lo_id, score]) => ({ lo_id, score }))
+    : [];
   return (
-    <section className="space-y-8 text-slate-100">
+      <section className="space-y-8 text-text-high min-h-screen bg-surface-bg1 px-6 py-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Operational analytics</p>
-          <h1 className="text-3xl font-semibold text-white">Summary</h1>
+          <p className="text-xs uppercase tracking-wide text-text-med">Operational analytics</p>
+          <h1 className="text-3xl font-semibold text-text-high">Summary</h1>
         </div>
         {rubric && (
-          <div className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide ${rubric.overall_pass ? 'border-emerald-400/40 text-emerald-200' : 'border-amber-400/40 text-amber-200'}`}>
+          <div className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide ${rubric.overall_pass ? 'border-semantic-success/40 text-semantic-success' : 'border-semantic-warning/40 text-semantic-warning'}`}>
             Rubric {rubric.overall_score.toFixed(1)} / {rubric.threshold}
           </div>
         )}
@@ -79,16 +83,16 @@ export default async function SummaryPage() {
             {rubric ? (
               <div className="flex items-center justify-between">
                 <span>Rubric score</span>
-                <span className={`rounded-full px-3 py-1 text-sm font-semibold uppercase tracking-wide ${rubric.overall_pass ? 'bg-emerald-500/20 text-emerald-200' : 'bg-amber-500/20 text-amber-200'}`}>
+                <span className={`rounded-full px-3 py-1 text-sm font-semibold uppercase tracking-wide ${rubric.overall_pass ? 'bg-semantic-success/20 text-semantic-success' : 'bg-semantic-warning/20 text-semantic-warning'}`}>
                   {rubric.overall_score.toFixed(1)} / {rubric.threshold}
                 </span>
               </div>
             ) : (
-              <p className="text-slate-300">
-                Run <code className="text-white/90">npm run score:rubric</code> to generate a score snapshot.
+              <p className="text-text-med">
+                Run <code className="text-text-high/90">npm run score:rubric</code> to generate a score snapshot.
               </p>
             )}
-            <p className="text-xs text-slate-400">Critical gates must stay green — rerun rubric scoring before every release.</p>
+            <p className="text-xs text-text-med">Critical gates must stay green — rerun rubric scoring before every release.</p>
           </CardContent>
         </Card>
         <Card>
@@ -100,21 +104,21 @@ export default async function SummaryPage() {
                   <span>Total reviews</span>
                   <span>{analytics.retention_summary.total_reviews}</span>
                 </div>
-                <div className="flex items-center justify-between text-emerald-200">
+                <div className="flex items-center justify-between text-semantic-success">
                   <span>Correct</span>
                   <span>{analytics.retention_summary.correct}</span>
                 </div>
-                <div className="flex items-center justify-between text-rose-200">
+                <div className="flex items-center justify-between text-semantic-danger">
                   <span>Incorrect</span>
                   <span>{analytics.retention_summary.incorrect}</span>
                 </div>
-                <div className="flex items-center justify-between text-slate-300">
+                <div className="flex items-center justify-between text-text-med">
                   <span>Success rate</span>
                   <span>{(analytics.retention_summary.success_rate * 100).toFixed(0)}%</span>
                 </div>
               </>
             ) : (
-              <p className="text-slate-400">
+              <p className="text-text-med">
                 No retention reviews logged yet. Run the study flow with FSRS queue to populate analytics.
               </p>
             )}
@@ -160,6 +164,12 @@ export default async function SummaryPage() {
           <CardHeader>Adaptive dashboards</CardHeader>
           <CardContent>
             <SummaryDashboards dashboards={dashboards} />
+          </CardContent>
+        </Card>
+        <Card className="col-span-full">
+          <CardHeader>Mastery insights</CardHeader>
+          <CardContent>
+            <InsightsView masteryScores={masteryScores} />
           </CardContent>
         </Card>
         <Card className="col-span-full">

@@ -18,6 +18,34 @@ import {
 } from '../xp-system';
 
 const STORAGE_KEY = 'studyin-xp-progress';
+const LEARNER_ID = 'local-dev'; // TODO: Replace with actual user ID from auth
+
+/**
+ * Persist XP progress to API
+ */
+async function persistToAPI(progress: UserProgress): Promise<void> {
+  try {
+    await fetch('/api/learner-state', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        learnerId: LEARNER_ID,
+        learnerState: {
+          gamification: {
+            level: progress.level,
+            totalXP: progress.totalXP,
+            currentXP: progress.currentXP,
+            streak: progress.streak,
+            lastStudyDate: progress.lastStudyDate,
+          },
+        },
+      }),
+    });
+  } catch (error) {
+    // Fail silently - localStorage is the source of truth
+    console.warn('XP persistence to API failed:', error);
+  }
+}
 
 export interface UseXPSystemReturn {
   // Current state
@@ -57,11 +85,17 @@ export function useXPSystem(): UseXPSystemReturn {
     }
   }, []);
 
-  // Save progress to localStorage whenever it changes
+  // Save progress to localStorage and API whenever it changes
   useEffect(() => {
     if (!isLoading) {
       try {
+        // Save to localStorage (immediate)
         localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+
+        // Persist to API (background)
+        persistToAPI(progress).catch((error) => {
+          console.error('Failed to persist XP to API:', error);
+        });
       } catch (error) {
         console.error('Failed to save XP progress:', error);
       }

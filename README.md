@@ -1,6 +1,23 @@
 # Studyin: The Personal Learning Companion (MVP)
 
+> **UI/UX Status**: ✅ Phase 1 Complete - Unified HeroUI Navigation | 🔄 Phase 2 In Progress - Design System
+
 This project is a local-first, AI-powered learning application designed to help you study your own materials more effectively. You can upload documents, have them automatically transformed into interactive lessons, and get personalized recommendations on what to study next.
+
+## 🎨 UI/UX Improvements
+
+**Recent Updates (2025-10-07)**:
+- ✅ Unified HeroUI Navbar across all pages
+- ✅ AppShell layout wrapper for consistent navigation
+- ✅ Fixed duplicate navbar issues
+- ✅ All production pages have consistent header
+- ✅ Shared design tokens + HeroUI/Tailwind theme bridge
+- ✅ Dark/light mode toggle now persists across routes
+- ✅ `/api/upload` gated to dev-only usage when `NEXT_PUBLIC_DEV_UPLOAD=1`
+- ✅ Token-aligned study/summary/upload/exam experiences + embedded drills/insights
+- ✅ Breadcrumbs + footer components for core flows
+
+See [MASTER_PLAN_UIUX.md](./MASTER_PLAN_UIUX.md) for complete UI/UX roadmap.
 
 ## Quick Start
 
@@ -65,6 +82,29 @@ The application is built around a simple, powerful loop:
 - Engine Spec & Prompts: docs/personal-adaptive-study-engine-spec.md
 - Optional Cloud Setup: docs/SUPABASE_SETUP.md
 - Archived history: docs/archive/README_HISTORY.md, docs/archive/IMPLEMENTATION_HISTORY.md, docs/archive/ui-blueprint/
+
+## Design Tokens (overview)
+- Single source of truth in `lib/design/tokens.ts` and `app/globals.css` CSS variables.
+- Tailwind + HeroUI theme consume the same palette for surfaces (`surface-*`), text (`text-*`), semantic (`semantic-*`), and analytics viz (`viz-*`).
+- Charts read token-backed CSS vars via the ECharts base adapter.
+
+## E2E UI Tests (Playwright)
+We ship a minimal smoke + snapshot suite to catch regressions from tokenization and routing.
+
+1. Start dev server (in another terminal)
+   ```bash
+   npm run dev:start  # serves at http://localhost:3005
+   ```
+2. Run e2e tests (first run accepts snapshots)
+   ```bash
+   npm run test:e2e -- --update-snapshots
+   ```
+3. Inspect report
+   ```bash
+   npx playwright show-report
+   ```
+
+Dev-only gate check: the suite also verifies `/api/upload` returns 403 without `NEXT_PUBLIC_DEV_UPLOAD=1`.
 > 
 > ### Optional Cloud (Supabase)
 > 

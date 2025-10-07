@@ -10,6 +10,16 @@ function sanitizeName(name: string): string {
 }
 
 export async function POST(request: Request) {
+  const isDevUploadEnabled =
+    process.env.NEXT_PUBLIC_DEV_UPLOAD === '1' && process.env.NODE_ENV !== 'production';
+
+  if (!isDevUploadEnabled) {
+    return NextResponse.json(
+      { error: 'upload route is available only in local development' },
+      { status: 403 }
+    );
+  }
+
   try {
     const form = await request.formData();
     const file = form.get('file');
@@ -27,4 +37,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error?.message ?? 'upload failed' }, { status: 500 });
   }
 }
-

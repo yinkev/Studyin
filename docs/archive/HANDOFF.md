@@ -83,8 +83,3 @@ Blueprint 'studyin-dev' weights tracked (2 LOs)
 Statuses: { draft: 2 }
 ```
 
----
-
-**To resume, provide this entire `HANDOFF.md` file as context in the new chat and invoke the agent noted below.**
-
-Next agent: AdaptiveEngineer · Model: gpt-5-codex-high · Scope: data/events.ndjson docs/HANDOFF.md scripts/lib/schema.mjs
