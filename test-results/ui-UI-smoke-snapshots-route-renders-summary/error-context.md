@@ -1,0 +1,177 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - link "Studyin" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8] [cursor=pointer]
+          - generic [ref=e11] [cursor=pointer]: Studyin
+        - list [ref=e12]:
+          - listitem [ref=e13]:
+            - link "Study" [ref=e14] [cursor=pointer]:
+              - /url: /study
+          - listitem [ref=e15]:
+            - link "Dashboard" [ref=e16] [cursor=pointer]:
+              - /url: /dashboard
+          - listitem [ref=e17]:
+            - link "Analytics" [ref=e18] [cursor=pointer]:
+              - /url: /summary
+          - listitem [ref=e19]:
+            - link "Upload" [ref=e20] [cursor=pointer]:
+              - /url: /upload
+        - list [ref=e21]:
+          - listitem [ref=e22]:
+            - link "Docs" [ref=e23] [cursor=pointer]:
+              - /url: /docs
+              - button "Docs" [ref=e24] [cursor=pointer]
+    - main [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e28]:
+          - paragraph [ref=e29]: Operational analytics
+          - heading "Summary" [level=1] [ref=e30]
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]: Release readiness
+            - generic [ref=e34]:
+              - paragraph [ref=e35]:
+                - text: Run
+                - code [ref=e36]: npm run score:rubric
+                - text: to generate a score snapshot.
+              - paragraph [ref=e37]: Critical gates must stay green — rerun rubric scoring before every release.
+          - generic [ref=e38]:
+            - generic [ref=e39]: Retention throughput
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - generic [ref=e42]: Total reviews
+                - generic [ref=e43]: "0"
+              - generic [ref=e44]:
+                - generic [ref=e45]: Correct
+                - generic [ref=e46]: "0"
+              - generic [ref=e47]:
+                - generic [ref=e48]: Incorrect
+                - generic [ref=e49]: "0"
+              - generic [ref=e50]:
+                - generic [ref=e51]: Success rate
+                - generic [ref=e52]: 0%
+          - generic [ref=e53]:
+            - generic [ref=e54]: Blueprint drift
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - generic [ref=e58]: Blueprint drift
+                - paragraph [ref=e59]: Compare target LO mix against observed practice
+              - img "Blueprint drift chart" [ref=e61]:
+                - generic [ref=e66]:
+                  - generic [ref=e69]: 0%
+                  - generic [ref=e71]: 20%
+                  - generic [ref=e73]: 40%
+                  - generic [ref=e75]: 60%
+                  - generic [ref=e77]: 80%
+                  - generic [ref=e79]: 100%
+                - generic [ref=e80]:
+                  - generic [ref=e83]: Target % (blueprint)
+                  - generic [ref=e86]: Practice % (observed)
+          - generic [ref=e87]:
+            - generic [ref=e88]: Mastery · TTM
+            - button "View details" [ref=e95]
+          - generic [ref=e96]:
+            - generic [ref=e97]: Speed vs accuracy
+            - button "View details" [ref=e105]
+          - generic [ref=e106]:
+            - generic [ref=e107]: Confusion hotspots
+            - button "View details" [ref=e113]
+          - generic [ref=e114]:
+            - generic [ref=e115]: Evidence efficacy
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - generic [ref=e119]: Confusion graph
+                - paragraph [ref=e120]: LO nodes connect to distractors; width ~ count
+              - img "Confusion graph" [ref=e122]:
+                - generic [ref=e123]: No confusion edges yet
+          - generic [ref=e125]: TTM canvas
+          - generic [ref=e130]:
+            - generic [ref=e131]: Adaptive dashboards
+            - generic [ref=e133]:
+              - generic [ref=e134]:
+                - generic [ref=e135]:
+                  - heading "Priority LOs" [level=3] [ref=e136]
+                  - generic [ref=e137]: Top 0
+                - list [ref=e138]:
+                  - listitem [ref=e139]: No mastery deficits detected.
+              - generic [ref=e140]:
+                - generic [ref=e141]:
+                  - heading "Stalled LOs" [level=3] [ref=e142]
+                  - generic [ref=e143]: "0"
+                - list [ref=e144]:
+                  - listitem [ref=e145]: No stalled LOs.
+              - generic [ref=e146]:
+                - generic [ref=e147]:
+                  - heading "Overexposed items" [level=3] [ref=e148]
+                  - generic [ref=e149]: "0"
+                - list [ref=e150]:
+                  - listitem [ref=e151]: No overexposed items.
+          - generic [ref=e152]:
+            - generic [ref=e153]: Mastery insights
+            - generic [ref=e155]:
+              - heading "Mastery Insights" [level=2] [ref=e156]
+              - list [ref=e157]:
+                - listitem [ref=e158]: No mastery data available yet.
+          - generic [ref=e159]:
+            - generic [ref=e160]: Confusion graph
+            - paragraph [ref=e162]: No confusion edges yet. Collect more attempts.
+          - generic [ref=e163]:
+            - generic [ref=e164]: Blueprint flow
+            - paragraph [ref=e166]: Blueprint not configured.
+          - generic [ref=e167]:
+            - generic [ref=e168]: Recent session traces
+            - generic [ref=e171]:
+              - generic [ref=e173]:
+                - generic:
+                  - img:
+                    - generic:
+                      - button "Edge from 84f932ed-81bf-4b02-b878-738121b33be5-0 to 84f932ed-81bf-4b02-b878-738121b33be5-1" [ref=e174] [cursor=pointer]:
+                        - generic [ref=e177] [cursor=pointer]:
+                          - generic: 2:39:56 PM
+                      - button "Edge from 84f932ed-81bf-4b02-b878-738121b33be5-1 to 84f932ed-81bf-4b02-b878-738121b33be5-2" [ref=e179] [cursor=pointer]:
+                        - generic [ref=e182] [cursor=pointer]:
+                          - generic: 2:40:01 PM
+                  - generic:
+                    - button "item.shoulder.anterior-dislocation ❌" [ref=e184]: item.shoulder.anterior-dislocation ❌
+                    - button "item.ulnar.power-grip ✅" [ref=e187]: item.ulnar.power-grip ✅
+                    - button "item.ulnar.power-grip ❌" [ref=e190]: item.ulnar.power-grip ❌
+                    - button "item.ulnar.claw-hand ✅" [ref=e193]: item.ulnar.claw-hand ✅
+              - img [ref=e196]
+              - generic [ref=e198]:
+                - button "zoom in" [ref=e199] [cursor=pointer]:
+                  - img [ref=e200] [cursor=pointer]
+                - button "zoom out" [ref=e202] [cursor=pointer]:
+                  - img [ref=e203] [cursor=pointer]
+                - button "fit view" [ref=e205] [cursor=pointer]:
+                  - img [ref=e206] [cursor=pointer]
+    - contentinfo [ref=e209]:
+      - generic [ref=e210]:
+        - generic [ref=e211]:
+          - paragraph [ref=e212]: Studyin
+          - paragraph [ref=e213]: Adaptive study, deterministic analytics.
+        - navigation [ref=e214]:
+          - link "Home" [ref=e215] [cursor=pointer]:
+            - /url: /
+          - link "Docs" [ref=e216] [cursor=pointer]:
+            - /url: /docs
+          - link "GitHub" [ref=e217] [cursor=pointer]:
+            - /url: https://github.com/kyin/Studyin
+  - generic [ref=e222] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e223] [cursor=pointer]:
+      - img [ref=e224] [cursor=pointer]
+    - generic [ref=e227] [cursor=pointer]:
+      - button "Open issues overlay" [ref=e228] [cursor=pointer]:
+        - generic [ref=e229] [cursor=pointer]:
+          - generic [ref=e230] [cursor=pointer]: "0"
+          - generic [ref=e231] [cursor=pointer]: "1"
+        - generic [ref=e232] [cursor=pointer]: Issue
+      - button "Collapse issues badge" [ref=e233] [cursor=pointer]:
+        - img [ref=e234] [cursor=pointer]
+  - alert [ref=e236]
+```
