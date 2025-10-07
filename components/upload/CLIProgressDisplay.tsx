@@ -26,14 +26,14 @@ interface CLIProgressDisplayProps {
 }
 
 const STEP_CONFIG: Record<CLIStep, { icon: string; label: string; color: string; target: number }> = {
-  init: { icon: '🚀', label: 'Initializing', color: '#94a3b8', target: 0 },
-  ocr: { icon: '👁️', label: 'Gemini OCR', color: '#1CB0F6', target: 30 },
-  'lo-extraction': { icon: '🎯', label: 'Extract LOs', color: '#58CC02', target: 50 },
-  'mcq-generation': { icon: '✍️', label: 'Generate MCQs', color: '#FFC800', target: 70 },
-  validation: { icon: '✅', label: 'Validate', color: '#CE82FF', target: 85 },
-  refinement: { icon: '🔧', label: 'Refine', color: '#FF4B4B', target: 95 },
-  saving: { icon: '💾', label: 'Saving', color: '#58CC02', target: 99 },
-  onComplete: { icon: '🎉', label: 'Complete', color: '#58CC02', target: 100 },
+  init: { icon: '🚀', label: 'Initializing', color: 'var(--text-low)', target: 0 },
+  ocr: { icon: '👁️', label: 'Gemini OCR', color: 'var(--brand-light)', target: 30 },
+  'lo-extraction': { icon: '🎯', label: 'Extract LOs', color: 'var(--semantic-success)', target: 50 },
+  'mcq-generation': { icon: '✍️', label: 'Generate MCQs', color: 'var(--semantic-warning)', target: 70 },
+  validation: { icon: '✅', label: 'Validate', color: 'var(--viz-mastery-high)', target: 85 },
+  refinement: { icon: '🔧', label: 'Refine', color: 'var(--semantic-danger)', target: 95 },
+  saving: { icon: '💾', label: 'Saving', color: 'var(--semantic-success)', target: 99 },
+  onComplete: { icon: '🎉', label: 'Complete', color: 'var(--semantic-success)', target: 100 },
 };
 
 export function CLIProgressDisplay({
@@ -80,22 +80,22 @@ export function CLIProgressDisplay({
   }, [logs]);
 
   return (
-    <div className="glow-card p-6 rounded-3xl">
+    <div className="glow-card p-6 rounded-3xl bg-surface-bg0/70 border border-text-low/15">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-white">{fileName}</h3>
-          <p className="text-xs text-slate-400 font-mono">{jobId}</p>
+          <h3 className="text-lg font-bold text-text-high">{fileName}</h3>
+          <p className="text-xs text-text-med font-mono">{jobId}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-2xl">{stepConfig.icon}</span>
-          <span className="text-sm font-semibold text-white">{stepConfig.label}</span>
+          <span className="text-sm font-semibold text-text-high">{stepConfig.label}</span>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-6">
-        <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden relative">
+        <div className="w-full h-4 bg-surface-bg2 rounded-full overflow-hidden relative">
           <div
             ref={progressBarRef}
             className="h-full rounded-full transition-all"
@@ -107,8 +107,8 @@ export function CLIProgressDisplay({
           />
         </div>
         <div className="flex items-center justify-between mt-2 text-xs">
-          <span className="text-slate-400">{progress?.message || 'Waiting...'}</span>
-          <span className="text-white font-mono font-bold">{currentProgress}%</span>
+          <span className="text-text-med">{progress?.message || 'Waiting...'}</span>
+          <span className="text-text-high font-mono font-bold">{currentProgress}%</span>
         </div>
       </div>
 
@@ -125,10 +125,10 @@ export function CLIProgressDisplay({
               key={step}
               className={`flex flex-col items-center p-3 rounded-2xl transition-all ${
                 isActive
-                  ? 'bg-white/10 border-2 scale-105'
+                  ? 'bg-surface-bg0/80 border-2 scale-105'
                   : isComplete
-                  ? 'bg-white/5'
-                  : 'bg-slate-800/50'
+                  ? 'bg-surface-bg0/50'
+                  : 'bg-surface-bg2/50'
               }`}
               style={{
                 borderColor: isActive ? config.color : 'transparent',
@@ -137,31 +137,31 @@ export function CLIProgressDisplay({
               <span className={`text-2xl mb-1 ${isActive ? 'animate-bounce' : ''}`}>
                 {isComplete ? '✓' : config.icon}
               </span>
-              <span className="text-[10px] text-center text-slate-400">{config.label}</span>
+              <span className="text-[10px] text-center text-text-med">{config.label}</span>
             </div>
           );
         })}
       </div>
 
       {/* CLI Logs */}
-      <div className="rounded-2xl bg-slate-950 border border-white/10 p-4">
+      <div className="rounded-2xl bg-surface-bg2 border border-text-low/15 p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-xs font-semibold text-slate-400">CLI Output</div>
-          <div className="text-xs text-slate-500">{logs.length} lines</div>
+          <div className="text-xs font-semibold text-text-med">CLI Output</div>
+          <div className="text-xs text-text-low">{logs.length} lines</div>
         </div>
         <div
           ref={logsRef}
-          className="h-32 overflow-y-auto font-mono text-xs text-slate-300 space-y-1"
+          className="h-32 overflow-y-auto font-mono text-xs text-text-high space-y-1"
           style={{
             scrollbarWidth: 'thin',
-            scrollbarColor: '#475569 #1e293b',
+            scrollbarColor: 'var(--text-low) var(--surface-bg2)',
           }}
         >
           {logs.length === 0 ? (
-            <div className="text-slate-500 italic">Waiting for CLI output...</div>
+            <div className="text-text-low italic">Waiting for CLI output...</div>
           ) : (
             logs.map((log, index) => (
-              <div key={index} className="hover:bg-white/5 px-2 py-1 rounded">
+              <div key={index} className="hover:bg-surface-bg0/40 px-2 py-1 rounded">
                 {log}
               </div>
             ))
@@ -171,8 +171,8 @@ export function CLIProgressDisplay({
 
       {/* Status Footer */}
       {isProcessing && (
-        <div className="mt-4 flex items-center justify-center gap-2 text-sm text-slate-400">
-          <div className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+        <div className="mt-4 flex items-center justify-center gap-2 text-sm text-text-med">
+          <div className="w-2 h-2 rounded-full bg-brand-light animate-pulse" />
           Processing with Gemini + Codex CLI...
         </div>
       )}

@@ -9,12 +9,13 @@ const config = {
     baseURL: 'http://localhost:3005',
     headless: true,
   },
+  globalSetup: './tests/e2e-js/global-setup.js',
   webServer: {
     command: 'npm run dev:start',
     port: 3005,
-    reuseExistingServer: true,
-    timeout: 120_000,
+    reuseExistingServer: false,
+    timeout: 180_000,
   },
 };
 
-module.exports = config;
+export default config;
