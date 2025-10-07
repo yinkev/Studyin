@@ -1,6 +1,6 @@
 # Personal Adaptive Study Engine — PRD
 
-> Consensus Note (2025-10-06): Validated via Zen MCP (Gemini) against repo state. No scope change. Minor clarifications are enumerated below; architecture remains deterministic with shims and seeded randomness only.
+ > Consensus Note (2025-10-07): Validated via Zen MCP (Gemini) against current repo state. No scope change. Minor clarifications enumerated below; line citations refreshed; architecture remains deterministic with shims and seeded randomness only.
 
 ## Context & Problem Statement
 - We are introducing a personal adaptive study engine that selects items in-session, schedules across topics, and hands off mastered content to a retention lane. The authoritative behavior is defined in `docs/personal-adaptive-study-engine-spec.md` and its delivery prompt. We must implement the engine deterministically, respecting blueprint rails, exposure caps, and stop rules articulated in the spec, while aligning with our existing validator, analytics, and governance stack.
@@ -47,7 +47,7 @@ Consensus Clarifications
 - Enforce blueprint share within ±5% per system/LO, using multipliers `max(0.2, 1 − drift*2)` and `1 + drift*3` (cap 1.5). Exposure caps: item/user ≤1/day, ≤2/week, 96h cooldown; multiplier returns to 0.5 post‑cooldown and 1.0 after 7 days clean. Reduce exposure to 0.6 for items with mean score >0.9 and SE<0.15 unless in retention.
 
 5) Telemetry & Analytics
-- Log training, scheduler, and retention events to NDJSON using `scripts/lib/schema.mjs` event types (`attemptEventSchema` at `scripts/lib/schema.mjs:103`–`125`; `sessionEventSchema` at `scripts/lib/schema.mjs:127`–`138`).
+- Log training, scheduler, and retention events to NDJSON using `scripts/lib/schema.mjs` event types (`attemptEventSchema` at `scripts/lib/schema.mjs:142`–`165`; `sessionEventSchema` at `scripts/lib/schema.mjs:167`–`179`).
 - `npm run analyze` produces `public/analytics/latest.json` using analyzer core (`scripts/analyze.mjs:10`–`18`, `scripts/lib/analyzer-core.mjs:37`–`175`, `scripts/lib/analyzer-core.mjs:220`–`243`).
 - “Why this next” reads from `latest.json` and engine signals for transparency.
 
@@ -61,8 +61,8 @@ Consensus Clarifications
 - Privacy: telemetry stays pseudonymous; service role keys server‑only.
 
 ## Acceptance Gates
-- Item Gate: validator clean; ABCDE structure; per‑choice rationales; LO mapped; evidence `{file,page,(bbox|cropPath)}` or relaxed with citation when `REQUIRE_EVIDENCE_CROP=0` (`scripts/validate-items.mjs:150`–`157`). Published items must meet `rubric_score ≥ 2.7` (`scripts/validate-items.mjs:146`–`147`).
-- Exam Gate: blueprint feasibility verified; deficits returned with 409 (`app/api/forms/route.ts:12`, `app/api/forms/route.ts:32`, `app/api/forms/route.ts:35`). Evidence remains locked in exam UI.
+- Item Gate: validator clean; ABCDE structure; per‑choice rationales; LO mapped; evidence `{file,page,(bbox|cropPath)}` or relaxed with citation when `REQUIRE_EVIDENCE_CROP=0` (`scripts/validate-items.mjs:149`–`157`). Published items must meet `rubric_score ≥ 2.7` (`scripts/validate-items.mjs:145`–`147`).
+- Exam Gate: blueprint feasibility verified; deficits returned with 409 (`app/api/forms/route.ts:12`, `app/api/forms/route.ts:31`–`33`, `app/api/forms/route.ts:34`–`43`). Evidence remains locked in exam UI.
 - Analytics Gate: `latest.json` contains `ttm_per_lo`, `elg_per_min`, `confusion_edges`, `speed_accuracy`, `nfd_summary`, and `reliability` generated deterministically from NDJSON (`scripts/analyze.mjs:10`, `scripts/lib/analyzer-core.mjs:37`).
 - Engine Gate: blueprint rails enforced (±5%); exposure caps enforced (≤1/day, ≤2/week, 96h cooldown); stop rules respected; randomesque top‑K; retention budgeting applied; all thresholds logged.
 - Governance Gate: `npm run score:rubric` output attached (`public/analytics/rubric-score.json`), PLAN updated post‑merge.
