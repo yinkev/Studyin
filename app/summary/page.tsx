@@ -1,13 +1,14 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { loadAnalyticsSummary } from '../../lib/getAnalytics';
-import { TTMCard } from '../../components/okc/charts/TTMCard';
-import { SpeedAccuracyCard } from '../../components/okc/charts/SpeedAccuracyCard';
-import { ConfusionBarCard } from '../../components/okc/charts/ConfusionBarCard';
+// ECharts cards removed - using Canvas/D3 alternatives
+// import { TTMCard } from '../../components/okc/charts/TTMCard';
+// import { SpeedAccuracyCard } from '../../components/okc/charts/SpeedAccuracyCard';
+// import { ConfusionBarCard } from '../../components/okc/charts/ConfusionBarCard';
 import { ConfusionForce } from '../../components/charts/ConfusionForce';
 import { BlueprintDriftChart } from '../../components/charts/BlueprintDriftChart';
 import { TTMBarCanvas } from '../../components/canvas/TTMBarCanvas';
-import { Card, CardContent, CardHeader } from '../../components/ui/card';
+import { Card } from '@mantine/core';
 import { ConfusionGraph } from '../../components/graphs/ConfusionGraph';
 import { BlueprintFlow } from '../../components/graphs/BlueprintFlow';
 import { SessionFlow } from '../../components/graphs/SessionFlow';
@@ -64,7 +65,7 @@ export default async function SummaryPage() {
     ? Object.entries(analytics.mastery_per_lo).map(([lo_id, score]) => ({ lo_id, score }))
     : [];
   return (
-      <section className="space-y-8 text-text-high min-h-screen bg-surface-bg1 px-6 py-8">
+      <section className="space-y-8 text-text-high min-h-screen px-6 py-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-text-med">Operational analytics</p>
@@ -77,9 +78,9 @@ export default async function SummaryPage() {
         )}
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="h-full">
-          <CardHeader>Release readiness</CardHeader>
-          <CardContent className="space-y-4 text-sm">
+        <div className="glass-clinical-card h-full">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Release readiness</div>
+          <div className="space-y-4 text-sm">
             {rubric ? (
               <div className="flex items-center justify-between">
                 <span>Rubric score</span>
@@ -93,11 +94,11 @@ export default async function SummaryPage() {
               </p>
             )}
             <p className="text-xs text-text-med">Critical gates must stay green — rerun rubric scoring before every release.</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>Retention throughput</CardHeader>
-          <CardContent className="space-y-2 text-sm">
+          </div>
+        </div>
+        <div className="glass-clinical-card">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Retention throughput</div>
+          <div className="space-y-2 text-sm">
             {analytics?.retention_summary ? (
               <>
                 <div className="flex items-center justify-between">
@@ -122,74 +123,71 @@ export default async function SummaryPage() {
                 No retention reviews logged yet. Run the study flow with FSRS queue to populate analytics.
               </p>
             )}
-          </CardContent>
-        </Card>
-        <Card className="h-full">
-          <CardHeader>Blueprint drift</CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card h-full">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Blueprint drift</div>
+          <div>
             <BlueprintDriftChart analytics={analytics} weights={blueprint?.weights ?? {}} />
-          </CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Mastery · TTM (Canvas)</div>
+          <div>
+            <TTMBarCanvas analytics={analytics} height={320} />
+          </div>
+        </div>
+        {/* ECharts charts removed - TODO: Replace with D3/Recharts alternatives */}
+        {/* <Card padding="lg">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Speed vs accuracy</div>
+          <div>Speed/Accuracy chart placeholder</div>
         </Card>
-        <Card>
-          <CardHeader>Mastery · TTM</CardHeader>
-          <CardContent>
-            <TTMCard analytics={analytics} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>Speed vs accuracy</CardHeader>
-          <CardContent>
-            <SpeedAccuracyCard analytics={analytics} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>Confusion hotspots</CardHeader>
-          <CardContent>
-            <ConfusionBarCard analytics={analytics} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>Evidence efficacy</CardHeader>
-          <CardContent>
+        <Card padding="lg">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Confusion hotspots</div>
+          <div>Confusion chart placeholder</div>
+        </Card> */}
+        <div className="glass-clinical-card">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Evidence efficacy</div>
+          <div>
             <ConfusionForce analytics={analytics} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>TTM canvas</CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">TTM canvas</div>
+          <div>
             <TTMBarCanvas analytics={analytics} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full">
-          <CardHeader>Adaptive dashboards</CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card col-span-full">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Adaptive dashboards</div>
+          <div>
             <SummaryDashboards dashboards={dashboards} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full">
-          <CardHeader>Mastery insights</CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card col-span-full">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Mastery insights</div>
+          <div>
             <InsightsView masteryScores={masteryScores} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full">
-          <CardHeader>Confusion graph</CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card col-span-full">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Confusion graph</div>
+          <div>
             <ConfusionGraph analytics={analytics} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full">
-          <CardHeader>Blueprint flow</CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card col-span-full">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Blueprint flow</div>
+          <div>
             <BlueprintFlow analytics={analytics} weights={blueprint?.weights ?? {}} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full">
-          <CardHeader>Recent session traces</CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        <div className="glass-clinical-card col-span-full">
+          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Recent session traces</div>
+          <div>
             <SessionFlow attempts={attempts} />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -85,15 +85,20 @@ export function useUploader() {
     [jobs]
   );
 
+  // Stable reference to the pending job IDs string for dependency tracking
+  const pendingJobIdsString = pendingJobIds.join(',');
+
   useEffect(() => {
     if (!pendingJobIds.length) {
       return;
     }
 
     let cancelled = false;
+    let timeoutId: NodeJS.Timeout;
 
     const tick = async () => {
       if (cancelled) return;
+
       await Promise.all(
         pendingJobIds.map(async (jobId) => {
           try {
@@ -155,16 +160,18 @@ export function useUploader() {
       );
 
       if (!cancelled) {
-        setTimeout(tick, 1500);
+        timeoutId = setTimeout(tick, 1500);
       }
     };
 
-    tick();
+    const initialTimeoutId = setTimeout(tick, 0);
 
     return () => {
       cancelled = true;
+      clearTimeout(initialTimeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [pendingJobIds]);
+  }, [pendingJobIdsString]);
 
   const reset = useCallback(() => {
     setFile(null);

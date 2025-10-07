@@ -10,7 +10,8 @@ import { Breadcrumbs } from '../../components/layout/Breadcrumbs';
 async function loadLatestLesson(): Promise<InteractiveLesson | null> {
   const customDir = process.env.LESSON_STORAGE_DIR ?? path.join(process.cwd(), 'data', 'lessons');
   const fallbackDir = path.join(process.cwd(), 'content', 'lessons');
-  const dirs = [customDir, fallbackDir];
+  const wristHandDir = path.join(process.cwd(), 'content', 'lessons', 'wrist-hand');
+  const dirs = [customDir, fallbackDir, wristHandDir];
 
   for (const dir of dirs) {
     try {
@@ -49,16 +50,53 @@ export default async function StudyPage() {
       { label: 'Study' },
     ];
     return (
-        <div className="min-h-screen bg-surface-bg1 px-6 py-24 text-text-high">
-        <div className="mx-auto max-w-4xl text-center">
+      <div className="min-h-screen px-6 py-24 text-text-high">
+        <div className="mx-auto max-w-4xl">
           <Breadcrumbs items={crumbs} />
-          <div className="mt-6">
-            <GlowCard className="border border-[rgba(148,163,184,0.2)] bg-surface-bg2/70 p-16 text-text-high">
-              <h1 className="text-4xl font-bold text-text-high">No lessons yet</h1>
-              <p className="mt-3 text-text-med">
-                Upload a source file to generate your first adaptive lesson. Once the worker finishes, it will appear here automatically.
+          <div className="mt-12">
+            <div className="glass-clinical-card p-12 md:p-16 text-center">
+              {/* Icon */}
+              <div className="mb-6 flex justify-center">
+                <div className="w-24 h-24 rounded-2xl shadow-clinical-lg flex items-center justify-center"
+                     style={{ background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' }}>
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                  </svg>
+                </div>
+              </div>
+
+              <h1 className="text-4xl font-bold text-text-high mb-4">No Lessons Available</h1>
+              <p className="text-lg text-text-med mb-8 max-w-2xl mx-auto">
+                Upload a document to generate your first interactive lesson. Our AI will create personalized MCQs, evidence cards, and adaptive drills.
               </p>
-            </GlowCard>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/upload" className="clinical-button inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold shadow-clinical-md hover:shadow-clinical-lg transition-all">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M3 15l7.5-7.5L18 15m-7.5-7.5V21"/>
+                  </svg>
+                  Upload Document
+                </a>
+                <a href="/dashboard" className="clinical-button-secondary inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                  </svg>
+                  View Dashboard
+                </a>
+              </div>
+
+              {/* Info */}
+              <div className="mt-10 pt-8 border-t border-border-default">
+                <p className="text-sm text-text-low">
+                  Supported formats: PDF, PPT, DOCX, Markdown • Processing typically takes 2-5 minutes
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -66,7 +104,7 @@ export default async function StudyPage() {
   }
 
   return (
-      <div className="min-h-screen bg-surface-bg1 px-6 py-16 text-text-high">
+      <div className="min-h-screen px-6 py-16 text-text-high">
       <div className="mx-auto flex max-w-6xl flex-col gap-12">
         <Breadcrumbs
           items={[

@@ -21,17 +21,12 @@ export function GlowCard({
   useEffect(() => {
     if (!ref.current) return;
     const element = ref.current;
-    const animation = anime({
-      targets: element,
-      opacity: [0, 1],
-      translateY: [24, 0],
-      boxShadow: [
-        '0 0 0 rgba(0,0,0,0)',
-        `0 20px 60px ${glowColor}`
-      ],
+    const animation = anime(element, {
+      opacity: { from: 0, to: 1 },
+      translateY: { from: 24, to: 0 },
       duration: 900,
       delay: delayMs,
-      ease: 'easeOutExpo'
+      ease: 'outExpo'
     });
     return () => {
       animation.pause();

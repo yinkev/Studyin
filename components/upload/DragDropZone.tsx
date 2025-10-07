@@ -7,7 +7,7 @@
  */
 
 import { useState, useRef, DragEvent, ChangeEvent } from 'react';
-import { animate as anime } from "animejs";
+import anime from "animejs";
 
 interface DragDropZoneProps {
   onFileSelect: (file: File) => void;
@@ -41,7 +41,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
         targets: dropZoneRef.current,
         scale: [1, 1.02],
         duration: 200,
-        ease: 'easeOutQuad',
+        easing: 'easeOutQuad',
       });
     }
   };
@@ -57,7 +57,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
         targets: dropZoneRef.current,
         scale: [1.02, 1],
         duration: 200,
-        ease: 'easeOutQuad',
+        easing: 'easeOutQuad',
       });
     }
   };
@@ -80,7 +80,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
         targets: dropZoneRef.current,
         scale: [1.02, 1],
         duration: 300,
-        ease: 'easeOutElastic(1, 0.6)',
+        easing: 'easeOutElastic(1, 0.6)',
       });
     }
 
@@ -119,13 +119,13 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
       onDrop={handleDrop}
       onClick={handleClick}
       className={`
-        relative h-64 rounded-3xl border-2 border-dashed transition-all cursor-pointer
+        glass-clinical-card relative h-64 transition-all cursor-pointer
         ${
           isDragging
-            ? 'border-brand-light bg-brand-light/20 shadow-[0_0_40px_var(--accent-trust-glow)]'
+            ? 'border-brand-light !bg-brand-light/20 shadow-[0_0_40px_rgba(59,130,246,0.3)]'
           : selectedFile
-            ? 'border-semantic-success bg-semantic-success/10'
-            : 'border-text-low/20 bg-surface-bg0/70 hover:border-brand-light hover:bg-surface-bg0/90'
+            ? 'border-semantic-success !bg-semantic-success/10'
+            : 'hover:border-brand-light'
         }
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}

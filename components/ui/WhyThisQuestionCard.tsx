@@ -6,7 +6,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardBody, Button, Modal, ModalContent, ModalHeader, ModalBody } from '@heroui/react';
+import { Card, Button, Modal } from '@mantine/core';
 
 interface WhyThisQuestionCardProps {
   darkMode?: boolean;
@@ -52,8 +52,8 @@ export function WhyThisQuestionCard({
           ? '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
           : '0 4px 0 #E5E7EB, 0 8px 16px rgba(0, 0, 0, 0.06)',
         border: darkMode ? `1px solid ${theme.cardBorder}` : 'none',
-      }}>
-        <CardBody className="p-6">
+      }} padding="lg">
+        <div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl transition-colors" style={{ background: darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)' }}>
@@ -69,8 +69,8 @@ export function WhyThisQuestionCard({
             <Button
               size="sm"
               variant="light"
-              onPress={() => setShowMathModal(true)}
-              endContent={
+              onClick={() => setShowMathModal(true)}
+              rightSection={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="12" y1="16" x2="12" y2="12"/>
@@ -132,23 +132,25 @@ export function WhyThisQuestionCard({
               </div>
             </div>
           </div>
-        </CardBody>
+        </div>
       </Card>
 
       {/* Math Explanation Modal */}
       <Modal
-        isOpen={showMathModal}
+        opened={showMathModal}
         onClose={() => setShowMathModal(false)}
-        size="2xl"
-        scrollBehavior="inside"
+        size="xl"
+        centered
+        styles={{
+          content: {
+            background: theme.cardBg,
+            backdropFilter: darkMode ? 'blur(20px)' : 'none',
+            border: darkMode ? `1px solid ${theme.cardBorder}` : 'none',
+          }
+        }}
       >
-        <ModalContent style={{
-          background: theme.cardBg,
-          backdropFilter: darkMode ? 'blur(20px)' : 'none',
-          border: darkMode ? `1px solid ${theme.cardBorder}` : 'none',
-        }}>
-          <ModalHeader style={{ color: theme.textPrimary }}>
-            <div className="flex items-center gap-3">
+        <div style={{ color: theme.textPrimary }}>
+          <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-xl" style={{ background: darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
@@ -161,8 +163,8 @@ export function WhyThisQuestionCard({
               </div>
               <span>How Adaptive Learning Works</span>
             </div>
-          </ModalHeader>
-          <ModalBody className="pb-6">
+          </div>
+          <div className="pb-6">
             <div className="space-y-6" style={{ color: theme.textSecondary }}>
               <div>
                 <h4 className="font-bold text-sm mb-2" style={{ color: theme.textPrimary }}>📊 Your Ability Estimate (θ̂ = {abilityLevel.toFixed(2)})</h4>
@@ -220,8 +222,8 @@ export function WhyThisQuestionCard({
                 </p>
               </div>
             </div>
-          </ModalBody>
-        </ModalContent>
+          </div>
+        </div>
       </Modal>
     </>
   );

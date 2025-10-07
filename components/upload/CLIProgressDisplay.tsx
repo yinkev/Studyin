@@ -33,7 +33,7 @@ const STEP_CONFIG: Record<CLIStep, { icon: string; label: string; color: string;
   validation: { icon: '✅', label: 'Validate', color: 'var(--viz-mastery-high)', target: 85 },
   refinement: { icon: '🔧', label: 'Refine', color: 'var(--semantic-danger)', target: 95 },
   saving: { icon: '💾', label: 'Saving', color: 'var(--semantic-success)', target: 99 },
-  onComplete: { icon: '🎉', label: 'Complete', color: 'var(--semantic-success)', target: 100 },
+  complete: { icon: '🎉', label: 'Complete', color: 'var(--semantic-success)', target: 100 },
 };
 
 export function CLIProgressDisplay({

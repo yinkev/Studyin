@@ -85,28 +85,29 @@ export const tokens: DesignTokens = {
       '3xl': '64px'
     },
     radius: {
-      xs: '4px',
-      sm: '8px',
-      md: '12px',
-      lg: '16px',
-      xl: '24px',
-      full: '9999px'
+      xs: '6px',     // Clinical Clarity: small buttons, badges
+      sm: '8px',     // Clinical Clarity: default buttons, inputs
+      md: '12px',    // Clinical Clarity: cards
+      lg: '16px',    // Clinical Clarity: large cards
+      xl: '20px',    // Clinical Clarity: hero sections
+      full: '9999px' // Clinical Clarity: pills, avatars
     },
     shadow: {
       sm: {
-        value: '0 4px 12px rgba(15, 23, 42, 0.15)'
+        value: '0 1px 3px rgba(15, 23, 42, 0.08)',  // Clinical Clarity: subtle
+        focusRing: '0 0 0 2px rgba(59, 130, 246, 0.5)' // Clinical Clarity: blue focus
       },
       md: {
-        value: '0 10px 24px rgba(15, 23, 42, 0.18)',
-        focusRing: '0 0 0 1px rgba(34, 211, 238, 0.3)'
+        value: '0 4px 12px rgba(15, 23, 42, 0.08)',
+        focusRing: '0 0 0 2px rgba(59, 130, 246, 0.5)'
       },
       lg: {
-        value: '0 20px 45px rgba(15, 23, 42, 0.24)',
-        focusRing: '0 0 0 1px rgba(167, 139, 250, 0.3)'
+        value: '0 10px 24px rgba(15, 23, 42, 0.12)',
+        focusRing: '0 0 0 2px rgba(59, 130, 246, 0.5)'
       },
       xl: {
-        value: '0 35px 65px rgba(15, 23, 42, 0.32)',
-        focusRing: '0 0 0 1px rgba(56, 189, 248, 0.35)'
+        value: '0 20px 40px rgba(15, 23, 42, 0.16)',
+        focusRing: '0 0 0 2px rgba(59, 130, 246, 0.5)'
       }
     },
     motion: {
@@ -118,68 +119,68 @@ export const tokens: DesignTokens = {
   themes: {
     dark: {
       brand: {
-        primary: '#5B9CFF',
-        secondary: '#9B6BFF',
-        tertiary: '#38E3C2'
+        primary: '#60a5fa',    // Clinical Clarity: blue-400
+        secondary: '#0d9488',  // Clinical Clarity: teal-600
+        tertiary: '#14b8a6'    // Clinical Clarity: teal-500
       },
       surface: {
-        bg0: '#0A0F1A',
-        bg1: '#0F172A',
-        bg2: '#162036',
-        bg3: '#1E293B'
+        bg0: '#0f172a',        // Clinical Clarity: slate-900
+        bg1: '#1e293b',        // Clinical Clarity: slate-800
+        bg2: '#334155',        // Clinical Clarity: slate-700
+        bg3: '#475569'         // Clinical Clarity: slate-600
       },
       text: {
-        high: '#F8FAFC',
-        med: '#C7D2FE',
-        low: '#93A4C3',
-        disabled: '#475569'
+        high: '#f8fafc',       // Clinical Clarity: slate-50
+        med: '#cbd5e1',        // Clinical Clarity: slate-300
+        low: '#94a3b8',        // Clinical Clarity: slate-400
+        disabled: '#64748b'    // Clinical Clarity: slate-500
       },
       semantic: {
-        success: '#3DD97F',
-        warning: '#FFD166',
-        danger: '#FF6B6B',
-        info: '#57C1FF'
+        success: '#34d399',    // Clinical Clarity: green-400 (bright for dark)
+        warning: '#fbbf24',    // Clinical Clarity: amber-400
+        danger: '#f87171',     // Clinical Clarity: red-400
+        info: '#0ea5e9'        // Clinical Clarity: sky-500
       },
       viz: {
-        masteryLow: '#F97316',
-        masteryMid: '#22D3EE',
-        masteryHigh: '#A78BFA',
-        confusionEdge: '#FF6363',
-        blueprintTarget: '#22C55E',
-        retention: '#FBBF24'
+        masteryLow: '#f59e0b',
+        masteryMid: '#60a5fa',
+        masteryHigh: '#8b5cf6',
+        confusionEdge: '#f87171',
+        blueprintTarget: '#34d399',
+        retention: '#fbbf24'
       }
     },
     light: {
       brand: {
-        primary: '#0891B2',
-        secondary: '#7C3AED',
-        tertiary: '#059669'
+        primary: '#3b82f6',    // Clinical Clarity: blue-500
+        secondary: '#0d9488',  // Clinical Clarity: teal-600
+        tertiary: '#14b8a6'    // Clinical Clarity: teal-500
       },
       surface: {
-        bg0: '#FFFFFF',
-        bg1: '#F8FAFC',
-        bg2: '#F1F5F9',
-        bg3: '#E2E8F0'
+        bg0: '#ffffff',        // Clinical Clarity: white
+        bg1: '#f8fafc',        // Clinical Clarity: slate-50
+        bg2: '#f1f5f9',        // Clinical Clarity: slate-100
+        bg3: '#e2e8f0'         // Clinical Clarity: slate-200
       },
       text: {
-        high: '#0F172A',
-        med: '#334155',
-        low: '#64748B',
-        disabled: '#94A3B8'
+        high: '#0f172a',       // Clinical Clarity: slate-900
+        med: '#475569',        // Clinical Clarity: slate-600
+        low: '#64748b',        // Clinical Clarity: slate-500
+        disabled: '#cbd5e1'    // Clinical Clarity: slate-300
       },
       semantic: {
-        success: '#10B981',
-        warning: '#F59E0B',
-        danger: '#EF4444',
-        info: '#3B82F6'
+        success: '#10b981',    // Clinical Clarity: emerald-500
+        warning: '#f59e0b',    // Clinical Clarity: amber-500
+        danger: '#ef4444',     // Clinical Clarity: red-500
+        info: '#0ea5e9'        // Clinical Clarity: sky-500
       },
       viz: {
-        masteryLow: '#F97316',
-        masteryMid: '#3B82F6',
-        masteryHigh: '#7C3AED',
-        confusionEdge: '#EF4444',
-        blueprintTarget: '#22C55E',
-        retention: '#F59E0B'
+        masteryLow: '#f97316',
+        masteryMid: '#3b82f6',
+        masteryHigh: '#7c3aed',
+        confusionEdge: '#ef4444',
+        blueprintTarget: '#10b981',
+        retention: '#f59e0b'
       }
     }
   }

@@ -2,7 +2,8 @@
 
 import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { HeroUIProvider } from '@heroui/react';
+import { MantineProvider } from '@mantine/core';
+import { theme } from '../styles/mantine-theme';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { XPProvider } from '../components/XPProvider';
 
@@ -24,11 +25,11 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <HeroUIProvider>
+      <MantineProvider theme={theme} defaultColorScheme="light">
         <ThemeProvider>
           <XPProvider>{children}</XPProvider>
         </ThemeProvider>
-      </HeroUIProvider>
+      </MantineProvider>
     </QueryClientProvider>
   );
 }
