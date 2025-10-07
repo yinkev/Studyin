@@ -8,7 +8,7 @@ This project is a local-first, AI-powered learning application designed to help 
 
 **Recent Updates (2025-10-07)**:
 - ✅ Unified HeroUI Navbar across all pages
-- ✅ AppShell layout wrapper for consistent navigation
+- ✅ Unified HeroUI Navbar in root layout (no AppShell)
 - ✅ Fixed duplicate navbar issues
 - ✅ All production pages have consistent header
 - ✅ Shared design tokens + HeroUI/Tailwind theme bridge
