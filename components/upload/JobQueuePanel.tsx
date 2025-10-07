@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { animate as anime } from "animejs";
+import anime from "animejs";
 import GlowCard from '../atoms/GlowCard';
 import { CLIProgressDisplay, type CLIProgress } from './CLIProgressDisplay';
 
@@ -49,7 +49,7 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
         translateY: [20, 0],
         duration: 600,
         delay: (anime as any).stagger ? (anime as any).stagger(100) : 0,
-        ease: 'easeOutExpo',
+        easing: 'easeOutExpo',
       });
     }
   }, [jobs.length]);
@@ -72,14 +72,14 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
 
   const getStatusBadge = (status: Job['status']) => {
     const badges = {
-      queued: { bg: 'bg-slate-500/90', text: 'Queued', icon: '⏳' },
-      processing: { bg: 'bg-sky-500/80', text: 'Processing', icon: '⚡' },
-      ready: { bg: 'bg-emerald-500/90', text: 'Ready', icon: '✅' },
-      failed: { bg: 'bg-rose-500/90', text: 'Failed', icon: '❌' },
+      queued: { bg: 'bg-text-low/30 text-text-high', text: 'Queued', icon: '⏳' },
+      processing: { bg: 'bg-brand-light/20 text-brand-light', text: 'Processing', icon: '⚡' },
+      ready: { bg: 'bg-semantic-success/20 text-semantic-success', text: 'Ready', icon: '✅' },
+      failed: { bg: 'bg-semantic-danger/20 text-semantic-danger', text: 'Failed', icon: '❌' },
     };
     const badge = badges[status];
     return (
-      <span className={`${badge.bg} rounded-full px-4 py-1 text-sm font-semibold text-white flex items-center gap-2`}>
+      <span className={`${badge.bg} rounded-full px-4 py-1 text-sm font-semibold flex items-center gap-2`}>
         <span>{badge.icon}</span>
         {badge.text}
       </span>
@@ -98,8 +98,8 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
       {/* Active Jobs */}
       {activeJobs.length > 0 && (
         <section>
-          <h2 className="text-2xl font-bold text-slate-100 mb-4 flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-sky-400 animate-pulse" />
+          <h2 className="text-2xl font-bold text-text-high mb-4 flex items-center gap-3">
+            <div className="w-3 h-3 rounded-full bg-brand-light animate-pulse" />
             Active Jobs ({activeJobs.length})
           </h2>
           <div className="space-y-4">
@@ -113,17 +113,17 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
                     isProcessing={true}
                   />
                 ) : (
-                  <GlowCard className="border border-white/10 bg-white/10 p-6 text-slate-100">
+                  <GlowCard className="border border-text-low/15 bg-surface-bg0/70 p-6 text-text-high">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm uppercase tracking-wide text-slate-300">{formatBytes(job.fileSize)}</p>
-                        <h3 className="text-lg font-semibold text-white">{job.fileName}</h3>
-                        <p className="text-xs text-slate-400 font-mono mt-1">Job ID: {job.id}</p>
+                        <p className="text-sm uppercase tracking-wide text-text-med">{formatBytes(job.fileSize)}</p>
+                        <h3 className="text-lg font-semibold text-text-high">{job.fileName}</h3>
+                        <p className="text-xs text-text-med font-mono mt-1">Job ID: {job.id}</p>
                       </div>
                       {getStatusBadge(job.status)}
                     </div>
                     {job.startedAt && (
-                      <div className="mt-3 text-xs text-slate-400">
+                      <div className="mt-3 text-xs text-text-med">
                         Processing for {formatDuration(job.startedAt)}
                       </div>
                     )}
@@ -138,43 +138,43 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
       {/* Completed Jobs */}
       {completedJobs.length > 0 && (
         <section>
-          <h2 className="text-2xl font-bold text-slate-100 mb-4">
+          <h2 className="text-2xl font-bold text-text-high mb-4">
             History ({completedJobs.length})
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
             {completedJobs.map((job) => (
               <GlowCard
                 key={job.id}
-                className={`job-card border p-6 text-slate-100 ${
+                className={`job-card border p-6 text-text-high ${
                   job.status === 'ready'
-                    ? 'border-emerald-500/30 bg-emerald-500/10'
-                    : 'border-rose-500/30 bg-rose-500/10'
+                    ? 'border-semantic-success/30 bg-semantic-success/10'
+                    : 'border-semantic-danger/30 bg-semantic-danger/10'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-sm uppercase tracking-wide text-slate-300">{formatBytes(job.fileSize)}</p>
-                    <h3 className="text-lg font-semibold text-white">{job.fileName}</h3>
+                    <p className="text-sm uppercase tracking-wide text-text-med">{formatBytes(job.fileSize)}</p>
+                    <h3 className="text-lg font-semibold text-text-high">{job.fileName}</h3>
                   </div>
                   {getStatusBadge(job.status)}
                 </div>
 
                 {job.lesson && (
-                  <div className="mt-4 space-y-1 text-sm text-slate-200">
-                    <p className="font-semibold text-white">{job.lesson.title}</p>
-                    <p className="text-slate-300">{job.lesson.summary}</p>
-                    <p className="text-xs text-slate-400 font-mono">LO: {job.lesson.lo_id}</p>
+                  <div className="mt-4 space-y-1 text-sm text-text-high">
+                    <p className="font-semibold text-text-high">{job.lesson.title}</p>
+                    <p className="text-text-med">{job.lesson.summary}</p>
+                    <p className="text-xs text-text-med font-mono">LO: {job.lesson.lo_id}</p>
                   </div>
                 )}
 
                 {job.error && (
-                  <div className="mt-3 rounded-2xl bg-rose-500/20 border border-rose-500/30 p-3">
-                    <p className="text-sm text-rose-300">{job.error}</p>
+                  <div className="mt-3 rounded-2xl bg-semantic-danger/10 border border-semantic-danger/30 p-3">
+                    <p className="text-sm text-semantic-danger">{job.error}</p>
                   </div>
                 )}
 
                 {job.completedAt && (
-                  <div className="mt-3 text-xs text-slate-400">
+                  <div className="mt-3 text-xs text-text-med">
                     Completed in {formatDuration(job.startedAt || job.queuedAt, job.completedAt)}
                   </div>
                 )}
@@ -184,7 +184,7 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
                   <div className="mt-4 flex gap-2">
                     <a
                       href={`studyin-cli://process?file=${encodeURIComponent(job.localPath)}`}
-                      className="inline-flex items-center rounded-2xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+                      className="inline-flex items-center rounded-2xl bg-surface-bg0/80 px-4 py-2 text-sm font-semibold text-text-high hover:bg-surface-bg0/60"
                     >
                       🔧 Process via CLI
                     </a>
@@ -196,7 +196,7 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
                   {job.status === 'failed' && onRetry && (
                     <button
                       onClick={() => onRetry(job.id)}
-                      className="flex-1 rounded-2xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600 transition-colors"
+                      className="flex-1 rounded-2xl bg-brand-light px-4 py-2 text-sm font-semibold text-text-high hover:bg-brand-light/90 transition-colors"
                     >
                       🔄 Retry
                     </button>
@@ -204,7 +204,7 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
                   {job.status === 'ready' && job.lesson && (
                     <a
                       href={`/study?lesson=${job.lesson.lo_id}`}
-                      className="flex-1 text-center rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
+                      className="flex-1 text-center rounded-2xl bg-semantic-success px-4 py-2 text-sm font-semibold text-text-high hover:bg-semantic-success/90 transition-colors"
                     >
                       📚 Start Lesson
                     </a>
@@ -212,7 +212,7 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
                   {onCancel && job.status !== 'ready' && (
                     <button
                       onClick={() => onCancel(job.id)}
-                      className="rounded-2xl bg-rose-500/20 px-4 py-2 text-sm font-semibold text-rose-300 hover:bg-rose-500/30 transition-colors"
+                      className="rounded-2xl bg-semantic-danger/10 px-4 py-2 text-sm font-semibold text-semantic-danger hover:bg-semantic-danger/20 transition-colors"
                     >
                       🗑️ Remove
                     </button>

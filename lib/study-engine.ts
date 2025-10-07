@@ -340,7 +340,7 @@ export function buildThompsonArms(params: {
   cooldownHours?: number;
 }): ThompsonArm[] {
   const { learnerState, analytics, blueprint, items, now = Date.now(), cooldownHours = 96 } = params;
-  const disableCaps = true; // cooldown eligibility removed globally
+  const disableCaps = false; // cooldown eligibility enabled
   const effectiveCooldownHours = disableCaps ? 0 : cooldownHours;
   const loIds = new Set<string>();
   Object.keys(learnerState.los).forEach((loId) => loIds.add(loId));
@@ -357,7 +357,7 @@ export function buildThompsonArms(params: {
     const daysSinceLastRaw = Number.isFinite(cooldown) ? cooldown / 24 : 14;
     const urgency = computeUrgency(daysSinceLastRaw);
     const blueprintMult = computeBlueprintMultiplierForLo({ loId, learnerState, blueprint });
-    const eligible = true;
+    const eligible = cooldown >= effectiveCooldownHours;
 
     arms.push({
       loId,

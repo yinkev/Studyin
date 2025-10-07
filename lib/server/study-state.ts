@@ -36,6 +36,22 @@ export interface RetentionCard {
   lapses?: number;
 }
 
+export interface LearnerGamification {
+  level: number;
+  totalXP: number;
+  currentXP: number;
+  streak: number;
+  lastStudyDate: string | null;
+}
+
+export interface LearnerAnalytics {
+  totalStudyTimeMs: number;
+  questionsAnswered: number;
+  questionsCorrect: number;
+  lastWeekActivity: number[]; // 7 days of question counts
+  sessionsCompleted: number;
+}
+
 export interface LearnerState {
   learnerId: string;
   updatedAt: string;
@@ -50,6 +66,8 @@ export interface LearnerState {
     }
   >;
   retention: Record<string, RetentionCard>;
+  gamification?: LearnerGamification;
+  analytics?: LearnerAnalytics;
 }
 
 function sanitizeLo(raw: Partial<LearnerLoState> | undefined): LearnerLoState {

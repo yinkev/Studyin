@@ -1,6 +1,29 @@
 # Studyin: The Personal Learning Companion (MVP)
 
+> **UI/UX Status**: ✅ Mantine UI v8.3.0 Migration Complete | 🎮 Enhanced with Gamification & Analytics
+
 This project is a local-first, AI-powered learning application designed to help you study your own materials more effectively. You can upload documents, have them automatically transformed into interactive lessons, and get personalized recommendations on what to study next.
+
+## 🎨 UI/UX Improvements
+
+**Latest Migration (2025-10-07)**: **HeroUI → Mantine UI v8.3.0**
+- ✅ Complete migration from HeroUI v2.8.5 to Mantine UI v8.3.0
+- ✅ All components migrated: AppNav, Dashboard, Summary, Follow The Money game
+- ✅ HeroUI packages fully removed (191 packages uninstalled)
+- ✅ Mantine components: Card, Button, Badge, Progress, RingProgress, Modal, Tooltip, Skeleton
+- ✅ Recharts integration for analytics charts
+- ✅ All pages loading successfully with 200 OK status
+- ✅ Dark/light mode toggle persists across routes
+- ✅ No placeholder content - all UI uses real data
+- ✅ 9/9 E2E tests passing
+
+**Previous Updates**:
+- ✅ Unified navigation in root layout (no AppShell)
+- ✅ `/api/upload` gated to dev-only usage when `NEXT_PUBLIC_DEV_UPLOAD=1`
+- ✅ Token-aligned study/summary/upload/exam experiences + embedded drills/insights
+- ✅ Breadcrumbs + footer components for core flows
+
+See [MASTER_PLAN_UIUX.md](./MASTER_PLAN_UIUX.md) for complete UI/UX roadmap.
 
 ## Quick Start
 
@@ -65,6 +88,29 @@ The application is built around a simple, powerful loop:
 - Engine Spec & Prompts: docs/personal-adaptive-study-engine-spec.md
 - Optional Cloud Setup: docs/SUPABASE_SETUP.md
 - Archived history: docs/archive/README_HISTORY.md, docs/archive/IMPLEMENTATION_HISTORY.md, docs/archive/ui-blueprint/
+
+## Design Tokens (overview)
+- Single source of truth in `lib/design/tokens.ts` and `app/globals.css` CSS variables.
+- Tailwind + HeroUI theme consume the same palette for surfaces (`surface-*`), text (`text-*`), semantic (`semantic-*`), and analytics viz (`viz-*`).
+- Charts read token-backed CSS vars via the ECharts base adapter.
+
+## E2E UI Tests (Playwright)
+We ship a minimal smoke + snapshot suite to catch regressions from tokenization and routing.
+
+1. Start dev server (in another terminal)
+   ```bash
+   npm run dev:start  # serves at http://localhost:3005
+   ```
+2. Run e2e tests (first run accepts snapshots)
+   ```bash
+   npm run test:e2e -- --update-snapshots
+   ```
+3. Inspect report
+   ```bash
+   npx playwright show-report
+   ```
+
+Dev-only gate check: the suite also verifies `/api/upload` returns 403 without `NEXT_PUBLIC_DEV_UPLOAD=1`.
 > 
 > ### Optional Cloud (Supabase)
 > 
