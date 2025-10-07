@@ -1,35 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { appendLesson, clientFingerprint, parseLessonEvent, rateLimit, requireAuthToken, telemetryEnabled, validateBodySize } from '../../../lib/server/events';
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-export const runtime = 'nodejs';
+export async function GET() {
+  const customDir = process.env.LESSON_STORAGE_DIR ?? path.join(process.cwd(), 'data', 'lessons');
+  const fallbackDir = path.join(process.cwd(), 'content', 'lessons');
+  const dirs = [customDir, fallbackDir];
 
-export async function POST(req: NextRequest) {
-  if (!telemetryEnabled()) {
-    return NextResponse.json({ ok: false, message: 'Telemetry disabled' }, { status: 403 });
+  const lessons = [];
+
+  for (const dir of dirs) {
+    try {
+      const files = await fs.readdir(dir);
+      const jsonFiles = files.filter((file) => file.endsWith('.lesson.json'));
+
+      for (const file of jsonFiles) {
+        try {
+          const raw = await fs.readFile(path.join(dir, file), 'utf8');
+          const lesson = JSON.parse(raw);
+
+          lessons.push({
+            id: lesson.id || file.replace('.lesson.json', ''),
+            title: lesson.title || lesson.summary || 'Untitled Lesson',
+            fileName: file,
+            itemCount: lesson.content?.length || 0,
+            difficulty: lesson.difficulty || 'medium'
+          });
+        } catch (parseError) {
+          console.warn(`Failed to parse lesson ${file}:`, parseError);
+        }
+      }
+    } catch (error) {
+      console.warn(`Unable to read lessons from ${dir}`);
+    }
   }
-  const auth = requireAuthToken(req.headers.get('authorization'));
-  if (!auth.ok) return NextResponse.json({ ok: false, message: auth.message }, { status: auth.status });
 
-  const raw = await req.text();
-  const size = validateBodySize(raw);
-  if (!size.ok) return NextResponse.json({ ok: false, message: size.message }, { status: size.status });
+  lessons.sort((a, b) => b.id.localeCompare(a.id));
 
-  let payload: unknown;
-  try {
-    payload = JSON.parse(raw);
-  } catch (error: any) {
-    return NextResponse.json({ ok: false, message: error?.message ?? 'Invalid JSON' }, { status: 400 });
-  }
-
-  try {
-    const event = parseLessonEvent(payload);
-    const ip = clientFingerprint(req.headers, 'anon');
-    const gate = rateLimit(ip);
-    if (!gate.ok) return NextResponse.json({ ok: false, message: gate.message }, { status: gate.status });
-    await appendLesson(event);
-    return NextResponse.json({ ok: true }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ ok: false, message: error?.message ?? 'Invalid payload' }, { status: 400 });
-  }
+  return NextResponse.json({ lessons });
 }
-

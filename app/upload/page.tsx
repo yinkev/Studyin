@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Upload Page — PHASE 4 — MAX GRAPHICS MODE
+ * Upload Page - Document Upload & Processing
  * Features:
  * - Drag & drop file upload with animations
  * - Real-time CLI progress tracking (Gemini OCR → Codex MCQ)
@@ -9,7 +9,6 @@
  * - Job history with filters and retry actions
  */
 
-import Mascot from '../../components/Mascot';
 import { DragDropZone } from '../../components/upload/DragDropZone';
 import { JobQueuePanel } from '../../components/upload/JobQueuePanel';
 import { useUploader } from '../../lib/hooks/useUploader';
@@ -26,16 +25,21 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-16 text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_60%)]" />
+      <div className="relative min-h-screen overflow-hidden px-4 py-16 text-text-high">
       <div className="relative mx-auto flex max-w-6xl flex-col gap-12">
         {/* Header */}
         <header className="flex flex-col items-center gap-6 text-center">
-          <Mascot className="h-40 w-40 drop-shadow-[0_25px_45px_rgba(56,189,248,0.35)]" status={isProcessing ? 'happy' : 'default'} />
+          <div className="flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
           <div className="max-w-2xl space-y-3">
-            <h1 className="text-5xl font-black tracking-tight text-white">Drop a file. Spark a lesson.</h1>
-            <p className="text-lg text-slate-200">
-              Sparky runs your upload through our adaptive content engine. We queue the heavy lifting, so you stay in the flow.
+            <h1 className="text-5xl font-black tracking-tight text-text-high">Upload Your Content</h1>
+            <p className="text-lg text-text-med">
+              Upload documents and we'll transform them into interactive lessons with our adaptive content engine.
             </p>
           </div>
         </header>
@@ -47,14 +51,14 @@ export default function UploadPage() {
           <button
             onClick={handleUpload}
             disabled={!file || isProcessing}
-            className="w-full rounded-3xl bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 py-4 text-lg font-semibold text-white shadow-xl transition hover:from-sky-400 hover:via-blue-400 hover:to-indigo-400 disabled:cursor-not-allowed disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full rounded-3xl bg-gradient-to-r from-brand-light via-brand-secondary to-semantic-info py-4 text-lg font-semibold text-text-high shadow-xl transition hover:from-brand-light/90 hover:via-brand-secondary/90 hover:to-semantic-info/90 disabled:cursor-not-allowed disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
           >
-            {isProcessing ? '⚡ Queuing...' : '🚀 Send to Sparky'}
+            {isProcessing ? 'Processing...' : 'Process Document'}
           </button>
 
           {error && (
-            <div className="rounded-3xl bg-rose-500/20 border border-rose-500/30 p-4 text-center">
-              <p className="text-sm text-rose-300">{error}</p>
+            <div className="rounded-3xl bg-semantic-danger/10 border border-semantic-danger/30 p-4 text-center">
+              <p className="text-sm text-semantic-danger">{error}</p>
             </div>
           )}
         </div>

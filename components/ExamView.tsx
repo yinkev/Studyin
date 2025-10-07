@@ -49,32 +49,35 @@ export function ExamView({ items, length = 10, blueprintId }: ExamViewProps) {
   }, [submitted, form, answers]);
 
   return (
-    <div className="space-y-6 px-4 py-10 max-w-6xl mx-auto">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-10 text-text-high">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900">Exam Mode</h1>
-          <p className="text-sm text-gray-600">
+          <h1 className="text-3xl font-extrabold text-text-high">Exam Mode</h1>
+          <p className="text-sm text-text-med">
             Evidence locked · Deferred feedback
             {blueprintId ? ` · Blueprint ${blueprintId}` : ''}
           </p>
         </div>
         {!submitted ? (
-          <button onClick={() => setSubmitted(true)} className="duo-button px-4 py-2 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600/80">
+          <button
+            onClick={() => setSubmitted(true)}
+            className="rounded-full bg-semantic-danger px-4 py-2 text-sm font-bold text-text-high transition hover:bg-semantic-danger/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-semantic-danger/60"
+          >
             Submit
           </button>
         ) : (
-          <div className="rounded-full border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+          <div className="rounded-full border border-semantic-success/30 bg-semantic-success/10 px-4 py-2 text-sm font-semibold text-semantic-success">
             Score: {score?.correct}/{score?.total}
           </div>
         )}
       </header>
 
-      <article className="space-y-4 duo-card p-6">
-        <div className="flex items-center justify-between text-sm text-gray-600">
+      <article className="space-y-4 rounded-2xl border border-text-low/15 bg-surface-bg0/70 p-6">
+        <div className="flex items-center justify-between text-sm text-text-med">
           <span>#{index + 1} of {form.length}</span>
-          <span className="font-mono text-xs text-gray-500">{current.id}</span>
+          <span className="font-mono text-xs text-text-low">{current.id}</span>
         </div>
-        <h2 className="text-lg font-extrabold text-gray-900">{current.stem}</h2>
+        <h2 className="text-lg font-extrabold text-text-high">{current.stem}</h2>
 
         <div className="space-y-3">
           {letters.map((letter, idx) => {
@@ -82,35 +85,48 @@ export function ExamView({ items, length = 10, blueprintId }: ExamViewProps) {
             if (!choice) return null;
             const selected = answers[current.id] === letter;
             const klass = selected
-              ? 'border-white/30 bg-white/10'
-              : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/7';
+              ? 'border-brand-light/60 bg-brand-light/10'
+              : 'border-text-low/10 bg-surface-bg1/60 hover:border-brand-light hover:bg-surface-bg1/80';
             const disabled = submitted; // no changes after submit
             return (
               <button
                 key={letter}
                 disabled={disabled}
                 onClick={() => select(letter)}
-                className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left text-gray-900 transition hover:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${klass}`}
+                className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left text-text-high transition hover:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-light ${klass}`}
               >
                 <span className="mt-1 okc-pill-ghost">{idx + 1}</span>
-                <p className="font-medium">{letter}. {choice}</p>
+                <p className="font-medium">
+                  {letter}. {choice}
+                </p>
               </button>
             );
           })}
         </div>
 
         {submitted && (
-          <div className="mt-3 rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-            Correct answer: <span className="font-semibold text-emerald-900">{current.key}</span>
+          <div className="mt-3 rounded border border-semantic-success/30 bg-semantic-success/10 p-3 text-sm text-semantic-success">
+            Correct answer:{' '}
+            <span className="font-semibold text-semantic-success">{current.key}</span>
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-2 text-sm text-gray-600">
+        <div className="flex items-center justify-between pt-2 text-sm text-text-med">
           <div className="space-x-2">
-            <button onClick={prev} className="rounded-md border border-gray-200 bg-white px-3 py-1 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">← Prev</button>
-            <button onClick={next} className="rounded-md border border-gray-200 bg-white px-3 py-1 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">Next →</button>
+            <button
+              onClick={prev}
+              className="rounded-md border border-text-low/15 bg-surface-bg0 px-3 py-1 hover:bg-surface-bg0/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-light"
+            >
+              ← Prev
+            </button>
+            <button
+              onClick={next}
+              className="rounded-md border border-text-low/15 bg-surface-bg0 px-3 py-1 hover:bg-surface-bg0/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-light"
+            >
+              Next →
+            </button>
           </div>
-          <span className="text-gray-500">Evidence locked</span>
+          <span className="text-text-low">Evidence locked</span>
         </div>
       </article>
     </div>

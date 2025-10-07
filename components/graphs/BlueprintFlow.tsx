@@ -11,13 +11,13 @@ interface BlueprintFlowProps {
 }
 
 export function BlueprintFlow({ analytics, weights }: BlueprintFlowProps) {
-  const ttmMap = new Map<string, number>();
-  (analytics?.ttm_per_lo ?? []).forEach((entry) => {
-    ttmMap.set(entry.lo_id, entry.attempts ?? 0);
-  });
-  const totalAttempts = Array.from(ttmMap.values()).reduce((sum, val) => sum + val, 0) || 1;
-
   const { nodes, edges } = useMemo(() => {
+    const ttmMap = new Map<string, number>();
+    (analytics?.ttm_per_lo ?? []).forEach((entry) => {
+      ttmMap.set(entry.lo_id, entry.attempts ?? 0);
+    });
+    const totalAttempts = Array.from(ttmMap.values()).reduce((sum, val) => sum + val, 0) || 1;
+
     const entries = Object.entries(weights);
     const nodesArray: any[] = [
       {
@@ -55,7 +55,7 @@ export function BlueprintFlow({ analytics, weights }: BlueprintFlowProps) {
       });
     });
     return { nodes: nodesArray, edges: edgesArray };
-  }, [weights, ttmMap, totalAttempts]);
+  }, [analytics, weights]);
 
   if (!Object.keys(weights).length) {
     return <p className="text-sm text-slate-300/80">Blueprint not configured.</p>;

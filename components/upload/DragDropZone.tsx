@@ -7,7 +7,7 @@
  */
 
 import { useState, useRef, DragEvent, ChangeEvent } from 'react';
-import { animate as anime } from "animejs";
+import anime from "animejs";
 
 interface DragDropZoneProps {
   onFileSelect: (file: File) => void;
@@ -41,7 +41,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
         targets: dropZoneRef.current,
         scale: [1, 1.02],
         duration: 200,
-        ease: 'easeOutQuad',
+        easing: 'easeOutQuad',
       });
     }
   };
@@ -57,7 +57,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
         targets: dropZoneRef.current,
         scale: [1.02, 1],
         duration: 200,
-        ease: 'easeOutQuad',
+        easing: 'easeOutQuad',
       });
     }
   };
@@ -80,7 +80,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
         targets: dropZoneRef.current,
         scale: [1.02, 1],
         duration: 300,
-        ease: 'easeOutElastic(1, 0.6)',
+        easing: 'easeOutElastic(1, 0.6)',
       });
     }
 
@@ -119,13 +119,13 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
       onDrop={handleDrop}
       onClick={handleClick}
       className={`
-        relative h-64 rounded-3xl border-2 border-dashed transition-all cursor-pointer
+        glass-clinical-card relative h-64 transition-all cursor-pointer
         ${
           isDragging
-            ? 'border-sky-400 bg-sky-400/20 shadow-[0_0_40px_rgba(56,189,248,0.3)]'
-            : selectedFile
-            ? 'border-emerald-400 bg-emerald-400/10'
-            : 'border-white/40 bg-white/50 hover:border-sky-400 hover:bg-white/70'
+            ? 'border-brand-light !bg-brand-light/20 shadow-[0_0_40px_rgba(59,130,246,0.3)]'
+          : selectedFile
+            ? 'border-semantic-success !bg-semantic-success/10'
+            : 'hover:border-brand-light'
         }
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
@@ -147,7 +147,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
           ) : (
             <svg
               className={`h-20 w-20 transition-colors ${
-                isDragging ? 'text-sky-400' : 'text-sky-500'
+                isDragging ? 'text-brand-light' : 'text-brand-secondary'
               }`}
               aria-hidden="true"
               viewBox="0 0 24 24"
@@ -163,24 +163,24 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
         {/* Text */}
         {selectedFile ? (
           <div className="space-y-2">
-            <p className="text-2xl font-bold text-emerald-600">{selectedFile.name}</p>
-            <p className="text-sm text-slate-600">{formatFileSize(selectedFile.size)}</p>
-            <p className="text-xs text-slate-500">Click to change file</p>
+            <p className="text-2xl font-bold text-semantic-success">{selectedFile.name}</p>
+            <p className="text-sm text-text-high">{formatFileSize(selectedFile.size)}</p>
+            <p className="text-xs text-text-med">Click to change file</p>
           </div>
         ) : (
           <div className="space-y-2">
-            <p className="text-2xl font-bold text-slate-800">
+            <p className="text-2xl font-bold text-text-high">
               {isDragging ? 'Drop it like it\'s hot! 🔥' : 'Click to upload or drag & drop'}
             </p>
-            <p className="text-sm text-slate-500">PDF • PPT • DOCX • Markdown</p>
-            <p className="text-xs text-slate-400">Maximum file size: 50MB</p>
+            <p className="text-sm text-text-med">PDF • PPT • DOCX • Markdown</p>
+            <p className="text-xs text-text-low">Maximum file size: 50MB</p>
           </div>
         )}
 
         {/* Animated Pulse Ring */}
         {isDragging && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-32 h-32 rounded-full border-4 border-sky-400 animate-ping opacity-30" />
+            <div className="w-32 h-32 rounded-full border-4 border-brand-light animate-ping opacity-30" />
           </div>
         )}
       </div>
