@@ -13,7 +13,7 @@ const config = {
   webServer: {
     command: 'npm run dev:start',
     port: 3005,
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 180_000,
   },
 };

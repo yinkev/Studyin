@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { animate as anime } from "animejs";
+import anime from "animejs";
 import GlowCard from '../atoms/GlowCard';
 import { CLIProgressDisplay, type CLIProgress } from './CLIProgressDisplay';
 
@@ -49,7 +49,7 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
         translateY: [20, 0],
         duration: 600,
         delay: (anime as any).stagger ? (anime as any).stagger(100) : 0,
-        ease: 'easeOutExpo',
+        easing: 'easeOutExpo',
       });
     }
   }, [jobs.length]);

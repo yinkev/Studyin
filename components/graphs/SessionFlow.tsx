@@ -19,14 +19,15 @@ export function SessionFlow({ attempts }: SessionFlowProps) {
   if (!attempts.length) {
     return <p className="text-sm text-slate-300/80">No recent attempts.</p>;
   }
-  const sessions = new Map<string, AttemptNode[]>();
-  attempts.forEach((attempt) => {
-    const list = sessions.get(attempt.session_id) ?? [];
-    list.push(attempt);
-    sessions.set(attempt.session_id, list);
-  });
 
   const { nodes, edges } = useMemo(() => {
+    const sessions = new Map<string, AttemptNode[]>();
+    attempts.forEach((attempt) => {
+      const list = sessions.get(attempt.session_id) ?? [];
+      list.push(attempt);
+      sessions.set(attempt.session_id, list);
+    });
+
     const nodesArray: any[] = [];
     const edgesArray: any[] = [];
     let sessionIndex = 0;

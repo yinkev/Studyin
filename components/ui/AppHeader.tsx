@@ -5,7 +5,7 @@
 
 'use client';
 
-import { Button, Avatar, Badge } from '@heroui/react';
+import { Button, Avatar, Indicator } from '@mantine/core';
 import { DarkModeToggle } from './DarkModeToggle';
 
 interface AppHeaderProps {
@@ -70,10 +70,10 @@ export function AppHeader({
         {/* Navigation with Icons */}
         <nav className="flex items-center gap-2">
           <Button
-            variant={currentPage === 'study' ? 'flat' : 'light'}
-            color={currentPage === 'study' ? 'primary' : 'default'}
+            variant={currentPage === 'study' ? 'light' : 'subtle'}
+            color={currentPage === 'study' ? 'blue' : 'gray'}
             size="md"
-            startContent={
+            leftSection={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
@@ -84,10 +84,10 @@ export function AppHeader({
           </Button>
 
           <Button
-            variant={currentPage === 'upload' ? 'flat' : 'light'}
-            color={currentPage === 'upload' ? 'primary' : 'default'}
+            variant={currentPage === 'upload' ? 'light' : 'subtle'}
+            color={currentPage === 'upload' ? 'blue' : 'gray'}
             size="md"
-            startContent={
+            leftSection={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="17 8 12 3 7 8"/>
@@ -99,10 +99,10 @@ export function AppHeader({
           </Button>
 
           <Button
-            variant={currentPage === 'analytics' ? 'flat' : 'light'}
-            color={currentPage === 'analytics' ? 'primary' : 'default'}
+            variant={currentPage === 'analytics' ? 'light' : 'subtle'}
+            color={currentPage === 'analytics' ? 'blue' : 'gray'}
             size="md"
-            startContent={
+            leftSection={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="20" x2="18" y2="10"/>
                 <line x1="12" y1="20" x2="12" y2="4"/>
@@ -114,10 +114,10 @@ export function AppHeader({
           </Button>
 
           <Button
-            variant={currentPage === 'dashboard' ? 'flat' : 'light'}
-            color={currentPage === 'dashboard' ? 'primary' : 'default'}
+            variant={currentPage === 'dashboard' ? 'light' : 'subtle'}
+            color={currentPage === 'dashboard' ? 'blue' : 'gray'}
             size="md"
-            startContent={
+            leftSection={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="7" height="7"/>
                 <rect x="14" y="3" width="7" height="7"/>
@@ -144,18 +144,18 @@ export function AppHeader({
             <div className="text-xs font-medium" style={{ color: theme.textSecondary }}>{userXP.toLocaleString()} XP</div>
           </div>
           {notificationCount > 0 ? (
-            <Badge content={notificationCount} color="danger" size="sm">
+            <Indicator label={notificationCount} color="red" size={16}>
               <Avatar
-                className="w-10 h-10"
+                size="md"
                 style={{
                   background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
                   border: darkMode ? '2px solid rgba(59, 130, 246, 0.3)' : '2px solid rgba(59, 130, 246, 0.2)',
                 }}
               />
-            </Badge>
+            </Indicator>
           ) : (
             <Avatar
-              className="w-10 h-10"
+              size="md"
               style={{
                 background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
                 border: darkMode ? '2px solid rgba(59, 130, 246, 0.3)' : '2px solid rgba(59, 130, 246, 0.2)',

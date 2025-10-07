@@ -13,7 +13,9 @@ import { WhyThisNextPill, type EngineSignals } from './study/WhyThisNextPill';
 import { KeyboardShortcutsOverlay } from './study/KeyboardShortcutsOverlay';
 import { EvidencePanel, type EvidenceData } from './study/EvidencePanel';
 import { MasteryBurst, StarBurst } from './effects/MasteryBurst';
-import { AbilityTrackerGraph, type AbilityDataPoint } from './study/AbilityTrackerGraph';
+// Ability tracker removed (ECharts dependency deleted)
+// import { AbilityTrackerGraph, type AbilityDataPoint } from './study/AbilityTrackerGraph';
+type AbilityDataPoint = { x: number; y: number; se: number };
 import { useXP } from './XPProvider';
 import { XP_REWARDS } from '../lib/xp-system';
 
@@ -180,7 +182,7 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
       duration: 520,
       ease: 'easeOutExpo'
     });
-  }, [currentQuestion, learnerId, lesson.lo_id, selectedChoice, evidencePanelOpen, abilityData]);
+  }, [currentQuestion, learnerId, lesson.lo_id, selectedChoice, evidencePanelOpen, abilityData, awardXPWithFeedback]);
 
   const handleContinue = useCallback(() => {
     setAnswerState('idle');
@@ -198,7 +200,7 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
       awardXPWithFeedback(xpAmount, reason);
       onLessonComplete();
     }
-  }, [activeIndex, mcqs.length, onLessonComplete, correctAnswers, totalAnswered, awardXPWithFeedback]);
+  }, [activeIndex, mcqs, onLessonComplete, correctAnswers, totalAnswered, awardXPWithFeedback]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -392,7 +394,7 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
             </div>
             {answerState !== 'idle' && (
               <div id="mcq-feedback" className="mt-4 rounded-2xl bg-slate-900/80 px-6 py-4 text-slate-100">
-                {answerState === 'correct' ? '🔥 Nailed it! Mastery confirmed.' : 'Let’s revisit—Sparky logged this for another pass.'}
+                {answerState === 'correct' ? 'Correct! Mastery confirmed.' : 'This has been logged for review.'}
               </div>
             )}
           </GlowCard>
@@ -408,8 +410,8 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
       <div className="space-y-6">
         <LessonMetaPanel lesson={lesson} />
 
-        {/* Ability Tracker Graph */}
-        {abilityData.length > 0 && (
+        {/* Ability Tracker Graph - Temporarily disabled (ECharts removed) */}
+        {/* {abilityData.length > 0 && (
           <AbilityTrackerGraph
             loId={lesson.lo_id}
             loName={lesson.title}
@@ -417,7 +419,7 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
             height={280}
             autoScroll={true}
           />
-        )}
+        )} */}
 
         {/* Keyboard shortcuts hint */}
         <GlowCard className="p-4 text-center bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20">

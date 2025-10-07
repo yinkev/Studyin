@@ -101,14 +101,68 @@ Output ONLY valid JSON array with NO markdown code fences or extra text:
   try {
     const { stdout } = await execAsync(`cat "${tempFile}" | codex exec`, { maxBuffer: 1024 * 1024 * 10 }); // 10MB buffer
 
+    // Clean output: remove markdown code fences if present
+    let cleaned = stdout.trim();
+    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+
     // Extract JSON from output (Codex sometimes includes thinking/metadata)
-    const jsonMatch = stdout.match(/\[[\s\S]*\]/);
+    // Use greedy match to get the complete JSON array (not non-greedy)
+    const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
+      console.error('[codex] Raw output:', stdout.substring(0, 500));
       throw new Error('No valid JSON array found in Codex output');
     }
 
-    const cleaned = jsonMatch[0].trim();
-    const mcqs = JSON.parse(cleaned);
+    const jsonString = jsonMatch[0].trim();
+
+    // Try to parse, log on failure
+    let mcqs;
+    try {
+      mcqs = JSON.parse(jsonString);
+    } catch (parseError) {
+      // Attempt to repair incomplete JSON by closing unclosed structures
+      console.warn('[codex] JSON parse failed, attempting repair...');
+      let repairedJson = jsonString;
+
+      // Remove incomplete trailing field name (e.g., "learningObjective without closing quote/colon/value)
+      // Find the last complete field ending with ", or "}
+      const lastComma = repairedJson.lastIndexOf('",');
+      const lastCloseBrace = repairedJson.lastIndexOf('"}');
+      const cutoffPoint = Math.max(lastComma, lastCloseBrace);
+
+      if (cutoffPoint > 0) {
+        // Check if there's incomplete content after the last valid field
+        const afterCutoff = repairedJson.substring(cutoffPoint + 2).trim();
+        if (afterCutoff && !afterCutoff.startsWith(']') && !afterCutoff.startsWith('}')) {
+          // Truncate to last complete field
+          repairedJson = repairedJson.substring(0, cutoffPoint + (lastComma > lastCloseBrace ? 2 : 2));
+        }
+      }
+
+      // Count opening and closing brackets/braces
+      const openBrackets = (repairedJson.match(/\[/g) || []).length;
+      const closeBrackets = (repairedJson.match(/\]/g) || []).length;
+      const openBraces = (repairedJson.match(/\{/g) || []).length;
+      const closeBraces = (repairedJson.match(/\}/g) || []).length;
+
+      // Close unclosed braces and brackets
+      for (let i = 0; i < openBraces - closeBraces; i++) {
+        repairedJson += '\n  }';
+      }
+      for (let i = 0; i < openBrackets - closeBrackets; i++) {
+        repairedJson += '\n]';
+      }
+
+      try {
+        mcqs = JSON.parse(repairedJson);
+        console.log('[codex] JSON repair successful');
+      } catch (repairError) {
+        console.error('[codex] Failed to parse JSON:', jsonString.substring(0, 500));
+        console.error('[codex] Parse error:', parseError);
+        console.error('[codex] Repair also failed:', repairError);
+        throw new Error(`JSON parse failed: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+      }
+    }
 
     // Validate structure
     if (!Array.isArray(mcqs)) {
@@ -154,11 +208,24 @@ Output ONLY valid JSON with NO markdown code fences:
 
   try {
     const { stdout } = await execAsync(`cat "${tempFile}" | codex exec`);
-    const jsonMatch = stdout.match(/\{[\s\S]*\}/);
+
+    // Clean output: remove markdown code fences if present
+    let cleaned = stdout.trim();
+    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+
+    // Use greedy match for complete object
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('[codex-validate] Raw output:', stdout.substring(0, 500));
       throw new Error('No valid JSON found in validation output');
     }
-    return JSON.parse(jsonMatch[0]);
+
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error('[codex-validate] Failed to parse JSON:', jsonMatch[0].substring(0, 500));
+      throw new Error(`Validation JSON parse failed: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+    }
   } finally {
     await fs.unlink(tempFile).catch(() => {});
   }
@@ -295,11 +362,24 @@ Output ONLY the refined MCQ as valid JSON (same structure as input).`;
 
   try {
     const { stdout } = await execAsync(`cat "${tempFile}" | codex exec`);
-    const jsonMatch = stdout.match(/\{[\s\S]*\}/);
+
+    // Clean output: remove markdown code fences if present
+    let cleaned = stdout.trim();
+    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+
+    // Use greedy match for complete object
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('[codex-refine] Raw output:', stdout.substring(0, 500));
       throw new Error('No valid JSON found in refined MCQ output');
     }
-    return JSON.parse(jsonMatch[0]);
+
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error('[codex-refine] Failed to parse JSON:', jsonMatch[0].substring(0, 500));
+      throw new Error(`Refine JSON parse failed: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+    }
   } finally {
     await fs.unlink(tempFile).catch(() => {});
   }
