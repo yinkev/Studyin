@@ -149,9 +149,12 @@ function updateThemeDOM(theme: Theme): void {
 
   if (theme === 'system') {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    root.classList.add(prefersDark ? 'dark' : 'light');
+    const resolved = prefersDark ? 'dark' : 'light';
+    root.classList.add(resolved);
+    root.setAttribute('data-theme', resolved);
   } else {
     root.classList.add(theme);
+    root.setAttribute('data-theme', theme);
   }
 }
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { BentoCard } from '../layout/BentoCard';
-import { Progress, Badge, Skeleton } from '@mantine/core';
 
 interface Quest {
   id: string;
@@ -22,7 +21,7 @@ interface DailyQuestsCardProps {
 export function DailyQuestsCard({ quests, isLoading = false, size = 'lg' }: DailyQuestsCardProps) {
   return (
     <BentoCard size={size}>
-      <div className="p-6">
+      <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card interactive-card">
         <div className="flex gap-3 items-center mb-4">
           <div className="p-2.5 rounded-xl" style={{ background: 'var(--brand-primary-alpha-10)' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" strokeWidth="2.5">
@@ -39,8 +38,8 @@ export function DailyQuestsCard({ quests, isLoading = false, size = 'lg' }: Dail
         <div className="space-y-3">
           {isLoading ? (
             <>
-              <Skeleton className="h-20 w-full rounded-xl" />
-              <Skeleton className="h-20 w-full rounded-xl" />
+              <div className="h-20 w-full rounded-xl bento-skeleton" aria-hidden></div>
+              <div className="h-20 w-full rounded-xl bento-skeleton" aria-hidden></div>
             </>
           ) : quests.length > 0 ? (
             quests.map((quest) => (
@@ -51,6 +50,8 @@ export function DailyQuestsCard({ quests, isLoading = false, size = 'lg' }: Dail
                     ? 'bg-semantic-success/10 border-semantic-success/30'
                     : 'bg-surface-bg3/60 border-border-subtle hover:border-border-med'
                 }`}
+                role="group"
+                aria-label={`${quest.name} quest`}
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
@@ -59,28 +60,35 @@ export function DailyQuestsCard({ quests, isLoading = false, size = 'lg' }: Dail
                         {quest.name}
                       </p>
                       {quest.completed && (
-                        <Badge size="sm" variant="light" className="bg-semantic-success/20 text-semantic-success text-xs">
-                          Complete!
-                        </Badge>
+                        <span className="clinical-badge badge-success text-xs" aria-label="Quest complete">
+                          ✓ Complete
+                        </span>
                       )}
                     </div>
                     <p className="text-xs text-text-med">{quest.description}</p>
                   </div>
-                  <Badge size="sm" variant="light" className="bg-warning/10 text-warning ml-2">
+                  <span className="clinical-badge badge-warning ml-2" aria-label={`Reward ${quest.xpReward} XP`}>
                     +{quest.xpReward} XP
-                  </Badge>
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Progress
-                    value={(quest.progress / quest.target) * 100}
-                    size="sm"
-                    radius="md"
-                    className="flex-1"
-                    color={quest.completed ? "green" : "blue"}
-                  />
+                <div className="flex items-center gap-3">
+                  <div className="flex-1" aria-label="Quest progress">
+                    <md-linear-progress
+                      value={Math.max(0, Math.min(1, (quest.progress / Math.max(1, quest.target))))}
+                    ></md-linear-progress>
+                  </div>
                   <span className="text-xs font-semibold text-text-med whitespace-nowrap tabular-nums">
                     {quest.progress}/{quest.target}
                   </span>
+                  {quest.completed ? (
+                    <span className="text-semantic-success text-sm" aria-hidden>✔️</span>
+                  ) : (
+                    <a href={`/study?quest=${encodeURIComponent(quest.id)}`} className="no-underline">
+                      <md-filled-tonal-button aria-label={`Start ${quest.name}`}>
+                        Start 5-min drill
+                      </md-filled-tonal-button>
+                    </a>
+                  )}
                 </div>
               </div>
             ))

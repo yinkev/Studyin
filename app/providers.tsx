@@ -1,9 +1,16 @@
 'use client';
 
+/**
+ * Application Providers
+ *
+ * Material Web Components themed application
+ * - React Query for data fetching
+ * - Material Design 3 theme via CSS custom properties
+ * - XP/gamification state
+ */
+
 import { ReactNode, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MantineProvider } from '@mantine/core';
-import { theme } from '../styles/mantine-theme';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { XPProvider } from '../components/XPProvider';
 
@@ -25,11 +32,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme} defaultColorScheme="light">
-        <ThemeProvider>
-          <XPProvider>{children}</XPProvider>
-        </ThemeProvider>
-      </MantineProvider>
+      <ThemeProvider>
+        <XPProvider>{children}</XPProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

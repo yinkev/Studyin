@@ -6,7 +6,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, Modal } from '@mantine/core';
+import { MD3Card } from './MD3Card';
+import { MD3Button } from './MD3Button';
 
 interface WhyThisQuestionCardProps {
   darkMode?: boolean;
@@ -27,50 +28,44 @@ export function WhyThisQuestionCard({
 }: WhyThisQuestionCardProps) {
   const [showMathModal, setShowMathModal] = useState(false);
 
-  const theme = darkMode ? {
-    cardBg: 'rgba(30, 41, 59, 0.6)',
-    cardBorder: 'rgba(71, 85, 105, 0.3)',
-    textPrimary: '#F9FAFB',
-    textSecondary: '#9CA3AF',
-  } : {
-    cardBg: 'rgba(248, 250, 252, 0.95)',
-    cardBorder: '#CBD5E1',
-    textPrimary: '#0F172A',
-    textSecondary: '#475569',
-  };
-
+  // Error function approximation and Normal CDF for percentile
+  function erf(x: number): number {
+    const sign = x < 0 ? -1 : 1;
+    const a1 = 0.254829592;
+    const a2 = -0.284496736;
+    const a3 = 1.421413741;
+    const a4 = -1.453152027;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
+    const ax = Math.abs(x);
+    const t = 1.0 / (1.0 + p * ax);
+    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-ax * ax);
+    return sign * y;
+  }
+  const normalCdf = (x: number) => 0.5 * (1 + erf(x / Math.SQRT2));
   const masteryPercent = Math.round(mastery * 100);
-  const abilityPercentile = Math.round((1 + Math.erf(abilityLevel / Math.sqrt(2))) * 50); // rough percentile
+  const abilityPercentile = Math.round(normalCdf(abilityLevel) * 100);
 
   return (
     <>
-      <Card className={`transition-all duration-500 ${className}`} style={{
-        background: theme.cardBg,
-        backdropFilter: darkMode ? 'blur(20px)' : 'none',
-        borderRadius: '28px',
-        boxShadow: darkMode
-          ? '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-          : '0 4px 0 #E5E7EB, 0 8px 16px rgba(0, 0, 0, 0.06)',
-        border: darkMode ? `1px solid ${theme.cardBorder}` : 'none',
-      }} padding="lg">
+      <MD3Card className={`transition-all duration-500 ${className}`} elevation={1} interactive>
         <div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl transition-colors" style={{ background: darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)' }}>
+              <div className="p-2 rounded-xl transition-colors" style={{ background: 'color-mix(in srgb, var(--md-sys-color-primary) 16%, transparent)' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/>
                   <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
                   <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
               </div>
-              <h3 className="font-bold text-base transition-colors" style={{ color: theme.textPrimary }}>Why This Question?</h3>
+              <h3 className="font-bold text-base transition-colors" style={{ color: 'var(--md-sys-color-on-surface)' }}>Why This Question?</h3>
             </div>
 
-            <Button
-              size="sm"
-              variant="light"
+            <MD3Button
+              variant="tonal"
               onClick={() => setShowMathModal(true)}
-              rightSection={
+              endIcon={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="12" y1="16" x2="12" y2="12"/>
@@ -79,45 +74,45 @@ export function WhyThisQuestionCard({
               }
             >
               How it works
-            </Button>
+            </MD3Button>
           </div>
 
           {/* User-Friendly Explanation */}
           <div className="space-y-4">
             <div className="flex items-start gap-3 p-4 rounded-2xl transition-colors" style={{
-              background: darkMode ? 'rgba(52, 211, 153, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-              border: darkMode ? '1px solid rgba(52, 211, 153, 0.2)' : '1px solid rgba(16, 185, 129, 0.2)',
+              background: 'color-mix(in srgb, var(--md-sys-color-tertiary) 10%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--md-sys-color-tertiary) 25%, transparent)'
             }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
               <div>
-                <p className="font-semibold text-sm mb-1" style={{ color: theme.textPrimary }}>Perfect for your level</p>
-                <p className="text-xs" style={{ color: theme.textSecondary }}>
+                <p className="font-semibold text-sm mb-1" style={{ color: 'var(--md-sys-color-on-surface)' }}>Perfect for your level</p>
+                <p className="text-xs" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
                   Your estimated ability is <strong>Level {Math.round(abilityLevel * 10)} ({masteryPercent}% mastery)</strong>. This question matches your current knowledge.
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3 p-4 rounded-2xl transition-colors" style={{
-              background: darkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-              border: darkMode ? '1px solid rgba(59, 130, 246, 0.2)' : '1px solid rgba(59, 130, 246, 0.2)',
+              background: 'color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--md-sys-color-primary) 25%, transparent)'
             }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                 <polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
               <div>
-                <p className="font-semibold text-sm mb-1" style={{ color: theme.textPrimary }}>High learning value</p>
-                <p className="text-xs" style={{ color: theme.textSecondary }}>
+                <p className="font-semibold text-sm mb-1" style={{ color: 'var(--md-sys-color-on-surface)' }}>High learning value</p>
+                <p className="text-xs" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
                   This question will give us <strong>{informationValue.toFixed(2)}x more insight</strong> into what you know compared to random selection.
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3 p-4 rounded-2xl transition-colors" style={{
-              background: darkMode ? 'rgba(168, 85, 247, 0.1)' : 'rgba(168, 85, 247, 0.1)',
-              border: darkMode ? '1px solid rgba(168, 85, 247, 0.2)' : '1px solid rgba(168, 85, 247, 0.2)',
+              background: 'color-mix(in srgb, var(--md-sys-color-secondary) 10%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--md-sys-color-secondary) 25%, transparent)'
             }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -125,33 +120,21 @@ export function WhyThisQuestionCard({
                 <line x1="15" y1="9" x2="9" y2="15"/>
               </svg>
               <div>
-                <p className="font-semibold text-sm mb-1" style={{ color: theme.textPrimary }}>Aligned with your goals</p>
-                <p className="text-xs" style={{ color: theme.textSecondary }}>
+                <p className="font-semibold text-sm mb-1" style={{ color: 'var(--md-sys-color-on-surface)' }}>Aligned with your goals</p>
+                <p className="text-xs" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
                   This topic appears <strong>{Math.round((blueprintWeight - 1) * 100)}% more often</strong> in your target exam blueprint.
                 </p>
               </div>
             </div>
           </div>
         </div>
-      </Card>
+      </MD3Card>
 
-      {/* Math Explanation Modal */}
-      <Modal
-        opened={showMathModal}
-        onClose={() => setShowMathModal(false)}
-        size="xl"
-        centered
-        styles={{
-          content: {
-            background: theme.cardBg,
-            backdropFilter: darkMode ? 'blur(20px)' : 'none',
-            border: darkMode ? `1px solid ${theme.cardBorder}` : 'none',
-          }
-        }}
-      >
-        <div style={{ color: theme.textPrimary }}>
+      {/* Math Explanation Dialog */}
+      <md-dialog open={showMathModal}>
+        <div style={{ color: 'var(--md-sys-color-on-surface)' }}>
           <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl" style={{ background: darkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)' }}>
+              <div className="p-2 rounded-xl" style={{ background: 'color-mix(in srgb, var(--md-sys-color-primary) 16%, transparent)' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                   <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
@@ -163,11 +146,10 @@ export function WhyThisQuestionCard({
               </div>
               <span>How Adaptive Learning Works</span>
             </div>
-          </div>
           <div className="pb-6">
-            <div className="space-y-6" style={{ color: theme.textSecondary }}>
+            <div className="space-y-6" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
               <div>
-                <h4 className="font-bold text-sm mb-2" style={{ color: theme.textPrimary }}>📊 Your Ability Estimate (θ̂ = {abilityLevel.toFixed(2)})</h4>
+                <h4 className="font-bold text-sm mb-2" style={{ color: 'var(--md-sys-color-on-surface)' }}>📊 Your Ability Estimate (θ̂ = {abilityLevel.toFixed(2)})</h4>
                 <p className="text-sm mb-2">
                   Based on your past performance, we estimate your knowledge level is <strong>{abilityLevel.toFixed(2)}</strong> on a scale from -3 to +3.
                 </p>
@@ -178,7 +160,7 @@ export function WhyThisQuestionCard({
               </div>
 
               <div>
-                <h4 className="font-bold text-sm mb-2" style={{ color: theme.textPrimary }}>🎯 Uncertainty (SE = 0.12)</h4>
+                <h4 className="font-bold text-sm mb-2" style={{ color: 'var(--md-sys-color-on-surface)' }}>🎯 Uncertainty (SE = 0.12)</h4>
                 <p className="text-sm mb-2">
                   We're <strong>very confident</strong> about your ability level (low standard error of 0.12).
                 </p>
@@ -189,7 +171,7 @@ export function WhyThisQuestionCard({
               </div>
 
               <div>
-                <h4 className="font-bold text-sm mb-2" style={{ color: theme.textPrimary }}>💡 Information Value (Info = {informationValue.toFixed(2)})</h4>
+                <h4 className="font-bold text-sm mb-2" style={{ color: 'var(--md-sys-color-on-surface)' }}>💡 Information Value (Info = {informationValue.toFixed(2)})</h4>
                 <p className="text-sm mb-2">
                   This question provides <strong>{informationValue.toFixed(2)}x more information</strong> than a random question.
                 </p>
@@ -200,7 +182,7 @@ export function WhyThisQuestionCard({
               </div>
 
               <div>
-                <h4 className="font-bold text-sm mb-2" style={{ color: theme.textPrimary }}>📋 Blueprint Weight (×{blueprintWeight.toFixed(1)})</h4>
+                <h4 className="font-bold text-sm mb-2" style={{ color: 'var(--md-sys-color-on-surface)' }}>📋 Blueprint Weight (×{blueprintWeight.toFixed(1)})</h4>
                 <p className="text-sm mb-2">
                   This topic appears <strong>{Math.round((blueprintWeight - 1) * 100)}% more often</strong> in your target exam.
                 </p>
@@ -211,10 +193,10 @@ export function WhyThisQuestionCard({
               </div>
 
               <div className="p-4 rounded-2xl mt-6" style={{
-                background: darkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.05)',
-                border: darkMode ? '1px solid rgba(59, 130, 246, 0.2)' : '1px solid rgba(59, 130, 246, 0.1)',
+                background: 'color-mix(in srgb, var(--md-sys-color-primary) 7%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent)'
               }}>
-                <p className="text-sm font-semibold mb-2" style={{ color: theme.textPrimary }}>
+                <p className="text-sm font-semibold mb-2" style={{ color: 'var(--md-sys-color-on-surface)' }}>
                   🧠 The Algorithm
                 </p>
                 <p className="text-xs">
@@ -223,8 +205,11 @@ export function WhyThisQuestionCard({
               </div>
             </div>
           </div>
+          <div slot="actions" className="flex gap-2 justify-end">
+            <MD3Button variant="text" onClick={() => setShowMathModal(false)}>Close</MD3Button>
+          </div>
         </div>
-      </Modal>
+      </md-dialog>
     </>
   );
 }

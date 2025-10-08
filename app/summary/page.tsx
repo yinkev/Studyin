@@ -1,14 +1,14 @@
+/**
+ * Summary Page - Material Design 3 Edition
+ * Analytics dashboard using official MD3 design tokens
+ */
+
 import { promises as fs } from 'fs';
 import path from 'path';
 import { loadAnalyticsSummary } from '../../lib/getAnalytics';
-// ECharts cards removed - using Canvas/D3 alternatives
-// import { TTMCard } from '../../components/okc/charts/TTMCard';
-// import { SpeedAccuracyCard } from '../../components/okc/charts/SpeedAccuracyCard';
-// import { ConfusionBarCard } from '../../components/okc/charts/ConfusionBarCard';
 import { ConfusionForce } from '../../components/charts/ConfusionForce';
 import { BlueprintDriftChart } from '../../components/charts/BlueprintDriftChart';
 import { TTMBarCanvas } from '../../components/canvas/TTMBarCanvas';
-import { Card } from '@mantine/core';
 import { ConfusionGraph } from '../../components/graphs/ConfusionGraph';
 import { BlueprintFlow } from '../../components/graphs/BlueprintFlow';
 import { SessionFlow } from '../../components/graphs/SessionFlow';
@@ -65,22 +65,72 @@ export default async function SummaryPage() {
     ? Object.entries(analytics.mastery_per_lo).map(([lo_id, score]) => ({ lo_id, score }))
     : [];
   return (
-      <section className="space-y-8 text-text-high min-h-screen px-6 py-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <section style={{
+      minHeight: '100vh',
+      padding: '2rem 1.5rem',
+      backgroundColor: 'var(--md-sys-color-surface)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '2rem'
+    }}>
+      {/* Page Header */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '1rem'
+      }}>
         <div>
-          <p className="text-xs uppercase tracking-wide text-text-med">Operational analytics</p>
-          <h1 className="text-3xl font-semibold text-text-high">Summary</h1>
+          <p className="md3-label-small" style={{
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: 'var(--md-sys-color-on-surface-variant)',
+            marginBottom: '0.5rem'
+          }}>
+            Operational analytics
+          </p>
+          <h1 className="md3-display-small" style={{
+            color: 'var(--md-sys-color-on-surface)',
+            fontWeight: 600
+          }}>
+            Summary
+          </h1>
         </div>
         {rubric && (
-          <div className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide ${rubric.overall_pass ? 'border-semantic-success/40 text-semantic-success' : 'border-semantic-warning/40 text-semantic-warning'}`}>
+          <div style={{
+            borderRadius: 'var(--md-sys-shape-corner-full)',
+            border: `2px solid ${rubric.overall_pass ? 'var(--md-sys-color-tertiary)' : 'var(--md-sys-color-error)'}`,
+            padding: '0.5rem 1rem',
+            color: rubric.overall_pass ? 'var(--md-sys-color-tertiary)' : 'var(--md-sys-color-error)',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            fontSize: '0.75rem'
+          }}>
             Rubric {rubric.overall_score.toFixed(1)} / {rubric.threshold}
           </div>
         )}
       </div>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="glass-clinical-card h-full">
-          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Release readiness</div>
-          <div className="space-y-4 text-sm">
+
+      {/* Analytics Grid */}
+      <div style={{
+        display: 'grid',
+        gap: '1.5rem',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))'
+      }} className="lg:grid-cols-2">
+        {/* Release Readiness Card */}
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card" style={{ padding: '1.5rem', height: '100%' }}>
+          <div className="md3-label-large" style={{
+            paddingBottom: '1rem',
+            borderBottom: '1px solid var(--md-sys-color-outline-variant)',
+            marginBottom: '1rem',
+            fontWeight: 600,
+            color: 'var(--md-sys-color-on-surface)'
+          }}>
+            Release readiness
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} className="md3-body-medium">
             {rubric ? (
               <div className="flex items-center justify-between">
                 <span>Rubric score</span>
@@ -96,7 +146,7 @@ export default async function SummaryPage() {
             <p className="text-xs text-text-med">Critical gates must stay green — rerun rubric scoring before every release.</p>
           </div>
         </div>
-        <div className="glass-clinical-card">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Retention throughput</div>
           <div className="space-y-2 text-sm">
             {analytics?.retention_summary ? (
@@ -125,13 +175,13 @@ export default async function SummaryPage() {
             )}
           </div>
         </div>
-        <div className="glass-clinical-card h-full">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card h-full">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Blueprint drift</div>
           <div>
             <BlueprintDriftChart analytics={analytics} weights={blueprint?.weights ?? {}} />
           </div>
         </div>
-        <div className="glass-clinical-card">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Mastery · TTM (Canvas)</div>
           <div>
             <TTMBarCanvas analytics={analytics} height={320} />
@@ -146,43 +196,43 @@ export default async function SummaryPage() {
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Confusion hotspots</div>
           <div>Confusion chart placeholder</div>
         </Card> */}
-        <div className="glass-clinical-card">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Evidence efficacy</div>
           <div>
             <ConfusionForce analytics={analytics} />
           </div>
         </div>
-        <div className="glass-clinical-card">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">TTM canvas</div>
           <div>
             <TTMBarCanvas analytics={analytics} />
           </div>
         </div>
-        <div className="glass-clinical-card col-span-full">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card col-span-full">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Adaptive dashboards</div>
           <div>
             <SummaryDashboards dashboards={dashboards} />
           </div>
         </div>
-        <div className="glass-clinical-card col-span-full">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card col-span-full">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Mastery insights</div>
           <div>
             <InsightsView masteryScores={masteryScores} />
           </div>
         </div>
-        <div className="glass-clinical-card col-span-full">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card col-span-full">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Confusion graph</div>
           <div>
             <ConfusionGraph analytics={analytics} />
           </div>
         </div>
-        <div className="glass-clinical-card col-span-full">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card col-span-full">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Blueprint flow</div>
           <div>
             <BlueprintFlow analytics={analytics} weights={blueprint?.weights ?? {}} />
           </div>
         </div>
-        <div className="glass-clinical-card col-span-full">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card col-span-full">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Recent session traces</div>
           <div>
             <SessionFlow attempts={attempts} />

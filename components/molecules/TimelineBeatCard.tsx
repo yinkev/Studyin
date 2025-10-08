@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { animate as anime } from "animejs";
+import { useEffect } from 'react';
+import { motion } from 'motion/react';
 import GlowCard from '../atoms/GlowCard';
 import type { LessonAnimationBeat } from '../../lib/types/lesson';
 
@@ -13,22 +13,7 @@ interface TimelineBeatCardProps {
 }
 
 export function TimelineBeatCard({ beat, index, isActive, onActivate }: TimelineBeatCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!cardRef.current) return;
-    const el = cardRef.current;
-    const animation = anime({
-      targets: el,
-      scale: isActive ? [1, 1.02] : 1,
-      borderColor: isActive ? '#38bdf8' : 'rgba(255,255,255,0.1)',
-      duration: isActive ? 600 : 300,
-      ease: isActive ? 'easeInOutQuad' : 'easeOutSine'
-    });
-    return () => {
-      animation.pause();
-    };
-  }, [isActive]);
+  // Declarative animation via Motion
 
   useEffect(() => {
     if (isActive && onActivate) {
@@ -38,20 +23,42 @@ export function TimelineBeatCard({ beat, index, isActive, onActivate }: Timeline
 
   return (
     <GlowCard
-      className="flex flex-col gap-3 border border-white/10 bg-white/70 p-6 transition-colors"
-      glowColor={isActive ? 'rgba(14, 165, 233, 0.45)' : 'rgba(203, 213, 225, 0.2)'}
+      variant={isActive ? 'flow' : 'default'}
+      glowColor={isActive ? 'rgba(61, 192, 207, 0.45)' : undefined}
       delayMs={80 * index}
     >
-      <div ref={cardRef} className="flex items-center gap-4">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500 text-2xl font-bold text-white shadow-lg ${isActive ? 'animate-pulse' : ''}`}>
+      <motion.div
+        style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+        animate={{ scale: isActive ? 1.02 : 1 }}
+        transition={{ duration: isActive ? 0.6 : 0.3, ease: [0.45, 0, 0.55, 1] }}
+      >
+        <motion.div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '3rem',
+            height: '3rem',
+            borderRadius: 'var(--md-sys-shape-corner-large)',
+            backgroundColor: 'var(--md-sys-color-secondary-container)',
+            color: 'var(--md-sys-color-on-secondary-container)',
+            boxShadow: 'var(--md-sys-elevation-2)',
+            fontWeight: 800,
+            fontSize: '1.25rem',
+          }}
+          animate={isActive ? { scale: [1, 1.05, 1] } : {}}
+          transition={{ duration: 0.8, repeat: isActive ? Infinity : 0, repeatType: 'reverse' }}
+        >
           {String(beat.beat + 1).padStart(2, '0')}
+        </motion.div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--md-sys-color-secondary)' }}>
+            {beat.duration_s.toFixed(1)}s
+          </div>
+          <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--md-sys-color-on-surface)' }}>{beat.narration}</p>
+          <p style={{ marginTop: '0.25rem', fontSize: '0.875rem', color: 'var(--md-sys-color-on-surface-variant)' }}>{beat.visual}</p>
         </div>
-        <div className="flex-1">
-          <div className="text-sm uppercase tracking-wide text-slate-500">{beat.duration_s.toFixed(1)}s</div>
-          <p className="text-lg font-semibold text-slate-900">{beat.narration}</p>
-          <p className="mt-1 text-sm text-slate-600">{beat.visual}</p>
-        </div>
-      </div>
+      </motion.div>
     </GlowCard>
   );
 }

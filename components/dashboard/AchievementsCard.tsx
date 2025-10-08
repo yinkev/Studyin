@@ -1,7 +1,6 @@
 'use client';
 
 import { BentoCard } from '../layout/BentoCard';
-import { Progress, Tooltip, Skeleton } from '@mantine/core';
 
 interface Achievement {
   id: string;
@@ -23,7 +22,7 @@ export function AchievementsCard({ achievements, isLoading = false, size = 'full
 
   return (
     <BentoCard size={size}>
-      <div className="p-6">
+      <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card interactive-card">
         <div className="flex gap-3 items-center mb-4">
           <div className="p-2.5 rounded-xl bg-warning/10">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" strokeWidth="2.5">
@@ -41,43 +40,42 @@ export function AchievementsCard({ achievements, isLoading = false, size = 'full
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} height={96} radius="md" />
+              <div key={i} className="h-24 rounded-xl bento-skeleton" aria-hidden></div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {achievements.map((achievement) => (
-              <Tooltip
+              <div
                 key={achievement.id}
-                label={
-                  <div className="p-2">
-                    <p className="font-bold text-sm mb-1">{achievement.name}</p>
-                    <p className="text-xs text-text-med mb-2">{achievement.description}</p>
-                    <Progress value={achievement.progress} size="sm" />
-                    <p className="text-xs mt-1">
-                      {Math.round(achievement.progress)}% complete
-                    </p>
-                  </div>
-                }
+                className={`relative p-4 rounded-xl border text-center transition-all ${
+                  achievement.completed
+                    ? 'bg-gradient-to-br from-warning/20 to-semantic-success/20 border-warning/40 shadow-lg achievement-unlocked'
+                    : 'bg-surface-bg3/40 border-border-subtle hover:border-border-med'
+                }`}
+                role="group"
+                aria-label={`${achievement.name} ${achievement.completed ? 'unlocked' : 'locked'}`}
+                title={`${achievement.name} — ${achievement.description}`}
               >
-                <div
-                  className={`p-4 rounded-xl border text-center cursor-pointer transition-all hover:scale-105 ${
-                    achievement.completed
-                      ? 'bg-gradient-to-br from-warning/20 to-semantic-success/20 border-warning/40 shadow-lg'
-                      : 'bg-surface-bg3/40 border-border-subtle opacity-60'
-                  }`}
-                >
-                  <div className="text-3xl mb-2">{achievement.icon}</div>
-                  <p className={`text-xs font-bold ${achievement.completed ? 'text-warning' : 'text-text-med'}`}>
-                    {achievement.name}
-                  </p>
-                  {!achievement.completed && (
+                <div className="text-3xl mb-2" aria-hidden>{achievement.icon}</div>
+                <p className={`text-xs font-bold ${achievement.completed ? 'text-warning' : 'text-text-med'}`}>
+                  {achievement.name}
+                </p>
+
+                {!achievement.completed ? (
+                  <div className="mt-2" aria-label={`${Math.round(achievement.progress)} percent complete`}>
+                    <md-linear-progress value={Math.max(0, Math.min(1, achievement.progress / 100))}></md-linear-progress>
                     <p className="text-xs text-text-low mt-1 tabular-nums">
                       {Math.round(achievement.progress)}%
                     </p>
-                  )}
-                </div>
-              </Tooltip>
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 pointer-events-none" aria-hidden>
+                    {/* subtle celebratory ripple/elevation handled by CSS */}
+                  </div>
+                )}
+                <md-ripple></md-ripple>
+              </div>
             ))}
           </div>
         )}

@@ -1,13 +1,12 @@
 /**
- * World-Class Gamified Learning Dashboard
- * Built with HeroUI and Bento Grid, featuring comprehensive gamification and learning analytics
+ * Dashboard Page - Material Design 3 Edition
+ * Gamified learning dashboard with MD3 components
  */
 
 'use client';
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Card, Button } from '@mantine/core';
 import { useDashboardMetrics } from '../../lib/hooks/useDashboardMetrics';
 import { BentoGrid } from '@/components/layout/BentoGrid';
 import { ProgressCard } from '@/components/cards/ProgressCard';
@@ -27,7 +26,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <main className="min-h-screen px-6 py-8 flex items-center justify-center">
-        <div className="glass-clinical-card max-w-md">
+        <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card max-w-md">
           <div className="text-center">
             <p className="text-semantic-danger font-semibold mb-2">Error Loading Dashboard</p>
             <p className="text-text-med text-sm">{error.message}</p>
@@ -42,7 +41,7 @@ export default function DashboardPage() {
     return (
       <main className="min-h-screen px-4 md:px-6 py-12 flex items-center justify-center">
         <div className="max-w-2xl w-full">
-          <div className="glass-clinical-card">
+          <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card">
             <div className="p-8 md:p-12 text-center">
               {/* Hero Icon */}
               <div className="mb-6 flex justify-center">
@@ -84,17 +83,16 @@ export default function DashboardPage() {
 
               {/* CTA */}
               <Link href="/study">
-                <Button
-                  size="lg"
-                  className="clinical-button text-lg px-8 shadow-clinical-lg hover:shadow-clinical-xl transition-all"
-                  leftSection={
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
-                  }
-                >
+                <md-filled-button style={{
+                  fontSize: '1.125rem',
+                  padding: '0.75rem 2rem',
+                  '--md-filled-button-container-shape': '28px'
+                }}>
+                  <svg slot="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
                   Start Your First Session
-                </Button>
+                </md-filled-button>
               </Link>
 
               <p className="text-xs text-text-low mt-4">
@@ -122,17 +120,42 @@ export default function DashboardPage() {
                 {metrics.recommendedFocus}
               </p>
             </div>
-
-            {/* Mini-Game Button */}
-            <Link href="/games/follow-the-money">
-              <Button
-                size="lg"
-                className="clinical-button font-bold shadow-clinical-md"
-                leftSection={<span>💰</span>}
+            {/* Right cluster: sticky progress + mini-game */}
+            <div className="flex items-center gap-3">
+              {/* Always-visible mastery progress (sticky on scroll) */}
+              <div
+                className="hidden md:flex items-center gap-2 md3-surface-container md3-elevation-1 md3-shape-large"
+                style={{
+                  position: 'sticky',
+                  top: '0.5rem',
+                  padding: '0.5rem 0.75rem',
+                  border: '1px solid var(--md-sys-color-outline-variant)'
+                }}
+                aria-live="polite"
               >
-                Play Mini-Game
-              </Button>
-            </Link>
+                <span className="text-xs font-semibold" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
+                  Mastery
+                </span>
+                <div style={{ minWidth: 140 }}>
+                  <md-linear-progress value={Math.max(0, Math.min(1, metrics.percentToNextLevel / 100))}></md-linear-progress>
+                </div>
+                <span className="text-xs tabular-nums" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
+                  {Math.round(metrics.percentToNextLevel)}%
+                </span>
+              </div>
+
+              {/* Mini-Game Button */}
+              <Link href="/games/follow-the-money">
+                <md-filled-tonal-button style={{
+                  fontSize: '1rem',
+                  padding: '0.75rem 1.5rem',
+                  fontWeight: 'bold'
+                }}>
+                  <span slot="icon">💰</span>
+                  Play Mini-Game
+                </md-filled-tonal-button>
+              </Link>
+            </div>
           </div>
         </div>
 

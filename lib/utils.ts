@@ -1,6 +1,9 @@
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 
+/**
+ * Combines class names using clsx
+ * (No Tailwind merge needed - we use MD3 design system!)
+ */
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return clsx(inputs);
 }

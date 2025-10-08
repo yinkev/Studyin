@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { animate as anime } from 'animejs';
+import { animate } from 'motion/react';
 
 interface XPGainToastProps {
   /** Amount of XP gained */
@@ -32,34 +32,20 @@ export function XPGainToast({ amount, reason, onDismiss, duration = 2000 }: XPGa
     const toast = toastRef.current;
 
     // Slide in from right
-    anime(toast, {
-      translateX: { from: 100, to: 0 },
-      opacity: { from: 0, to: 1 },
-      duration: 400,
-      ease: 'outBack',
-    });
+    animate(toast, { x: [100, 0], opacity: [0, 1] }, { duration: 0.4, easing: [0.34, 1.56, 0.64, 1] });
 
     // Pulse glow
-    anime(toast, {
-      boxShadow: [
-        { to: '0 0 20px rgba(167, 139, 250, 0.5)' },
-        { to: '0 0 40px rgba(167, 139, 250, 0.8)' },
-        { to: '0 0 20px rgba(167, 139, 250, 0.5)' },
-      ],
-      duration: 1000,
-      loop: true,
-      ease: 'inOutQuad',
-    });
+    animate(
+      toast,
+      { boxShadow: ['0 0 20px rgba(167, 139, 250, 0.5)', '0 0 40px rgba(167, 139, 250, 0.8)', '0 0 20px rgba(167, 139, 250, 0.5)'] },
+      { duration: 1, easing: [0.45, 0, 0.55, 1], repeat: Infinity }
+    );
 
     // Auto-dismiss
     const timeout = setTimeout(() => {
-      anime(toast, {
-        translateX: { from: 0, to: 100 },
-        opacity: { from: 1, to: 0 },
-        duration: 300,
-        ease: 'inQuad',
-        onComplete: () => onDismiss?.(),
-      });
+      const out = animate(toast, { x: [0, 100], opacity: [1, 0] }, { duration: 0.3, easing: [0.55, 0.085, 0.68, 0.53] });
+      const finished = Array.isArray(out) ? Promise.all(out.map(a => a.finished)) : out.finished;
+      Promise.resolve(finished).then(() => onDismiss?.());
     }, duration);
 
     return () => clearTimeout(timeout);

@@ -340,7 +340,14 @@ export function buildThompsonArms(params: {
   cooldownHours?: number;
 }): ThompsonArm[] {
   const { learnerState, analytics, blueprint, items, now = Date.now(), cooldownHours = 96 } = params;
-  const disableCaps = false; // cooldown eligibility enabled
+  // Respect development override for exposure caps (see AGENTS.md Engine Gate)
+  const disableCaps = (() => {
+    const flag = process?.env?.STUDY_NO_CAPS;
+    if (!flag) return false;
+    const requested = flag === '1' || flag.toLowerCase?.() === 'true';
+    // Limit override to non-production environments
+    return requested && process?.env?.NODE_ENV !== 'production';
+  })();
   const effectiveCooldownHours = disableCaps ? 0 : cooldownHours;
   const loIds = new Set<string>();
   Object.keys(learnerState.los).forEach((loId) => loIds.add(loId));

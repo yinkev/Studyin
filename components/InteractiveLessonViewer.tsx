@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { animate as anime } from "animejs";
+import { animate } from 'motion/react';
 import type { InteractiveLesson, LessonAnimationBeat, LessonMultipleChoiceBlock } from '../lib/types/lesson';
 import { submitStudyAttempt } from '../app/study/actions';
 import { StudyAttemptInputSchema } from '../core/types/events';
@@ -63,14 +63,15 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
 
   useEffect(() => {
     if (!hasTimeline) return;
-    const controls = anime({
-      targets: '#timeline-progress-bar',
-      width: [`${(activeIndex / timeline.length) * 100}%`, `${((activeIndex + 1) / timeline.length) * 100}%`],
-      ease: 'easeOutExpo',
-      duration: 600
-    });
+    const el = document.getElementById('timeline-progress-bar');
+    if (!el) return;
+    const anim = animate(el, { width: [
+      `${(activeIndex / timeline.length) * 100}%`,
+      `${((activeIndex + 1) / timeline.length) * 100}%`
+    ] }, { duration: 0.6, easing: [0.19, 1, 0.22, 1] });
     return () => {
-      controls.pause();
+      if (Array.isArray(anim)) anim.forEach(a => a.cancel());
+      else anim.cancel();
     };
   }, [activeIndex, hasTimeline, timeline.length]);
 
@@ -91,13 +92,10 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
   const handleChoiceSelect = useCallback(
     (choiceId: string) => {
       setSelectedChoice(choiceId);
-      anime({
-        targets: `#choice-${choiceId}`,
-        scale: [1, 1.04],
-        duration: 220,
-        ease: 'easeOutQuad',
-        direction: 'alternate'
-      });
+      const el = document.querySelector(`#choice-${choiceId}`);
+      if (el instanceof HTMLElement) {
+        animate(el, { scale: [1, 1.04, 1] }, { duration: 0.22, easing: [0.19, 1, 0.22, 1] });
+      }
     },
     []
   );
@@ -175,13 +173,10 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
       }
     }
 
-    anime({
-      targets: '#mcq-feedback',
-      opacity: [0, 1],
-      translateY: [24, 0],
-      duration: 520,
-      ease: 'easeOutExpo'
-    });
+    const el = document.getElementById('mcq-feedback');
+    if (el) {
+      animate(el, { opacity: [0, 1], y: [24, 0] }, { duration: 0.52, easing: [0.19, 1, 0.22, 1] });
+    }
   }, [currentQuestion, learnerId, lesson.lo_id, selectedChoice, evidencePanelOpen, abilityData, awardXPWithFeedback]);
 
   const handleContinue = useCallback(() => {
@@ -335,14 +330,14 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
         )}
 
         {currentQuestion && (
-          <GlowCard className="border border-white/20 bg-white/80 p-8">
+          <GlowCard variant="comfort" className="p-8">
             <div className="flex items-center justify-between gap-4">
-              <div className="text-sm uppercase tracking-wide text-slate-500">Confidence Probe</div>
-              <div className="rounded-full bg-slate-900/80 px-4 py-1 text-xs font-semibold text-slate-100">
+              <div className="text-sm uppercase tracking-wide text-[#F4E0C0]">Confidence Probe</div>
+              <div className="rounded-full bg-[#203B2A] border border-[#4a7c5d]/40 px-4 py-1 text-xs font-semibold text-white">
                 LO · {currentQuestion.learningObjective ?? lesson.lo_id}
               </div>
             </div>
-            <h2 className="mt-4 text-2xl font-bold text-slate-900">{currentQuestion.stem}</h2>
+            <h2 className="mt-4 text-2xl font-bold text-white">{currentQuestion.stem}</h2>
             <div className="mt-6 grid gap-3">
               {currentQuestion.choices.map((choice) => {
                 const isSelected = selectedChoice === choice.id;
@@ -356,12 +351,12 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
                     disabled={answerState !== 'idle'}
                     className={`rounded-2xl border-2 px-5 py-4 text-left text-lg transition ${
                       isCorrect
-                        ? 'border-emerald-400 bg-emerald-50 text-emerald-700 shadow-[0_12px_30px_rgba(16,185,129,0.2)]'
+                        ? 'border-emerald-400 bg-emerald-900/40 text-emerald-100 shadow-[0_12px_30px_rgba(16,185,129,0.3)]'
                         : isIncorrect
-                        ? 'border-rose-400 bg-rose-50 text-rose-700 shadow-[0_12px_30px_rgba(244,63,94,0.2)]'
+                        ? 'border-rose-400 bg-rose-900/40 text-rose-100 shadow-[0_12px_30px_rgba(244,63,94,0.3)]'
                         : isSelected
-                        ? 'border-sky-400 bg-sky-50 text-sky-700 shadow-[0_12px_30px_rgba(56,189,248,0.18)]'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-sky-300 hover:bg-slate-50'
+                        ? 'border-[#3DC0CF] bg-[#3DC0CF]/20 text-white shadow-[0_12px_30px_rgba(61,192,207,0.25)]'
+                        : 'border-slate-700 bg-slate-800/50 text-slate-100 hover:border-[#3DC0CF]/60 hover:bg-slate-800/70'
                     }`}
                   >
                     {choice.text}
@@ -380,20 +375,20 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
                 </button>
                 <button
                   onClick={() => setEvidencePanelOpen(true)}
-                  className="rounded-2xl border-2 border-slate-300 px-4 py-3 text-slate-700 hover:border-sky-400 hover:bg-sky-50 transition-colors"
+                  className="rounded-2xl border-2 border-[#F4E0C0]/30 px-4 py-3 text-white hover:border-[#F4E0C0] hover:bg-[#F4E0C0]/10 transition-colors"
                   title="View evidence (E)"
                 >
                   📚 Evidence
                 </button>
               </div>
               {answerState !== 'idle' && (
-                <button onClick={handleContinue} className="px-4 py-2 rounded-xl bg-slate-900/10 text-slate-700 font-semibold hover:bg-slate-900/20 transition-colors">
+                <button onClick={handleContinue} className="px-4 py-2 rounded-xl bg-[#CDD10F]/20 border border-[#CDD10F]/40 text-white font-semibold hover:bg-[#CDD10F]/30 transition-colors">
                   Next →
                 </button>
               )}
             </div>
             {answerState !== 'idle' && (
-              <div id="mcq-feedback" className="mt-4 rounded-2xl bg-slate-900/80 px-6 py-4 text-slate-100">
+              <div id="mcq-feedback" className="mt-4 rounded-2xl bg-[#203B2A]/80 border border-[#4a7c5d]/40 px-6 py-4 text-white">
                 {answerState === 'correct' ? 'Correct! Mastery confirmed.' : 'This has been logged for review.'}
               </div>
             )}
@@ -401,7 +396,7 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
         )}
 
         {!currentQuestion && !hasTimeline && (
-          <GlowCard className="border border-dashed border-white/20 bg-white/70 p-12 text-center text-slate-600">
+          <GlowCard variant="comfort" className="border border-dashed border-[#F4E0C0]/30 p-12 text-center text-[#F4E0C0]">
             This lesson does not yet contain interactive cards. Upload new content or trigger the worker to populate questions.
           </GlowCard>
         )}

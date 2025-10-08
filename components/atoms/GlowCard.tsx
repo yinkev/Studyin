@@ -1,49 +1,81 @@
 'use client';
 
-import { PropsWithChildren, useEffect, useRef } from 'react';
-import { animate as anime } from "animejs";
-import clsx from 'clsx';
+import { PropsWithChildren } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 
 interface GlowCardProps {
   className?: string;
   glowColor?: string;
   delayMs?: number;
+  variant?: 'default' | 'comfort' | 'flow' | 'achievement' | 'safety';
 }
 
 export function GlowCard({
   className,
-  glowColor = 'rgba(59, 130, 246, 0.35)',
+  glowColor,
   delayMs = 0,
-  children
+  variant = 'default',
+  children,
 }: PropsWithChildren<GlowCardProps>) {
-  const ref = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (!ref.current) return;
-    const element = ref.current;
-    const animation = anime(element, {
-      opacity: { from: 0, to: 1 },
-      translateY: { from: 24, to: 0 },
-      duration: 900,
-      delay: delayMs,
-      ease: 'outExpo'
-    });
-    return () => {
-      animation.pause();
-    };
-  }, [glowColor, delayMs]);
+  // Map variants to MD3 container roles
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'flow':
+        return {
+          backgroundColor: 'var(--md-sys-color-secondary-container)',
+          color: 'var(--md-sys-color-on-secondary-container)',
+          border: '1px solid var(--md-sys-color-outline-variant)',
+        } as const;
+      case 'achievement':
+        return {
+          backgroundColor: 'var(--md-sys-color-primary-container)',
+          color: 'var(--md-sys-color-on-primary-container)',
+          border: '1px solid var(--md-sys-color-outline-variant)',
+        } as const;
+      case 'safety':
+        return {
+          backgroundColor: 'var(--md-sys-color-tertiary-container)',
+          color: 'var(--md-sys-color-on-tertiary-container)',
+          border: '1px solid var(--md-sys-color-outline-variant)',
+        } as const;
+      case 'comfort':
+        return {
+          backgroundColor: 'var(--md-sys-color-surface-container-high)',
+          color: 'var(--md-sys-color-on-surface)',
+          border: '1px solid var(--md-sys-color-outline-variant)',
+        } as const;
+      case 'default':
+      default:
+        return {
+          backgroundColor: 'var(--md-sys-color-surface-container)',
+          color: 'var(--md-sys-color-on-surface)',
+          border: '1px solid var(--md-sys-color-outline-variant)',
+        } as const;
+    }
+  };
+
+  const baseStyle: React.CSSProperties = {
+    borderRadius: 'var(--md-sys-shape-corner-large)',
+    boxShadow: 'var(--md-sys-elevation-2)',
+    overflow: 'hidden',
+  };
+
+  const paddingStyle: React.CSSProperties = {
+    padding: '1.5rem',
+  };
 
   return (
-    <div
-      ref={ref}
-      className={clsx(
-        'relative overflow-hidden rounded-3xl border border-white/10 bg-white/80 backdrop-blur-lg shadow-lg',
-        'before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/30 before:to-white/5 before:opacity-70 before:pointer-events-none',
-        className
-      )}
+    <motion.div
+      initial={shouldReduceMotion ? {} : { opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: delayMs / 1000, ease: [0.19, 1, 0.22, 1] }}
+      className={className}
+      style={{ ...baseStyle, ...getVariantStyles(), ...(glowColor ? { boxShadow: `0 4px 24px ${glowColor}` } : {}) }}
     >
-      <div className="relative z-10">{children}</div>
-    </div>
+      <div style={paddingStyle}>{children}</div>
+    </motion.div>
   );
 }
 

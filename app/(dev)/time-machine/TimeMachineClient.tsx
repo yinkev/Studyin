@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { animate as anime } from "animejs";
+import { animate } from 'motion/react';
 import GlowCard from '../../../components/atoms/GlowCard';
 import type { StateSnapshot } from '../../../lib/persistence/stateLog';
 
@@ -57,12 +57,7 @@ export function TimeMachineClient({ learnerId, snapshots }: TimeMachineClientPro
             className="mt-4 max-h-[420px] overflow-y-auto whitespace-pre-wrap text-left"
             ref={(element) => {
               if (!element) return;
-              anime({
-                targets: element,
-                backgroundColor: ['rgba(14,165,233,0.05)', 'rgba(15,23,42,0.6)'],
-                duration: 800,
-                ease: 'easeOutQuad'
-              });
+              animate(element, { backgroundColor: ['rgba(14,165,233,0.05)', 'rgba(15,23,42,0.6)'] }, { duration: 0.8, easing: [0.19, 1, 0.22, 1] });
             }}
           >
             {renderJson}

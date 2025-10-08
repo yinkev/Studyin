@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { animate as anime } from "animejs";
+import { animate, stagger } from 'motion/react';
 import Image from 'next/image';
 
 export interface EvidenceSlide {
@@ -54,17 +54,14 @@ export function EvidencePanel({ evidence, isOpen, onClose, onEvidenceViewed }: E
   useEffect(() => {
     if (isOpen && panelRef.current) {
       // Animate panel slide-in
-      anime({ targets: panelRef.current, translateX: ['100%', '0%'], duration: 400, ease: 'easeOutExpo' });
+      animate(panelRef.current, { transform: ['translateX(100%)', 'translateX(0%)'] }, { duration: 0.4, easing: [0.19, 1, 0.22, 1] });
 
       // Animate slide cards
       const cards = panelRef.current.querySelectorAll('.evidence-slide-card');
-      anime({
-        targets: cards,
-        opacity: [0, 1],
-        translateY: [20, 0],
-        delay: (anime as any).stagger ? (anime as any).stagger(60, { start: 200 }) : 0,
-        duration: 400,
-        ease: 'easeOutExpo',
+      animate(cards, { opacity: [0, 1], y: [20, 0] }, {
+        delay: stagger(0.06, { start: 0.2 }),
+        duration: 0.4,
+        easing: [0.19, 1, 0.22, 1],
       });
     }
   }, [isOpen]);

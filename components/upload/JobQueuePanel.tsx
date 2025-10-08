@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import anime from "animejs";
+import { animate, stagger } from 'motion/react';
 import GlowCard from '../atoms/GlowCard';
 import { CLIProgressDisplay, type CLIProgress } from './CLIProgressDisplay';
 
@@ -43,13 +43,10 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
   useEffect(() => {
     if (panelRef.current && jobs.length > 0) {
       const cards = panelRef.current.querySelectorAll('.job-card');
-      anime({
-        targets: cards,
-        opacity: [0, 1],
-        translateY: [20, 0],
-        duration: 600,
-        delay: (anime as any).stagger ? (anime as any).stagger(100) : 0,
-        easing: 'easeOutExpo',
+      animate(cards, { opacity: [0, 1], y: [20, 0] }, {
+        duration: 0.6,
+        delay: stagger(0.1),
+        easing: [0.19, 1, 0.22, 1],
       });
     }
   }, [jobs.length]);

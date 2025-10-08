@@ -7,7 +7,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Badge, Button } from '@mantine/core';
 
 interface Lesson {
   id: string;
@@ -70,9 +69,10 @@ export function LessonBrowser() {
             Upload a document to generate your first interactive lesson
           </p>
           <Link href="/upload">
-            <Button className="clinical-button">
+            <md-filled-button aria-label="Upload Document">
+              <span slot="icon" aria-hidden>📤</span>
               Upload Document
-            </Button>
+            </md-filled-button>
           </Link>
         </div>
       </div>
@@ -88,12 +88,11 @@ export function LessonBrowser() {
         {lessons.map((lesson) => (
           <Link key={lesson.id} href={`/study?lesson=${lesson.id}`}>
             <div
-              className="p-4 rounded-lg border transition-clinical cursor-pointer hover:shadow-clinical-md"
+              className="p-4 md3-surface-container md3-elevation-1 md3-shape-large border transition-clinical cursor-pointer hover:shadow-clinical-md interactive-card"
               style={{
-                borderColor: 'var(--border-default)',
-                background: 'var(--surface-bg0)'
+                borderColor: 'var(--border-default)'
               }}
-            >
+              >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold mb-1 truncate" style={{ color: 'var(--text-high)' }}>
@@ -103,20 +102,9 @@ export function LessonBrowser() {
                     {lesson.fileName}
                   </p>
                   <div className="flex items-center gap-2">
-                    <Badge size="sm" className="clinical-badge badge-info">
-                      {lesson.itemCount} questions
-                    </Badge>
+                    <md-assist-chip label={`${lesson.itemCount} questions`} aria-label={`${lesson.itemCount} questions`}></md-assist-chip>
                     {lesson.difficulty && (
-                      <Badge
-                        size="sm"
-                        className={`clinical-badge ${
-                          lesson.difficulty === 'easy' ? 'badge-success' :
-                          lesson.difficulty === 'medium' ? 'badge-warning' :
-                          'badge-danger'
-                        }`}
-                      >
-                        {lesson.difficulty}
-                      </Badge>
+                      <md-assist-chip label={lesson.difficulty} aria-label={`Difficulty ${lesson.difficulty}`}></md-assist-chip>
                     )}
                   </div>
                 </div>
@@ -131,6 +119,7 @@ export function LessonBrowser() {
                 >
                   <polyline points="9 18 15 12 9 6"/>
                 </svg>
+                <md-ripple></md-ripple>
               </div>
             </div>
           </Link>

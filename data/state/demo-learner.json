@@ -1,0 +1,29 @@
+{
+  "learnerId": "demo-learner",
+  "updatedAt": "2025-10-08T19:24:52.227Z",
+  "los": {
+    "lo.wrist.radiocarpal-midcarpal": {
+      "thetaHat": 0,
+      "se": null,
+      "itemsAttempted": 1,
+      "recentSes": [
+        null
+      ],
+      "priorMu": 0,
+      "priorSigma": null,
+      "lastProbeDifficulty": 0,
+      "masteryConfirmed": false
+    }
+  },
+  "items": {
+    "lesson.lo.wrist.radiocarpal-midcarpal-mcq": {
+      "attempts": 1,
+      "correct": 1,
+      "recentAttempts": [
+        1759951492227
+      ],
+      "lastAttemptTs": 1759951492227
+    }
+  },
+  "retention": {}
+}

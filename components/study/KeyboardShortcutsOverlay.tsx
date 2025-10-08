@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
-import { animate as anime } from "animejs";
+import { animate, stagger } from 'motion/react';
 
 export interface KeyboardShortcut {
   keys: string[];
@@ -81,17 +81,14 @@ export function KeyboardShortcutsOverlay({
   useEffect(() => {
     if (visible && overlayRef.current) {
       // Animate in
-      anime({ targets: overlayRef.current, opacity: [0, 1], scale: [0.95, 1], duration: 300, ease: 'easeOutExpo' });
+      animate(overlayRef.current, { opacity: [0, 1], scale: [0.95, 1] }, { duration: 0.3, easing: [0.19, 1, 0.22, 1] });
 
       // Stagger animate categories
       const categories = overlayRef.current.querySelectorAll('.shortcut-category');
-      anime({
-        targets: categories,
-        translateY: [20, 0],
-        opacity: [0, 1],
-        delay: (anime as any).stagger ? (anime as any).stagger(80) : 0,
-        duration: 400,
-        ease: 'easeOutExpo',
+      animate(categories, { y: [20, 0], opacity: [0, 1] }, {
+        delay: stagger(0.08),
+        duration: 0.4,
+        easing: [0.19, 1, 0.22, 1],
       });
     }
   }, [visible]);
@@ -115,42 +112,58 @@ export function KeyboardShortcutsOverlay({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-md z-[100]"
+        className="md3-backdrop"
         onClick={() => {
           setVisible(false);
           onVisibilityChange?.(false);
         }}
-        style={{ animation: 'fadeIn 0.2s ease' }}
+        aria-hidden="true"
       />
 
       {/* Overlay */}
       <div
         ref={overlayRef}
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl max-h-[90vh] overflow-y-auto glass-dark rounded-3xl border border-white/20 p-8 z-[101]"
+        className="overlay-center md3-surface-container md3-shape-large md3-elevation-3"
         style={{
-          boxShadow: '0 24px 96px rgba(0, 0, 0, 0.8)',
+          padding: '2rem',
+          border: '1px solid var(--md-sys-color-outline-variant)',
+          boxShadow: 'var(--md-sys-elevation-5)',
         }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Keyboard Shortcuts"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
           <div>
-            <h2 className="text-4xl font-black gradient-text mb-2">Keyboard Shortcuts</h2>
-            <p className="text-slate-400 text-sm">Master study mode with your keyboard</p>
+            <h2 className="md3-headline-medium" style={{ fontWeight: 900 }}>Keyboard Shortcuts</h2>
+            <p className="md3-body-medium" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>Master study mode with your keyboard</p>
           </div>
           <button
             onClick={() => {
               setVisible(false);
               onVisibilityChange?.(false);
             }}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white text-2xl"
             aria-label="Close shortcuts"
+            style={{
+              width: '3rem',
+              height: '3rem',
+              borderRadius: '9999px',
+              background: 'color-mix(in srgb, var(--md-sys-color-surface-container) 80%, transparent)',
+              border: '1px solid var(--md-sys-color-outline-variant)',
+              color: 'var(--md-sys-color-on-surface)',
+              fontSize: '1.25rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
             ✕
           </button>
         </div>
 
         {/* Shortcuts Grid */}
-        <div className="space-y-6">
+        <div className="vstack-6">
           {(Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>).map((category) => {
             const categoryShortcuts = groupedShortcuts[category];
             if (!categoryShortcuts || categoryShortcuts.length === 0) return null;
@@ -159,29 +172,34 @@ export function KeyboardShortcutsOverlay({
             return (
               <div key={category} className="shortcut-category">
                 {/* Category Header */}
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">{meta.icon}</span>
-                  <h3 className="text-xl font-bold text-white">{meta.label}</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '1.75rem' }}>{meta.icon}</span>
+                  <h3 className="md3-title-large" style={{ fontWeight: 800 }}>{meta.label}</h3>
                 </div>
 
                 {/* Shortcuts List */}
-                <div className="space-y-3">
+                <div className="vstack-4">
                   {categoryShortcuts.map((shortcut, index) => (
                     <div
                       key={`${category}-${index}`}
-                      className="flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+                      className="md3-surface-container md3-shape-large"
+                      style={{
+                        padding: '1rem',
+                        border: '1px solid var(--md-sys-color-outline-variant)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
                     >
-                      <div className="text-slate-300">{shortcut.description}</div>
-                      <div className="flex items-center gap-2">
+                      <div className="md3-body-medium" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>{shortcut.description}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         {shortcut.keys.map((key, keyIndex) => (
                           <kbd
                             key={keyIndex}
-                            className="px-3 py-1.5 rounded-lg font-mono font-bold text-sm"
+                            className="kbd-md3"
                             style={{
-                              background: `linear-gradient(135deg, ${meta.color}30 0%, ${meta.color}10 100%)`,
-                              border: `1px solid ${meta.color}40`,
                               color: meta.color,
-                              boxShadow: `0 2px 8px ${meta.color}20`,
+                              borderColor: 'color-mix(in srgb, var(--md-sys-color-outline-variant) 60%, transparent)'
                             }}
                           >
                             {key}
@@ -197,13 +215,9 @@ export function KeyboardShortcutsOverlay({
         </div>
 
         {/* Footer */}
-        <div className="mt-8 pt-6 border-t border-white/10 text-center">
-          <div className="text-sm text-slate-400">
-            Press{' '}
-            <kbd className="px-2 py-1 rounded bg-white/10 text-white font-mono mx-1">?</kbd>
-            to toggle · Press{' '}
-            <kbd className="px-2 py-1 rounded bg-white/10 text-white font-mono mx-1">Esc</kbd>
-            to close
+        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--md-sys-color-outline-variant)', textAlign: 'center' }}>
+          <div className="md3-body-medium" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
+            Press <kbd className="kbd-md3">?</kbd> to toggle · Press <kbd className="kbd-md3">Esc</kbd> to close
           </div>
         </div>
       </div>

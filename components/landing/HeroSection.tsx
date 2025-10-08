@@ -9,24 +9,10 @@
  * - Trust-building stats
  */
 
-import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { animate as anime } from "animejs";
+import { motion } from 'motion/react';
 
 export function HeroSection() {
-  const headlineRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    // Gentle fade-in animation for headline
-    if (headlineRef.current) {
-      anime(headlineRef.current, {
-        translateY: { from: 20, to: 0 },
-        opacity: { from: 0, to: 1 },
-        ease: 'outQuad',
-        duration: 600,
-      });
-    }
-  }, []);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-surface-bg0 via-surface-bg1 to-surface-bg0">
@@ -42,10 +28,12 @@ export function HeroSection() {
         </div>
 
         {/* Animated Headline */}
-        <h1
-          ref={headlineRef}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
           className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight"
-          style={{ opacity: 0, color: 'var(--text-high)' }}
+          style={{ color: 'var(--text-high)' }}
         >
           Master medical knowledge with{' '}
           <span style={{
@@ -56,7 +44,7 @@ export function HeroSection() {
           }}>
             confidence
           </span>
-        </h1>
+        </motion.h1>
 
         {/* Subheadline */}
         <p className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto" style={{ color: 'var(--text-med)' }}>

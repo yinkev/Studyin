@@ -5,7 +5,7 @@
  * Shows game outcome and XP earned
  */
 
-import { Modal, Button, Group } from '@mantine/core';
+import { MD3Button } from '@/components/ui/MD3Button';
 import { type GameState } from '@/lib/games/follow-the-money/types';
 import { computeRoundXP } from '@/lib/games/follow-the-money/scoring';
 import { motion } from 'framer-motion';
@@ -34,15 +34,7 @@ export function ResultsModal({
   );
 
   return (
-    <Modal
-      opened={true}
-      onClose={() => {}}
-      closeOnClickOutside={false}
-      withCloseButton={false}
-      size="lg"
-      centered
-      className="bg-surface-bg2/95 backdrop-blur-xl"
-    >
+    <md-dialog open className="backdrop-blur-xl">
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -115,14 +107,14 @@ export function ResultsModal({
           </div>
         </div>
 
-        <Group justify="center" mt="xl">
-          <Button color="blue" variant="filled" onClick={onPlayAgain}>
+        <div slot="actions" className="flex gap-3 justify-center mt-6">
+          <MD3Button variant="filled" onClick={onPlayAgain}>
             Play Again ({difficulty})
-          </Button>
-          <Button color="gray" variant="outline" onClick={onChangeDifficulty}>
+          </MD3Button>
+          <MD3Button variant="outlined" onClick={onChangeDifficulty}>
             Change Difficulty
-          </Button>
-        </Group>
-    </Modal>
+          </MD3Button>
+        </div>
+    </md-dialog>
   );
 }

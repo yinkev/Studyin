@@ -1,7 +1,6 @@
 'use client';
 
 import { BentoCard } from '../layout/BentoCard';
-import { Progress, Tooltip, Badge } from '@mantine/core';
 import { getLevelTitle } from '@/lib/xp-system';
 
 interface ProgressCardProps {
@@ -27,7 +26,7 @@ export function ProgressCard({
 
   return (
     <BentoCard size={size} accent="primary" className="bg-gradient-to-br from-brand-primary/5 to-brand-secondary/5">
-      <div className="flex flex-col h-full justify-between p-6">
+      <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card interactive-card flex flex-col h-full justify-between" aria-label="Progress overview">
         <div>
           <div className="flex items-start justify-between mb-6">
             <div>
@@ -43,17 +42,20 @@ export function ProgressCard({
             </div>
 
             {streak > 0 && (
-              <Tooltip label={`${streak} day${streak > 1 ? 's' : ''} in a row!`}>
-                <div className="clinical-card rounded-full w-16 h-16 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform shadow-clinical-md"
-                     style={{ background: 'linear-gradient(135deg, #fee2e2, #fef3c7)' }}>
-                  <div className="text-center">
-                    <p className="text-2xl">🔥</p>
-                    <p className="text-xs font-bold text-semantic-danger">
-                      {streak}
-                    </p>
-                  </div>
+              <div
+                className="clinical-card rounded-full w-16 h-16 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform shadow-clinical-md"
+                style={{ background: 'linear-gradient(135deg, #fee2e2, #fef3c7)' }}
+                role="status"
+                aria-label={`${streak} day${streak > 1 ? 's' : ''} streak`}
+                title={`${streak} day${streak > 1 ? 's' : ''} in a row!`}
+              >
+                <div className="text-center">
+                  <p className="text-2xl" aria-hidden>🔥</p>
+                  <p className="text-xs font-bold text-semantic-danger tabular-nums">
+                    {streak}
+                  </p>
                 </div>
-              </Tooltip>
+              </div>
             )}
           </div>
 
@@ -78,12 +80,21 @@ export function ProgressCard({
                     {currentXP.toLocaleString()} / {xpToNextLevel.toLocaleString()}
                   </span>
                 </div>
-                <Progress
-                  value={percentToNextLevel}
-                  size="md"
-                  radius="md"
-                  className="[&_.mantine-Progress-section]:bg-gradient-to-r [&_.mantine-Progress-section]:from-brand-primary [&_.mantine-Progress-section]:to-brand-secondary"
-                />
+                <div aria-label="XP progress toward next level" className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <md-linear-progress
+                      value={Math.max(0, Math.min(1, percentToNextLevel / 100))}
+                    ></md-linear-progress>
+                  </div>
+                  <span className="text-xs font-semibold text-text-med tabular-nums" aria-hidden>
+                    {Math.round(percentToNextLevel)}%
+                  </span>
+                </div>
+                {streak > 0 && (
+                  <div className="mt-2 text-xs font-semibold" style={{ color: 'var(--semantic-warning)' }}>
+                    Don’t lose your {streak}-day streak!
+                  </div>
+                )}
               </div>
             </div>
           </div>

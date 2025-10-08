@@ -1,0 +1,537 @@
+/**
+ * Material Design 3 - Official Implementation
+ *
+ * Pure Material Web Components theme using official MD3 specifications
+ * from https://m3.material.io
+ *
+ * Components: @material/web v2.4.0
+ * Design System: Material Design 3 (2025)
+ * Framework: Next.js 15 + React 19
+ */
+
+/* ============================================================================
+   MATERIAL DESIGN 3 DESIGN TOKENS
+   Based on official M3 specifications
+   ============================================================================ */
+
+:root {
+  /* ==== MD3 COLOR SYSTEM (Dark Theme - Default) ==== */
+  /* Official Material Design 3 color roles */
+  /* https://m3.material.io/styles/color/roles */
+
+  /* Primary */
+  --md-sys-color-primary: #A8C7FA;
+  --md-sys-color-on-primary: #062E6F;
+  --md-sys-color-primary-container: #0842A0;
+  --md-sys-color-on-primary-container: #D3E3FD;
+
+  /* Secondary */
+  --md-sys-color-secondary: #BEC6DC;
+  --md-sys-color-on-secondary: #293041;
+  --md-sys-color-secondary-container: #3F4759;
+  --md-sys-color-on-secondary-container: #DAE2F9;
+
+  /* Tertiary */
+  --md-sys-color-tertiary: #DEBCDF;
+  --md-sys-color-on-tertiary: #3F2844;
+  --md-sys-color-tertiary-container: #573E5C;
+  --md-sys-color-on-tertiary-container: #FBD7FC;
+
+  /* Error */
+  --md-sys-color-error: #FFB4AB;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000A;
+  --md-sys-color-on-error-container: #FFDAD6;
+
+  /* Surface & Background */
+  --md-sys-color-surface: #1A1C1E;
+  --md-sys-color-on-surface: #E2E2E5;
+  --md-sys-color-surface-variant: #43474E;
+  --md-sys-color-on-surface-variant: #C3C6CF;
+
+  --md-sys-color-surface-dim: #121316;
+  --md-sys-color-surface-bright: #38393C;
+  --md-sys-color-surface-container-lowest: #0D0E11;
+  --md-sys-color-surface-container-low: #1A1C1E;
+  --md-sys-color-surface-container: #1E2022;
+  --md-sys-color-surface-container-high: #282A2C;
+  --md-sys-color-surface-container-highest: #333537;
+
+  /* Outline */
+  --md-sys-color-outline: #8D9199;
+  --md-sys-color-outline-variant: #43474E;
+
+  /* Inverse */
+  --md-sys-color-inverse-surface: #E2E2E5;
+  --md-sys-color-inverse-on-surface: #2E3133;
+  --md-sys-color-inverse-primary: #0B57D0;
+
+  /* Shadow & Scrim */
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+
+  /* ==== MD3 TYPOGRAPHY SYSTEM ==== */
+  /* Official Material Design 3 type scale */
+  /* https://m3.material.io/styles/typography/overview */
+
+  /* Reference Typefaces */
+  --md-ref-typeface-brand: 'Roboto', system-ui, -apple-system, sans-serif;
+  --md-ref-typeface-plain: 'Roboto', system-ui, -apple-system, sans-serif;
+
+  /* Display */
+  --md-sys-typescale-display-large-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-display-large-size: 57px;
+  --md-sys-typescale-display-large-line-height: 64px;
+  --md-sys-typescale-display-large-weight: 400;
+
+  --md-sys-typescale-display-medium-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-display-medium-size: 45px;
+  --md-sys-typescale-display-medium-line-height: 52px;
+  --md-sys-typescale-display-medium-weight: 400;
+
+  --md-sys-typescale-display-small-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-display-small-size: 36px;
+  --md-sys-typescale-display-small-line-height: 44px;
+  --md-sys-typescale-display-small-weight: 400;
+
+  /* Headline */
+  --md-sys-typescale-headline-large-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-large-size: 32px;
+  --md-sys-typescale-headline-large-line-height: 40px;
+  --md-sys-typescale-headline-large-weight: 400;
+
+  --md-sys-typescale-headline-medium-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-medium-size: 28px;
+  --md-sys-typescale-headline-medium-line-height: 36px;
+  --md-sys-typescale-headline-medium-weight: 400;
+
+  --md-sys-typescale-headline-small-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-small-size: 24px;
+  --md-sys-typescale-headline-small-line-height: 32px;
+  --md-sys-typescale-headline-small-weight: 400;
+
+  /* Title */
+  --md-sys-typescale-title-large-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-title-large-size: 22px;
+  --md-sys-typescale-title-large-line-height: 28px;
+  --md-sys-typescale-title-large-weight: 400;
+
+  --md-sys-typescale-title-medium-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-title-medium-size: 16px;
+  --md-sys-typescale-title-medium-line-height: 24px;
+  --md-sys-typescale-title-medium-weight: 500;
+
+  --md-sys-typescale-title-small-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-title-small-size: 14px;
+  --md-sys-typescale-title-small-line-height: 20px;
+  --md-sys-typescale-title-small-weight: 500;
+
+  /* Body */
+  --md-sys-typescale-body-large-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-body-large-size: 16px;
+  --md-sys-typescale-body-large-line-height: 24px;
+  --md-sys-typescale-body-large-weight: 400;
+
+  --md-sys-typescale-body-medium-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-body-medium-size: 14px;
+  --md-sys-typescale-body-medium-line-height: 20px;
+  --md-sys-typescale-body-medium-weight: 400;
+
+  --md-sys-typescale-body-small-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-body-small-size: 12px;
+  --md-sys-typescale-body-small-line-height: 16px;
+  --md-sys-typescale-body-small-weight: 400;
+
+  /* Label */
+  --md-sys-typescale-label-large-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-large-size: 14px;
+  --md-sys-typescale-label-large-line-height: 20px;
+  --md-sys-typescale-label-large-weight: 500;
+
+  --md-sys-typescale-label-medium-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-medium-size: 12px;
+  --md-sys-typescale-label-medium-line-height: 16px;
+  --md-sys-typescale-label-medium-weight: 500;
+  --md-sys-typescale-label-medium-tracking: 0.5px;
+
+  --md-sys-typescale-label-small-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-small-size: 11px;
+  --md-sys-typescale-label-small-line-height: 16px;
+  --md-sys-typescale-label-small-weight: 500;
+  --md-sys-typescale-label-small-tracking: 0.5px;
+
+  /* ==== MD3 SHAPE SYSTEM ==== */
+  /* Official Material Design 3 shape scale */
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* ==== MD3 ELEVATION SYSTEM ==== */
+  /* Official Material Design 3 elevation shadows */
+  --md-sys-elevation-0: none;
+  --md-sys-elevation-1: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-2: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-3: 0px 1px 3px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-4: 0px 2px 3px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-5: 0px 4px 4px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15);
+
+  /* ==== MD3 STATE LAYERS ==== */
+  --md-sys-state-hover-state-layer-opacity: 0.08;
+  --md-sys-state-focus-state-layer-opacity: 0.12;
+  --md-sys-state-pressed-state-layer-opacity: 0.12;
+  --md-sys-state-dragged-state-layer-opacity: 0.16;
+}
+
+/* ==== LIGHT THEME ==== */
+[data-theme='light'] {
+  /* Primary */
+  --md-sys-color-primary: #0B57D0;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #D3E3FD;
+  --md-sys-color-on-primary-container: #041E49;
+
+  /* Secondary */
+  --md-sys-color-secondary: #545F71;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #D8E2F9;
+  --md-sys-color-on-secondary-container: #111C2B;
+
+  /* Tertiary */
+  --md-sys-color-tertiary: #6D5677;
+  --md-sys-color-on-tertiary: #FFFFFF;
+  --md-sys-color-tertiary-container: #F7D7FF;
+  --md-sys-color-on-tertiary-container: #261431;
+
+  /* Error */
+  --md-sys-color-error: #BA1A1A;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-error-container: #FFDAD6;
+  --md-sys-color-on-error-container: #410002;
+
+  /* Surface & Background */
+  --md-sys-color-surface: #F9F9FF;
+  --md-sys-color-on-surface: #1A1C1E;
+  --md-sys-color-surface-variant: #DFE2EB;
+  --md-sys-color-on-surface-variant: #43474E;
+
+  --md-sys-color-surface-dim: #D9D9E0;
+  --md-sys-color-surface-bright: #F9F9FF;
+  --md-sys-color-surface-container-lowest: #FFFFFF;
+  --md-sys-color-surface-container-low: #F3F3FA;
+  --md-sys-color-surface-container: #EDEDF4;
+  --md-sys-color-surface-container-high: #E7E8EE;
+  --md-sys-color-surface-container-highest: #E2E2E9;
+
+  /* Outline */
+  --md-sys-color-outline: #73777F;
+  --md-sys-color-outline-variant: #C3C6CF;
+
+  /* Inverse */
+  --md-sys-color-inverse-surface: #2E3133;
+  --md-sys-color-inverse-on-surface: #F0F0F7;
+  --md-sys-color-inverse-primary: #A8C7FA;
+
+  /* Shadow & Scrim */
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+}
+
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--md-ref-typeface-plain);
+}
+
+body {
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-ref-typeface-plain);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  font-weight: var(--md-sys-typescale-body-medium-weight);
+}
+
+/* ============================================================================
+   MD3 UTILITY CLASSES
+   ============================================================================ */
+
+/* Typography Utilities */
+.md3-display-large {
+  font-family: var(--md-sys-typescale-display-large-font);
+  font-size: var(--md-sys-typescale-display-large-size);
+  line-height: var(--md-sys-typescale-display-large-line-height);
+  font-weight: var(--md-sys-typescale-display-large-weight);
+}
+
+.md3-display-medium {
+  font-family: var(--md-sys-typescale-display-medium-font);
+  font-size: var(--md-sys-typescale-display-medium-size);
+  line-height: var(--md-sys-typescale-display-medium-line-height);
+  font-weight: var(--md-sys-typescale-display-medium-weight);
+}
+
+.md3-headline-large {
+  font-family: var(--md-sys-typescale-headline-large-font);
+  font-size: var(--md-sys-typescale-headline-large-size);
+  line-height: var(--md-sys-typescale-headline-large-line-height);
+  font-weight: var(--md-sys-typescale-headline-large-weight);
+}
+
+.md3-headline-medium {
+  font-family: var(--md-sys-typescale-headline-medium-font);
+  font-size: var(--md-sys-typescale-headline-medium-size);
+  line-height: var(--md-sys-typescale-headline-medium-line-height);
+  font-weight: var(--md-sys-typescale-headline-medium-weight);
+}
+
+.md3-title-large {
+  font-family: var(--md-sys-typescale-title-large-font);
+  font-size: var(--md-sys-typescale-title-large-size);
+  line-height: var(--md-sys-typescale-title-large-line-height);
+  font-weight: var(--md-sys-typescale-title-large-weight);
+}
+
+.md3-body-large {
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line-height);
+  font-weight: var(--md-sys-typescale-body-large-weight);
+}
+
+.md3-body-medium {
+  font-family: var(--md-sys-typescale-body-medium-font);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  font-weight: var(--md-sys-typescale-body-medium-weight);
+}
+
+.md3-label-large {
+  font-family: var(--md-sys-typescale-label-large-font);
+  font-size: var(--md-sys-typescale-label-large-size);
+  line-height: var(--md-sys-typescale-label-large-line-height);
+  font-weight: var(--md-sys-typescale-label-large-weight);
+}
+
+/* Color Utilities */
+.md3-surface {
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+}
+
+.md3-surface-container {
+  background-color: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+}
+
+.md3-primary {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.md3-primary-container {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+/* Elevation Utilities */
+.md3-elevation-0 { box-shadow: var(--md-sys-elevation-0); }
+.md3-elevation-1 { box-shadow: var(--md-sys-elevation-1); }
+.md3-elevation-2 { box-shadow: var(--md-sys-elevation-2); }
+.md3-elevation-3 { box-shadow: var(--md-sys-elevation-3); }
+.md3-elevation-4 { box-shadow: var(--md-sys-elevation-4); }
+.md3-elevation-5 { box-shadow: var(--md-sys-elevation-5); }
+
+/* Shape Utilities */
+.md3-shape-small { border-radius: var(--md-sys-shape-corner-small); }
+.md3-shape-medium { border-radius: var(--md-sys-shape-corner-medium); }
+.md3-shape-large { border-radius: var(--md-sys-shape-corner-large); }
+.md3-shape-full { border-radius: var(--md-sys-shape-corner-full); }
+
+/* ============================================================================
+   SCROLLBAR STYLING (MD3)
+   ============================================================================ */
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--md-sys-color-surface-container);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-sys-color-outline);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-sys-color-outline-variant) var(--md-sys-color-surface-container);
+}
+
+/* ============================================================================
+   MD3 CARD/CONTAINER UTILITIES
+   ============================================================================ */
+
+.md3-card {
+  padding: 1.5rem;
+}
+
+.md3-card-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+
+/* ============================================================================
+   MICRO-INTERACTIONS (2025 Psychology-Informed)
+   ============================================================================ */
+
+.interactive-card {
+  transition: transform 300ms ease-out, box-shadow 300ms ease-out;
+}
+.interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--md-sys-elevation-2);
+}
+
+/* Achievement unlock celebration: scale + fade bounce */
+@keyframes achievement-pop {
+  0% { transform: scale(0.96); opacity: 0.0; }
+  40% { transform: scale(1.05); opacity: 1; }
+  70% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+.achievement-unlocked {
+  animation: achievement-pop 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ============================================================================
+   STUDY VIEW LAYOUT HELPERS (MD3)
+   - Replaces Tailwind grid/spacing utilities on /study
+   ============================================================================ */
+
+/* Two-column responsive study grid: 3fr / 2fr on large screens */
+.study-grid {
+  display: grid;
+  gap: 2rem; /* ~32px */
+}
+
+@media (min-width: 1024px) {
+  .study-grid {
+    grid-template-columns: 3fr 2fr;
+  }
+}
+
+/* Timeline beats grid (1 col → 2 cols on >=768px) */
+.study-timeline-grid {
+  display: grid;
+  gap: 1rem; /* ~16px */
+}
+
+@media (min-width: 768px) {
+  .study-timeline-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* VStack spacing utilities used in study components */
+.vstack-6 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* 24px */
+}
+
+.vstack-4 {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* 16px */
+}
+
+/* Centered overlay with max sizing */
+.overlay-center {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 48rem; /* 768px */
+  width: calc(100% - 2rem);
+  max-height: 90vh;
+  overflow: auto;
+  z-index: 101;
+}
+
+/* Backdrops */
+.md3-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+/* Evidence side panel */
+.evidence-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 100%;
+  max-width: 40rem; /* 640px */
+  overflow: hidden;
+  z-index: 91;
+}
+
+/* Keyboard key pill */
+.kbd-md3 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem; /* 4px 8px */
+  border-radius: 0.5rem; /* 8px */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent) 0%, color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--md-sys-color-primary) 25%, transparent);
+  color: var(--md-sys-color-primary);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent);
+}
+
+/* Subtle outlined surface block */
+.md3-outlined-surface {
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-large);
+}
+
+/* Helper tokens → utility aliases for readability */
+.md3-surface-container-highest {
+  background-color: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+}

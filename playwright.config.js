@@ -15,6 +15,11 @@ const config = {
     port: 3005,
     reuseExistingServer: true,
     timeout: 180_000,
+    // Ensure dev-only upload route is disabled during e2e tests
+    env: {
+      NEXT_PUBLIC_DEV_UPLOAD: '0',
+      NEXT_PUBLIC_DEV_TOOLS: '0',
+    },
   },
 };
 

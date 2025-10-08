@@ -6,7 +6,7 @@
  */
 
 import { type ShellState } from '@/lib/games/follow-the-money/types';
-import { Card } from '@mantine/core';
+import { MD3Card } from '@/components/ui/MD3Card';
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
 
@@ -99,7 +99,7 @@ export const Shell = forwardRef<HTMLDivElement, ShellProps>(
           disabled={disabled}
           className="focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 rounded-2xl transition-all"
         >
-          <Card
+          <MD3Card
             className={`
               w-24 h-24 md:w-32 md:h-32
               bg-gradient-to-br ${getShellColor()}
@@ -109,13 +109,13 @@ export const Shell = forwardRef<HTMLDivElement, ShellProps>(
               transition-all duration-200
               flex items-center justify-center
             `}
-            padding="0"
+            elevation={1}
           >
             {/* Shell Icon Placeholder */}
             <div className="text-4xl md:text-6xl opacity-60">
               {isRevealed && hasMoney ? '💰' : '🐚'}
             </div>
-          </Card>
+          </MD3Card>
         </button>
 
         {/* Money indicator (only shown when revealed) */}

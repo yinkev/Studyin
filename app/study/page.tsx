@@ -54,7 +54,7 @@ export default async function StudyPage() {
         <div className="mx-auto max-w-4xl">
           <Breadcrumbs items={crumbs} />
           <div className="mt-12">
-            <div className="glass-clinical-card p-12 md:p-16 text-center">
+            <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card p-12 md:p-16 text-center">
               {/* Icon */}
               <div className="mb-6 flex justify-center">
                 <div className="w-24 h-24 rounded-2xl shadow-clinical-lg flex items-center justify-center"

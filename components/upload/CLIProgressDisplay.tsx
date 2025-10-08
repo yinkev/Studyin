@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { animate as anime } from "animejs";
+import { animate } from 'motion/react';
 
 export type CLIStep = 'init' | 'ocr' | 'lo-extraction' | 'mcq-generation' | 'validation' | 'refinement' | 'saving' | 'complete';
 
@@ -63,12 +63,7 @@ export function CLIProgressDisplay({
   // Animate progress bar
   useEffect(() => {
     if (progressBarRef.current && isProcessing) {
-      anime({
-        targets: progressBarRef.current,
-        width: `${currentProgress}%`,
-        duration: 800,
-        ease: 'outExpo',
-      });
+      animate(progressBarRef.current, { width: `${currentProgress}%` }, { duration: 0.8, easing: [0.19, 1, 0.22, 1] });
     }
   }, [currentProgress, isProcessing]);
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { animate as anime } from "animejs";
+import { animate, stagger } from 'motion/react';
 import GlowCard from '../atoms/GlowCard';
 import type { InteractiveLesson } from '../../lib/types/lesson';
 
@@ -15,33 +15,22 @@ export function LessonMetaPanel({ lesson }: LessonMetaPanelProps) {
   useEffect(() => {
     if (!listRef.current) return;
     const items = listRef.current.querySelectorAll('li');
-    const timeline = (anime as any).timeline ? (anime as any).timeline({ ease: 'easeOutExpo' }) : null;
-    if (timeline) {
-      timeline.add({
-        targets: items,
-        translateX: [-20, 0],
-        opacity: [0, 1],
-        delay: (anime as any).stagger ? (anime as any).stagger(80) : 0
-      });
-      return () => {
-        timeline.pause();
-      };
-    }
+    animate(items, { x: [-20, 0], opacity: [0, 1] }, { delay: stagger(0.08), duration: 0.5, easing: [0.19, 1, 0.22, 1] });
   }, [lesson.id]);
 
   return (
-    <div className="grid gap-4">
-      <GlowCard className="p-6">
-        <h2 className="text-2xl font-bold text-slate-900">{lesson.title}</h2>
-        <p className="mt-2 text-base text-slate-600">{lesson.summary}</p>
+    <div className="vstack-4">
+      <GlowCard>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>{lesson.title}</h2>
+        <p style={{ marginTop: '0.5rem', fontSize: '1rem', color: 'var(--md-sys-color-on-surface-variant)' }}>{lesson.summary}</p>
       </GlowCard>
       {lesson.high_yield.length > 0 && (
-        <GlowCard className="px-6 py-5">
-          <h3 className="text-lg font-semibold text-sky-600">High-Yield Sparks</h3>
-          <ul ref={listRef} className="mt-3 space-y-2">
+        <GlowCard>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--md-sys-color-secondary)' }}>High‑Yield Sparks</h3>
+          <ul ref={listRef} style={{ marginTop: '0.75rem', display: 'grid', gap: '0.5rem' }}>
             {lesson.high_yield.map((item, index) => (
-              <li key={index} className="flex items-start gap-3 text-slate-700">
-                <span className="mt-1 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-sky-400 shadow-md" />
+              <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', color: 'var(--md-sys-color-on-surface)' }}>
+                <span style={{ marginTop: '0.25rem', width: '10px', height: '10px', borderRadius: '9999px', backgroundColor: 'var(--md-sys-color-secondary)', boxShadow: 'var(--md-sys-elevation-1)', flexShrink: 0 }} />
                 <span>{item}</span>
               </li>
             ))}
@@ -49,12 +38,12 @@ export function LessonMetaPanel({ lesson }: LessonMetaPanelProps) {
         </GlowCard>
       )}
       {lesson.pitfalls.length > 0 && (
-        <GlowCard className="px-6 py-5">
-          <h3 className="text-lg font-semibold text-rose-600">Avoid These Pitfalls</h3>
-          <ul className="mt-3 space-y-2 text-slate-700">
+        <GlowCard>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--md-sys-color-error)' }}>Avoid These Pitfalls</h3>
+          <ul style={{ marginTop: '0.75rem', display: 'grid', gap: '0.5rem', color: 'var(--md-sys-color-on-surface)' }}>
             {lesson.pitfalls.map((item, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <span className="mt-1 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-rose-400 shadow-md" />
+              <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                <span style={{ marginTop: '0.25rem', width: '10px', height: '10px', borderRadius: '9999px', backgroundColor: 'var(--md-sys-color-error)', boxShadow: 'var(--md-sys-elevation-1)', flexShrink: 0 }} />
                 <span>{item}</span>
               </li>
             ))}

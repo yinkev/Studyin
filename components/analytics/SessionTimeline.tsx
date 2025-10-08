@@ -7,7 +7,6 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { animate as anime } from "animejs";
 
 interface SessionAttempt {
   sessionId: string;

@@ -7,7 +7,7 @@
  */
 
 import { useState, useRef, DragEvent, ChangeEvent } from 'react';
-import anime from "animejs";
+import { animate, useReducedMotion } from 'motion/react';
 
 interface DragDropZoneProps {
   onFileSelect: (file: File) => void;
@@ -37,12 +37,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
 
     // Animate scale up
     if (dropZoneRef.current) {
-      anime({
-        targets: dropZoneRef.current,
-        scale: [1, 1.02],
-        duration: 200,
-        easing: 'easeOutQuad',
-      });
+      animate(dropZoneRef.current, { scale: 1.02 }, { duration: 0.2, easing: 'ease-out' });
     }
   };
 
@@ -53,12 +48,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
 
     // Animate scale down
     if (dropZoneRef.current) {
-      anime({
-        targets: dropZoneRef.current,
-        scale: [1.02, 1],
-        duration: 200,
-        easing: 'easeOutQuad',
-      });
+      animate(dropZoneRef.current, { scale: 1 }, { duration: 0.2, easing: 'ease-out' });
     }
   };
 
@@ -74,14 +64,9 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
 
     if (disabled) return;
 
-    // Reset scale
+    // Reset scale with elastic bounce
     if (dropZoneRef.current) {
-      anime({
-        targets: dropZoneRef.current,
-        scale: [1.02, 1],
-        duration: 300,
-        easing: 'easeOutElastic(1, 0.6)',
-      });
+      animate(dropZoneRef.current, { scale: 1 }, { duration: 0.3, easing: 'ease-out' });
     }
 
     const files = e.dataTransfer.files;

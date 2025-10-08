@@ -5,7 +5,7 @@
 
 'use client';
 
-import { Button, Avatar, Indicator } from '@mantine/core';
+import { MD3Button } from './MD3Button';
 import { DarkModeToggle } from './DarkModeToggle';
 
 interface AppHeaderProps {
@@ -25,17 +25,12 @@ export function AppHeader({
   userXP = 2450,
   notificationCount = 0,
 }: AppHeaderProps) {
-  const theme = darkMode ? {
-    headerBg: 'rgba(15, 23, 42, 0.8)',
-    headerBorder: 'rgba(71, 85, 105, 0.3)',
-    textPrimary: '#F9FAFB',
-    textSecondary: '#9CA3AF',
-  } : {
-    headerBg: 'rgba(255, 255, 255, 0.9)',
-    headerBorder: '#CBD5E1',
-    textPrimary: '#0F172A',
-    textSecondary: '#475569',
-  };
+  const theme = {
+    headerBg: 'color-mix(in srgb, var(--md-sys-color-surface) 92%, transparent)',
+    headerBorder: 'var(--md-sys-color-outline-variant)',
+    textPrimary: 'var(--md-sys-color-on-surface)',
+    textSecondary: 'var(--md-sys-color-on-surface-variant)'
+  } as const;
 
   return (
     <header className="border-b" style={{
@@ -69,11 +64,9 @@ export function AppHeader({
 
         {/* Navigation with Icons */}
         <nav className="flex items-center gap-2">
-          <Button
-            variant={currentPage === 'study' ? 'light' : 'subtle'}
-            color={currentPage === 'study' ? 'blue' : 'gray'}
-            size="md"
-            leftSection={
+          <MD3Button
+            variant={currentPage === 'study' ? 'filled' : 'text'}
+            startIcon={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
@@ -81,13 +74,11 @@ export function AppHeader({
             }
           >
             Study
-          </Button>
+          </MD3Button>
 
-          <Button
-            variant={currentPage === 'upload' ? 'light' : 'subtle'}
-            color={currentPage === 'upload' ? 'blue' : 'gray'}
-            size="md"
-            leftSection={
+          <MD3Button
+            variant={currentPage === 'upload' ? 'filled' : 'text'}
+            startIcon={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="17 8 12 3 7 8"/>
@@ -96,13 +87,11 @@ export function AppHeader({
             }
           >
             Upload
-          </Button>
+          </MD3Button>
 
-          <Button
-            variant={currentPage === 'analytics' ? 'light' : 'subtle'}
-            color={currentPage === 'analytics' ? 'blue' : 'gray'}
-            size="md"
-            leftSection={
+          <MD3Button
+            variant={currentPage === 'analytics' ? 'filled' : 'text'}
+            startIcon={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="20" x2="18" y2="10"/>
                 <line x1="12" y1="20" x2="12" y2="4"/>
@@ -111,13 +100,11 @@ export function AppHeader({
             }
           >
             Analytics
-          </Button>
+          </MD3Button>
 
-          <Button
-            variant={currentPage === 'dashboard' ? 'light' : 'subtle'}
-            color={currentPage === 'dashboard' ? 'blue' : 'gray'}
-            size="md"
-            leftSection={
+          <MD3Button
+            variant={currentPage === 'dashboard' ? 'filled' : 'text'}
+            startIcon={
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="7" height="7"/>
                 <rect x="14" y="3" width="7" height="7"/>
@@ -127,7 +114,7 @@ export function AppHeader({
             }
           >
             Dashboard
-          </Button>
+          </MD3Button>
 
           {/* Dark Mode Toggle */}
           <DarkModeToggle
@@ -143,25 +130,25 @@ export function AppHeader({
             <div className="text-sm font-bold" style={{ color: theme.textPrimary }}>Level {userLevel}</div>
             <div className="text-xs font-medium" style={{ color: theme.textSecondary }}>{userXP.toLocaleString()} XP</div>
           </div>
-          {notificationCount > 0 ? (
-            <Indicator label={notificationCount} color="red" size={16}>
-              <Avatar
-                size="md"
-                style={{
-                  background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-                  border: darkMode ? '2px solid rgba(59, 130, 246, 0.3)' : '2px solid rgba(59, 130, 246, 0.2)',
-                }}
-              />
-            </Indicator>
-          ) : (
-            <Avatar
-              size="md"
+          <div className="relative">
+            <div
+              aria-label="User avatar"
+              className="w-9 h-9 rounded-full"
               style={{
                 background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-                border: darkMode ? '2px solid rgba(59, 130, 246, 0.3)' : '2px solid rgba(59, 130, 246, 0.2)',
+                border: '2px solid color-mix(in srgb, var(--md-sys-color-primary) 30%, transparent)'
               }}
             />
-          )}
+            {notificationCount > 0 && (
+              <span
+                aria-label={`${notificationCount} notifications`}
+                className="absolute -top-1 -right-1 inline-flex items-center justify-center text-[10px] font-bold md3-primary rounded-full"
+                style={{ width: 16, height: 16 }}
+              >
+                {notificationCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </header>

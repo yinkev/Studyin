@@ -1,7 +1,6 @@
 'use client';
 
 import { BentoCard } from '../layout/BentoCard';
-import { Button } from '@mantine/core';
 import { ReactNode } from 'react';
 
 interface ActionCardProps {
@@ -31,7 +30,7 @@ export function ActionCard({
       accent="primary"
       className={gradient ? 'bg-gradient-to-br from-brand-primary/10 to-brand-secondary/10' : ''}
     >
-      <div className="flex flex-col h-full justify-between p-6">
+      <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card interactive-card flex flex-col h-full justify-between">
         <div>
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2.5 rounded-xl" style={{ background: 'var(--brand-primary-alpha-10, rgba(96, 165, 250, 0.1))' }}>
@@ -43,15 +42,18 @@ export function ActionCard({
             </div>
           </div>
         </div>
-        <Button
-          fullWidth
-          size="lg"
-          className="clinical-button font-bold shadow-clinical-md hover:shadow-clinical-lg transition-all"
-          leftSection={buttonIcon}
+        <md-filled-button
           onClick={onAction}
+          style={{ width: '100%', fontWeight: 800, padding: '0.875rem 1rem' }}
+          aria-label={buttonText}
         >
+          {buttonIcon ? (
+            <span slot="icon" aria-hidden>
+              {buttonIcon}
+            </span>
+          ) : null}
           {buttonText}
-        </Button>
+        </md-filled-button>
       </div>
     </BentoCard>
   );

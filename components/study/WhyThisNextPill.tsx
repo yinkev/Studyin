@@ -7,7 +7,7 @@
  */
 
 import { useState } from 'react';
-import { animate as anime } from "animejs";
+import { motion } from 'motion/react';
 
 export interface EngineSignals {
   /** Current ability estimate (Rasch θ̂) */
@@ -42,97 +42,100 @@ export function WhyThisNextPill({ signals, defaultExpanded = false }: WhyThisNex
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   const handleToggle = () => {
-    if (!expanded) {
-      // Animate expansion (guard reduced motion in caller if needed)
-      anime({
-        targets: '#engine-signals-detail',
-        opacity: [0, 1],
-        translateY: [-10, 0],
-        duration: 400,
-        ease: 'easeOutExpo',
-      });
-    }
     setExpanded(!expanded);
   };
 
-  const reasonLabels: Record<EngineSignals['reason'], { text: string; color: string; icon: string }> = {
-    max_utility: { text: 'Max SE reduction per min', color: '#1CB0F6', icon: '🎯' },
-    blueprint_deficit: { text: 'Blueprint gap >5%', color: '#FFC800', icon: '📊' },
-    high_se: { text: 'Uncertain estimate', color: '#FF4B4B', icon: '❓' },
-    urgency: { text: 'Overdue (>3 days)', color: '#CE82FF', icon: '⚡' },
-    retention: { text: 'FSRS review due', color: '#58CC02', icon: '🔁' },
+  const reasonLabels: Record<EngineSignals['reason'], { text: string; role: 'primary' | 'secondary' | 'tertiary' | 'error'; icon: string }> = {
+    max_utility: { text: 'Max SE reduction per min', role: 'primary', icon: '🎯' },
+    blueprint_deficit: { text: 'Blueprint gap >5%', role: 'secondary', icon: '📊' },
+    high_se: { text: 'Uncertain estimate', role: 'error', icon: '❓' },
+    urgency: { text: 'Overdue (>3 days)', role: 'tertiary', icon: '⚡' },
+    retention: { text: 'FSRS review due', role: 'secondary', icon: '🔁' },
   };
 
   const reasonMeta = reasonLabels[signals.reason];
 
+  const roleVar = (role: 'primary' | 'secondary' | 'tertiary' | 'error') => `var(--md-sys-color-${role})`;
+
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
       {/* Compact pill */}
-      <button
+      <md-filled-tonal-button
         onClick={handleToggle}
-        className="glass inline-flex items-center gap-3 px-5 py-3 rounded-full hover:scale-105 transition-all duration-300 border border-white/20"
         style={{
-          background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.1) 0%, rgba(28, 176, 246, 0.1) 100%)',
-          boxShadow: expanded ? '0 8px 24px rgba(88, 204, 2, 0.3)' : '0 4px 12px rgba(88, 204, 2, 0.2)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          borderRadius: '9999px',
+          fontSize: '0.95rem',
+          padding: '0.5rem 1rem',
         }}
+        aria-expanded={expanded}
       >
-        <span className="text-2xl">{reasonMeta.icon}</span>
-        <div className="text-left">
-          <div className="text-xs uppercase tracking-wider text-slate-300 font-semibold">Why this next</div>
-          <div className="text-sm font-bold text-white">{reasonMeta.text}</div>
+        <span style={{ fontSize: '1.25rem' }}>{reasonMeta.icon}</span>
+        <div style={{ textAlign: 'left' }}>
+          <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--md-sys-color-on-surface-variant)', fontWeight: 700 }}>Why this next</div>
+          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>{reasonMeta.text}</div>
         </div>
-        <span className="text-slate-300 text-xl ml-2">{expanded ? '▲' : '▼'}</span>
-      </button>
+        <span style={{ color: 'var(--md-sys-color-on-surface-variant)', fontSize: '1rem', marginLeft: '0.25rem' }}>
+          {expanded ? '▲' : '▼'}
+        </span>
+      </md-filled-tonal-button>
 
       {/* Expanded details */}
       {expanded && (
-        <div
+        <motion.div
           id="engine-signals-detail"
-          className="absolute top-full left-0 mt-3 w-96 glass-dark p-6 rounded-3xl border border-white/20 z-50"
-          style={{ boxShadow: '0 12px 48px rgba(0, 0, 0, 0.6)' }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            marginTop: '0.75rem',
+            width: '24rem',
+            borderRadius: 'var(--md-sys-shape-corner-large)',
+            backgroundColor: 'var(--md-sys-color-surface-container-high)',
+            color: 'var(--md-sys-color-on-surface)',
+            boxShadow: 'var(--md-sys-elevation-3)',
+            border: '1px solid var(--md-sys-color-outline-variant)',
+            padding: '1.5rem',
+            zIndex: 50,
+          }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-white">Engine Signals</h3>
-            <div className="text-xs text-slate-400 font-mono">{signals.loId}</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>Engine Signals</h3>
+            <div style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' }}>{signals.loId}</div>
           </div>
 
-          <div className="text-sm text-slate-300 mb-4">{signals.loName}</div>
+          <div style={{ fontSize: '0.9rem', color: 'var(--md-sys-color-on-surface-variant)', marginBottom: '1rem' }}>{signals.loName}</div>
 
           {/* Key Metrics Grid */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
             {/* Ability θ̂ */}
-            <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-2xl p-4">
-              <div className="text-xs text-slate-400 mb-1">Ability θ̂</div>
-              <div className="text-2xl font-black text-blue-400">{signals.theta.toFixed(2)}</div>
+            <div className="md3-outlined-surface" style={{ padding: '1rem' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', marginBottom: '0.25rem' }}>Ability θ̂</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--md-sys-color-primary)' }}>{signals.theta.toFixed(2)}</div>
             </div>
 
             {/* Standard Error */}
-            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-4">
-              <div className="text-xs text-slate-400 mb-1">SE</div>
-              <div className="text-2xl font-black text-purple-400">{signals.se.toFixed(2)}</div>
+            <div className="md3-outlined-surface" style={{ padding: '1rem' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', marginBottom: '0.25rem' }}>SE</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--md-sys-color-tertiary)' }}>{signals.se.toFixed(2)}</div>
             </div>
 
             {/* Mastery Probability */}
-            <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-2xl p-4">
-              <div className="text-xs text-slate-400 mb-1">Mastery P(θ̂ &gt; 0)</div>
-              <div className="text-2xl font-black text-green-400">{Math.round(signals.masteryProb * 100)}%</div>
+            <div className="md3-outlined-surface" style={{ padding: '1rem' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', marginBottom: '0.25rem' }}>Mastery P(θ̂ &gt; 0)</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--md-sys-color-secondary)' }}>{Math.round(signals.masteryProb * 100)}%</div>
             </div>
 
             {/* Blueprint Gap */}
-            <div
-              className={`bg-gradient-to-br rounded-2xl p-4 border ${
-                Math.abs(signals.blueprintGap) > 0.05
-                  ? 'from-yellow-500/20 to-orange-500/20 border-yellow-500/30'
-                  : 'from-slate-500/20 to-slate-600/20 border-slate-500/30'
-              }`}
-            >
-              <div className="text-xs text-slate-400 mb-1">Blueprint Gap</div>
-              <div
-                className={`text-2xl font-black ${
-                  Math.abs(signals.blueprintGap) > 0.05 ? 'text-yellow-400' : 'text-slate-400'
-                }`}
-              >
+            <div className="md3-outlined-surface" style={{ padding: '1rem' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', marginBottom: '0.25rem' }}>Blueprint Gap</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: Math.abs(signals.blueprintGap) > 0.05 ? 'var(--md-sys-color-secondary)' : 'var(--md-sys-color-on-surface-variant)' }}>
                 {signals.blueprintGap > 0 ? '+' : ''}
                 {(signals.blueprintGap * 100).toFixed(1)}%
               </div>
@@ -140,41 +143,42 @@ export function WhyThisNextPill({ signals, defaultExpanded = false }: WhyThisNex
           </div>
 
           {/* Urgency & Info */}
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">Urgency</span>
-              <span className="font-bold text-white">{signals.urgency.toFixed(2)}x</span>
+          <div style={{ display: 'grid', gap: '0.5rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+              <span style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>Urgency</span>
+              <span style={{ fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>{signals.urgency.toFixed(2)}x</span>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">Days since last</span>
-              <span className="font-bold text-white">{signals.daysSinceLast}d</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+              <span style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>Days since last</span>
+              <span style={{ fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>{signals.daysSinceLast}d</span>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">Item info I(θ̂)</span>
-              <span className="font-bold text-white">{signals.itemInfo.toFixed(3)}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+              <span style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>Item info I(θ̂)</span>
+              <span style={{ fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>{signals.itemInfo.toFixed(3)}</span>
             </div>
           </div>
 
           {/* Selection Reason */}
           <div
-            className="rounded-2xl p-4 border"
             style={{
-              background: `linear-gradient(135deg, ${reasonMeta.color}20 0%, ${reasonMeta.color}10 100%)`,
-              borderColor: `${reasonMeta.color}40`,
+              borderRadius: 'var(--md-sys-shape-corner-large)',
+              padding: '1rem',
+              border: '1px solid var(--md-sys-color-outline-variant)',
+              background: `linear-gradient(135deg, color-mix(in srgb, ${roleVar(reasonMeta.role)} 16%, transparent) 0%, color-mix(in srgb, ${roleVar(reasonMeta.role)} 6%, transparent) 100%)`,
             }}
           >
-            <div className="text-xs text-slate-400 mb-1">Selection Reason</div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{reasonMeta.icon}</span>
-              <span className="text-sm font-bold text-white">{reasonMeta.text}</span>
+            <div style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', marginBottom: '0.25rem' }}>Selection Reason</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1.25rem' }}>{reasonMeta.icon}</span>
+              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--md-sys-color-on-surface)' }}>{reasonMeta.text}</span>
             </div>
           </div>
 
           {/* Info note */}
-          <div className="mt-4 text-xs text-slate-500 text-center">
-            Thompson Sampling × Blueprint Rails × Fatigue-aware
+          <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--md-sys-color-on-surface-variant)', textAlign: 'center' }}>
+            Thompson Sampling × Blueprint Rails × Fatigue‑aware
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

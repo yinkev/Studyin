@@ -171,10 +171,10 @@ const theme = darkMode ? {
 
 ## Dependencies
 
-All components require:
-- `@heroui/react` - Button, Avatar, Badge, Modal, Card
-- React hooks (useState)
-- Next.js 15+
+All components are built on Material Web (MD3):
+- `@material/web` — Material Design 3 web components (buttons, dialog, progress)
+- React 19 + Next.js 15
+- Our thin wrappers in `components/ui/{MD3Button,MD3Card,MD3Progress}.tsx`
 
 ---
 
@@ -192,7 +192,7 @@ All components require:
 ### Immediate Integration (Easy Wins):
 1. Add `AppHeader` to `/study` page
 2. Replace `WhyThisNextPill` with `WhyThisQuestionCard` in InteractiveLessonViewer
-3. Add dark mode state management (React Context or Zustand)
+3. Use `ThemeProvider` (already wired) for light/dark; MD3 tokens switch via `data-theme`
 
 ### Future Components to Extract:
 - Answer choice cards with feedback

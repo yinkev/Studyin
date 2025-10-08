@@ -11,7 +11,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { animate as anime } from 'animejs';
+import { animate } from 'motion/react';
 
 interface LevelUpBurstProps {
   /** New level achieved */
@@ -31,19 +31,10 @@ export function LevelUpBurst({ level, onComplete }: LevelUpBurstProps) {
     const badge = badgeRef.current;
 
     // Flash effect
-    anime(container, {
-      opacity: { to: 1 },
-      duration: 200,
-      ease: 'outQuad',
-    });
+    animate(container, { opacity: [0, 1] }, { duration: 0.2, easing: [0.19, 1, 0.22, 1] });
 
     // Badge animation
-    anime(badge, {
-      scale: { from: 0, to: 1 },
-      rotate: { from: 0, to: 360 },
-      duration: 1000,
-      ease: 'outElastic',
-    });
+    animate(badge, { scale: [0, 1], rotate: [0, 360] }, { duration: 1.0, easing: [0.34, 1.56, 0.64, 1] });
 
     // Create confetti particles
     const confettiCount = 50;
@@ -62,39 +53,24 @@ export function LevelUpBurst({ level, onComplete }: LevelUpBurstProps) {
       const tx = Math.cos(angle) * velocity;
       const ty = Math.sin(angle) * velocity;
 
-      anime(confetti, {
-        translateX: { to: tx },
-        translateY: { to: ty },
-        scale: { from: 1, to: 0 },
-        opacity: { from: 1, to: 0 },
-        rotate: { to: Math.random() * 720 },
-        duration: 1500 + Math.random() * 500,
-        ease: 'outQuad',
-        onComplete: () => confetti.remove(),
+      const anim = animate(confetti, { x: tx, y: ty, scale: [1, 0], opacity: [1, 0], rotate: Math.random() * 720 }, {
+        duration: (1500 + Math.random() * 500) / 1000,
+        easing: [0.19, 1, 0.22, 1],
       });
+      (Array.isArray(anim) ? anim.map(a => a.finished) : [anim.finished]).forEach(p => p.then(() => confetti.remove()));
     }
 
     // XP text animation
     const xpText = container.querySelector('.xp-text');
     if (xpText) {
-      anime(xpText as HTMLElement, {
-        translateY: { from: -50, to: 0 },
-        opacity: { from: 0, to: 1 },
-        scale: { from: 0.5, to: 1 },
-        duration: 800,
-        ease: 'outBack',
-        delay: 500,
-      });
+      animate(xpText as HTMLElement, { y: [-50, 0], opacity: [0, 1], scale: [0.5, 1] }, { duration: 0.8, easing: [0.34, 1.56, 0.64, 1], delay: 0.5 });
     }
 
     // Auto-dismiss after 3s
     const timeout = setTimeout(() => {
-      anime(container, {
-        opacity: { from: 1, to: 0 },
-        duration: 500,
-        ease: 'outQuad',
-        onComplete: () => onComplete?.(),
-      });
+      const anim = animate(container, { opacity: [1, 0] }, { duration: 0.5, easing: [0.19, 1, 0.22, 1] });
+      const finished = Array.isArray(anim) ? Promise.all(anim.map(a => a.finished)) : anim.finished;
+      Promise.resolve(finished).then(() => onComplete?.());
     }, 3000);
 
     return () => clearTimeout(timeout);

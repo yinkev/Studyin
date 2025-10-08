@@ -6,8 +6,9 @@
  */
 
 import { useReducer, useRef, useEffect, useState } from 'react';
-import { Card, Button, Badge } from '@mantine/core';
-import { createTimeline } from 'animejs';
+import { MD3Card } from '@/components/ui/MD3Card';
+import { MD3Button } from '@/components/ui/MD3Button';
+import { animate } from 'motion/react';
 import { GameBoard } from './GameBoard';
 import { ResultsModal } from './ResultsModal';
 import {
@@ -99,7 +100,7 @@ export function FollowTheMoneyGame() {
     }, 500);
   };
 
-  // Animate shuffles using Anime.js
+  // Animate shuffles using Motion
   useEffect(() => {
     if (gameState.phase !== 'shuffling' || gameState.shuffleSequence.length === 0) {
       return;
@@ -107,12 +108,6 @@ export function FollowTheMoneyGame() {
 
     const config = DIFFICULTY_CONFIGS[gameState.difficulty];
     const sequence = gameState.shuffleSequence;
-
-    // Build timeline
-    const tl = createTimeline({
-      easing: 'easeInOutSine',
-      autoplay: false,
-    });
 
     let hasAnimations = false;
     sequence.forEach((swap, index) => {
@@ -133,54 +128,39 @@ export function FollowTheMoneyGame() {
         y: parseFloat(shellB.style.top) || 0,
       };
 
-      // Swap positions
-      tl
-        .add(
-          {
-            targets: shellA,
-            left: posB.x,
-            top: posB.y,
-            duration: config.speed,
-            complete: () => {
-              dispatch({ type: 'ADVANCE_SHUFFLE' });
-            },
-          },
-          index * config.speed
-        )
-        .add(
-          {
-            targets: shellB,
-            left: posA.x,
-            top: posA.y,
-            duration: config.speed,
-          },
-          index * config.speed // Same start time for simultaneous swap
-        );
+      // Swap positions, starting both at the same delayed time
+      const delaySec = (index * config.speed) / 1000;
+      const durationSec = config.speed / 1000;
+      const aAnim = animate(
+        shellA,
+        { left: posB.x, top: posB.y },
+        { duration: durationSec, delay: delaySec, easing: [0.45, 0, 0.55, 1] }
+      );
+      // Advance shuffle after A completes
+      (Array.isArray(aAnim) ? Promise.all(aAnim.map(a => a.finished)) : aAnim.finished)
+        .then(() => dispatch({ type: 'ADVANCE_SHUFFLE' }));
+
+      animate(
+        shellB,
+        { left: posA.x, top: posA.y },
+        { duration: durationSec, delay: delaySec, easing: [0.45, 0, 0.55, 1] }
+      );
     });
 
     // Only play and attach callback if we have animations
     if (hasAnimations) {
-      // Use complete callback instead of .finished promise
-      const lastAnimation = sequence[sequence.length - 1];
       const totalDuration = sequence.length * config.speed;
 
       setTimeout(() => {
         dispatch({ type: 'COMPLETE_SHUFFLING' });
         setSelectStartTime(Date.now());
       }, totalDuration);
-
-      // Play timeline
-      tl.play();
     } else {
       // No animations, go straight to selecting
       dispatch({ type: 'COMPLETE_SHUFFLING' });
       setSelectStartTime(Date.now());
     }
-
-    // Cleanup
-    return () => {
-      tl.pause();
-    };
+    // No explicit cleanup needed; animations are time-bounded
   }, [gameState.phase, gameState.shuffleSequence, gameState.difficulty]);
 
   const showResults = gameState.phase === 'complete';
@@ -188,7 +168,7 @@ export function FollowTheMoneyGame() {
   return (
     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
       {/* Header */}
-      <Card className="bg-surface-bg2/90 backdrop-blur-xl border-2 border-primary/20" padding="lg">
+      <MD3Card className="backdrop-blur-xl" elevation={1}>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pb-4">
           <div>
             <h1 className="text-3xl font-extrabold text-text-high">
@@ -201,19 +181,19 @@ export function FollowTheMoneyGame() {
 
           {/* Stats */}
           <div className="flex gap-3">
-            <Badge size="lg" variant="light" color="blue">
+            <span className="px-3 py-1 md3-primary-container md3-shape-medium text-xs font-semibold">
               Streak: {gameState.streak}
-            </Badge>
-            <Badge size="lg" variant="light" color="yellow">
+            </span>
+            <span className="px-3 py-1 md3-primary-container md3-shape-medium text-xs font-semibold">
               Total XP: {gameState.totalXP}
-            </Badge>
+            </span>
           </div>
         </div>
-      </Card>
+      </MD3Card>
 
       {/* Difficulty Selection (setup phase only) */}
       {gameState.phase === 'setup' && (
-        <Card className="bg-surface-bg2/90 backdrop-blur-xl" padding="lg">
+        <MD3Card className="backdrop-blur-xl" elevation={1}>
           <h2 className="text-xl font-bold text-text-high mb-4">
             Choose Difficulty
           </h2>
@@ -223,11 +203,9 @@ export function FollowTheMoneyGame() {
             ).map((difficulty) => {
               const config = DIFFICULTY_CONFIGS[difficulty];
               return (
-                <Button
+                <MD3Button
                   key={difficulty}
-                  variant={
-                    gameState.difficulty === difficulty ? 'filled' : 'outline'
-                  }
+                  variant={gameState.difficulty === difficulty ? 'filled' : 'outlined'}
                   className="h-auto flex flex-col items-start p-4"
                   onClick={() => handleStartGame(difficulty)}
                 >
@@ -238,22 +216,22 @@ export function FollowTheMoneyGame() {
                   <span className="text-xs opacity-70">
                     +{config.xpReward} XP
                   </span>
-                </Button>
+                </MD3Button>
               );
             })}
           </div>
-        </Card>
+        </MD3Card>
       )}
 
       {/* Game Board */}
       {gameState.phase !== 'setup' && (
-        <Card className="bg-surface-bg2/90 backdrop-blur-xl" padding="lg">
+        <MD3Card className="backdrop-blur-xl" elevation={1}>
           <GameBoard
             gameState={gameState}
             onShellSelect={handleShellSelect}
             onShellRef={handleShellRef}
           />
-        </Card>
+        </MD3Card>
       )}
 
       {/* Results Modal */}
