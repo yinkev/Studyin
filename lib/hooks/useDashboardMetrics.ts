@@ -27,12 +27,15 @@ export function useDashboardMetrics(learnerId: string = 'local-dev'): UseDashboa
       try {
         setIsLoading(true);
         setError(null);
+        console.log('[useDashboardMetrics] Fetching for learnerId:', learnerId);
         const data = await fetchDashboardMetrics(learnerId);
+        console.log('[useDashboardMetrics] Got data:', data);
         setMetrics(data);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch dashboard metrics'));
         console.error('[useDashboardMetrics] Error:', err);
       } finally {
+        console.log('[useDashboardMetrics] Setting isLoading to false');
         setIsLoading(false);
       }
     };

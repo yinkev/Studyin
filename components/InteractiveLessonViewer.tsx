@@ -289,6 +289,7 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
         evidence={evidenceData}
         isOpen={evidencePanelOpen}
         onClose={() => setEvidencePanelOpen(false)}
+        onEvidenceViewed={(slideNum) => console.log(`Evidence viewed: slide ${slideNum}`)}
       />
 
       {/* Mastery burst effects */}
