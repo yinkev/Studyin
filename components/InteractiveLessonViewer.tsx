@@ -14,7 +14,6 @@ import { KeyboardShortcutsOverlay } from './study/KeyboardShortcutsOverlay';
 import { EvidencePanel, type EvidenceData } from './study/EvidencePanel';
 import { MasteryBurst, StarBurst } from './effects/MasteryBurst';
 // Ability tracker removed (ECharts dependency deleted)
-// import { AbilityTrackerGraph, type AbilityDataPoint } from './study/AbilityTrackerGraph';
 type AbilityDataPoint = { x: number; y: number; se: number };
 import { useXP } from './XPProvider';
 import { XP_REWARDS } from '../lib/xp-system';
@@ -405,16 +404,7 @@ export default function InteractiveLessonViewer({ lesson, learnerId = 'local-dev
       <div className="space-y-6">
         <LessonMetaPanel lesson={lesson} />
 
-        {/* Ability Tracker Graph - Temporarily disabled (ECharts removed) */}
-        {/* {abilityData.length > 0 && (
-          <AbilityTrackerGraph
-            loId={lesson.lo_id}
-            loName={lesson.title}
-            dataPoints={abilityData}
-            height={280}
-            autoScroll={true}
-          />
-        )} */}
+        {/* Ability Tracker Graph removed along with ECharts dependency */}
 
         {/* Keyboard shortcuts hint */}
         <GlowCard className="p-4 text-center bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20">
