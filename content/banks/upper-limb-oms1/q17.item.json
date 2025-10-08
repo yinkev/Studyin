@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULR-ID-017",
+  "stem": "Which modality uses ionizing radiation and is best for detailed cortical bone evaluation in the upper limb?",
+  "choices": {
+    "A": "MRI",
+    "B": "CT",
+    "C": "Ultrasound",
+    "D": "PET‑MRI",
+    "E": "Doppler ultrasound"
+  },
+  "key": "B",
+  "rationale_correct": "CT uses ionizing radiation and provides high‑resolution evaluation of cortical bone and complex fractures.",
+  "rationale_distractors": {
+    "A": "MRI is non‑ionizing and optimized for soft tissue contrast.",
+    "C": "Ultrasound is non‑ionizing and operator‑dependent.",
+    "D": "PET‑MRI is non‑ionizing on the MRI component; PET uses positron emissions with different indications.",
+    "E": "Doppler is an ultrasound technique and non‑ionizing."
+  },
+  "los": ["UL.Radiology.Identify"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/Learning_objectives_for_Radiology_of_the_Upper_Limb.pdf",
+    "page": 1,
+    "cropPath": "content/evidence/upper-limb-oms1/radiology-1.png",
+    "citation": "Rhodes D. Learning objectives for Radiology of the Upper Limb. 2018/2021."
+  },
+  "tags": ["upper-limb", "radiology", "CT"],
+  "status": "draft"
+}
+

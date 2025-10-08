@@ -1,4 +1,49 @@
 {
   "schema_version": "1.0.0",
-  "learning_objectives": []
+  "learning_objectives": [
+    {
+      "id": "UL.Nerves.Radial",
+      "label": "Differentiate radial nerve lesions by level and expected motor/sensory deficits"
+    },
+    {
+      "id": "UL.Nerves.Median",
+      "label": "Differentiate median nerve lesions (proximal, pronator syndrome, AIN) and hallmark signs"
+    },
+    {
+      "id": "UL.Nerves.Ulnar",
+      "label": "Differentiate ulnar nerve lesions (canal vs elbow) and expected patterns"
+    },
+    {
+      "id": "UL.BrachialPlexus.Superior",
+      "label": "Recognize superior brachial plexus (C5–C6) lesion patterns and implicated peripheral nerves",
+      "parent": "UL.BrachialPlexus"
+    },
+    {
+      "id": "UL.BrachialPlexus.Inferior",
+      "label": "Recognize inferior brachial plexus (C8–T1) lesion patterns and implicated peripheral nerves",
+      "parent": "UL.BrachialPlexus"
+    },
+    {
+      "id": "UL.Radiology.Identify",
+      "label": "Identify normal upper‑limb structures and common variants on XR/CT/MRI/US",
+      "parent": "UL.Radiology"
+    },
+    {
+      "id": "UL.Radiology.ViewRecognition",
+      "label": "Recognize common radiographic views and match each to structures best evaluated",
+      "parent": "UL.Radiology"
+    }
+    ,
+    { "id": "UL.Clinical.CommonPathologies", "label": "Integrate upper‑limb clinical cases (e.g., vasculitic mononeuritis multiplex) with nerve/muscle exam findings", "parent": "UL.Clinical" }
+    ,
+    { "id": "LL.Nerves.Femoral", "label": "Describe femoral nerve territory and function (anterior thigh, saphenous distribution)", "parent": "LL.Nerves" },
+    { "id": "LL.Nerves.Sciatic", "label": "Describe sciatic nerve branches and typical deficits by lesion", "parent": "LL.Nerves" },
+    { "id": "LL.Nerves.CommonPeroneal", "label": "Differentiate common peroneal (fibular) nerve lesion patterns", "parent": "LL.Nerves" },
+    { "id": "LL.Nerves.Tibial", "label": "Recognize tibial nerve deficits and posterior compartment function", "parent": "LL.Nerves" },
+    { "id": "LL.Muscles.AnteriorLeg", "label": "Identify anterior leg compartment actions and innervation (deep fibular)", "parent": "LL.Muscles" },
+    { "id": "LL.Muscles.PosteriorLeg", "label": "Identify posterior leg compartment actions and innervation (tibial)", "parent": "LL.Muscles" },
+    { "id": "LL.Joints.Knee", "label": "Recognize knee joint features and movements relevant to function", "parent": "LL.Joints" },
+    { "id": "LL.Vasculature.FemoralArtery", "label": "Trace external iliac to femoral to popliteal transitions and major branches", "parent": "LL.Vasculature" },
+    { "id": "LL.Clinical.CommonPathologies", "label": "Apply venous valve pathophysiology to varicose veins/DVT scenarios", "parent": "LL.Clinical" }
+  ]
 }

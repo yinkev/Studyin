@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-UL-011",
+  "stem": "Compression of the ulnar nerve in Guyon’s canal most commonly produces which pattern?",
+  "choices": {
+    "A": "Sensory loss digits 4–5 with thenar weakness",
+    "B": "Sensory loss digits 4–5 with weakness of interossei",
+    "C": "Radial deviation with wrist flexion but intact sensation",
+    "D": "Loss of wrist/digit extension (wrist drop)",
+    "E": "Isolated dorsal radial hand numbness"
+  },
+  "key": "B",
+  "rationale_correct": "Ulnar canal lesions can affect sensation to digits 4–5 and the deep motor branch to interossei/hypothenar muscles.",
+  "rationale_distractors": {
+    "A": "Thenar muscles are median‑innervated.",
+    "C": "Radial deviation with flexion suggests ulnar lesion at elbow (FCU).",
+    "D": "Wrist drop is a radial neuropathy.",
+    "E": "Dorsal radial hand sensation is radial nerve territory."
+  },
+  "los": ["UL.Nerves.Ulnar"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 20,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-20.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "ulnar-nerve", "guyons-canal"],
+  "status": "draft"
+}
+

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-ME-009",
+  "stem": "Carpal tunnel syndrome typically presents first with which pattern?",
+  "choices": {
+    "A": "Thenar weakness with no sensory symptoms",
+    "B": "Sensory deficits in median distribution, thenar weakness later",
+    "C": "Loss of elbow extension and posterior arm numbness",
+    "D": "Radial deviation with wrist flexion",
+    "E": "Isolated dorsal hand numbness with normal motor function"
+  },
+  "key": "B",
+  "rationale_correct": "CTS classically begins with paresthesias/pain in the median distribution; thenar weakness/atrophy develops with progression.",
+  "rationale_distractors": {
+    "A": "Pure motor onset is atypical for CTS.",
+    "C": "Posterior arm findings suggest proximal radial/axillary involvement.",
+    "D": "Radial deviation on flexion suggests ulnar nerve/FCU involvement.",
+    "E": "Dorsal hand sensory loss suggests radial superficial branch injury."
+  },
+  "los": ["UL.Nerves.Median"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 14,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-14.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "median-nerve", "carpal-tunnel"],
+  "status": "draft"
+}
+

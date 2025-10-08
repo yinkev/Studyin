@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LL-Overview-Handout",
+  "lo_id": "LL.Muscles.AnteriorLeg",
+  "title": "Lower Limb Overview — Handout",
+  "summary": "Superficial structures, compartments, venous return, lymphatics, arteries, and nerve overview for the lower limb.",
+  "tags": ["lower-limb", "overview", "handout"],
+  "source_file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+  "high_yield": [
+    "Anterior leg: dorsiflexion, deep fibular nerve",
+    "Femoral → Popliteal across adductor hiatus",
+    "Great saphenous drains to femoral vein via saphenous opening"
+  ],
+  "pitfalls": [
+    "Confusing superficial vs deep venous systems",
+    "Mixing up deep vs superficial fibular nerve distributions"
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Compartments of the Leg"
+    },
+    {
+      "type": "figure",
+      "caption": "Leg compartments and innervation (handout, p.3).",
+      "asset": { "path": "content/evidence/lower-limb-oms1/ll-handout-3.png", "alt": "Leg compartments diagram" }
+    },
+    {
+      "type": "multiple_choice_question",
+      "id": "mcq-ll-handout-01",
+      "learningObjective": "LL.Muscles.AnteriorLeg",
+      "stem": "Which nerve typically innervates the anterior compartment of the leg?",
+      "choices": [
+        {"id": "A", "text": "Superficial fibular (peroneal) nerve"},
+        {"id": "B", "text": "Deep fibular (peroneal) nerve"},
+        {"id": "C", "text": "Tibial nerve"},
+        {"id": "D", "text": "Saphenous nerve"},
+        {"id": "E", "text": "Obturator nerve"}
+      ],
+      "correctChoice": "B",
+      "rationale": {
+        "correct": "The deep fibular nerve supplies the anterior compartment (dorsiflexors).",
+        "distractors": {
+          "A": "Superficial fibular supplies the lateral compartment (evertors).",
+          "C": "Tibial supplies the posterior compartment (plantarflexors/flexors).",
+          "D": "Saphenous is sensory only (branch of femoral).",
+          "E": "Obturator supplies medial thigh adductors, not leg compartments."
+        }
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-RA-006",
+  "stem": "A compression injury to the radial nerve in the distal arm leads to which hallmark deficit pattern?",
+  "choices": {
+    "A": "Loss of elbow flexion and forearm supination",
+    "B": "Wrist drop with sensory loss over lateral dorsal hand",
+    "C": "Thenar eminence atrophy with loss of thumb opposition",
+    "D": "Isolated numbness of the medial palm and digit 5 only",
+    "E": "Weakness of finger ab-/adduction with preserved sensation"
+  },
+  "key": "B",
+  "rationale_correct": "Distal radial lesions classically cause wrist/digit extensor weakness (wrist drop) plus sensory loss over the lateral dorsum of the hand.",
+  "rationale_distractors": {
+    "A": "Elbow flexion/supination are musculocutaneous (biceps) dominated.",
+    "C": "Thenar atrophy/opposition loss suggests median nerve injury.",
+    "D": "Medial palm/digit 5 numbness points to ulnar distribution.",
+    "E": "Interossei weakness (ab-/adduction) is ulnar and often includes sensory changes unless a pure motor branch lesion."
+  },
+  "los": ["UL.Nerves.Radial"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 8,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-08.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "radial-nerve"],
+  "status": "draft"
+}
+

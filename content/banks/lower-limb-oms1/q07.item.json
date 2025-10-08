@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLN-CPN-001",
+  "stem": "Fracture of the fibular neck injures the common peroneal (fibular) nerve. Which finding is most characteristic?",
+  "choices": {
+    "A": "Loss of plantarflexion and toe flexion",
+    "B": "Loss of knee extension",
+    "C": "Foot drop from loss of dorsiflexion with impaired eversion",
+    "D": "Weak hip adduction",
+    "E": "Loss of ankle inversion only"
+  },
+  "key": "C",
+  "rationale_correct": "Common peroneal nerve lesion denervates anterior and lateral leg compartments → dorsiflexion and eversion deficits (foot drop).",
+  "rationale_distractors": {
+    "A": "Posterior leg (tibial nerve).",
+    "B": "Quadriceps (femoral nerve).",
+    "D": "Medial thigh (obturator nerve).",
+    "E": "Inversion is split (tibialis anterior/posterior); isolated inversion loss is not typical for CPN."
+  },
+  "los": ["LL.Nerves.CommonPeroneal"],
+  "difficulty": "easy",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 6,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-6.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Leg compartments and innervation. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "common-peroneal", "foot-drop"],
+  "status": "draft"
+}
+

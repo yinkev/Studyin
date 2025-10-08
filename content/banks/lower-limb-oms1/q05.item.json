@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLN-SCI-002",
+  "stem": "The sciatic nerve divides into two major branches. Which branch innervates the posterior compartment of the leg and intrinsic plantar foot muscles?",
+  "choices": {
+    "A": "Deep fibular (peroneal) nerve",
+    "B": "Superficial fibular (peroneal) nerve",
+    "C": "Tibial nerve",
+    "D": "Sural nerve",
+    "E": "Saphenous nerve"
+  },
+  "key": "C",
+  "rationale_correct": "The tibial nerve (terminal branch of sciatic) supplies posterior leg and plantar foot.",
+  "rationale_distractors": {
+    "A": "Deep fibular supplies anterior leg and dorsum web space sensation.",
+    "B": "Superficial fibular supplies lateral leg.",
+    "D": "Sural is sensory to posterolateral leg and lateral foot.",
+    "E": "Saphenous is sensory (branch of femoral)."
+  },
+  "los": ["LL.Nerves.Sciatic"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 7,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-7.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Sciatic branches overview. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "sciatic", "tibial"],
+  "status": "draft"
+}
+

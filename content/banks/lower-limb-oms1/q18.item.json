@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLV-FEM-ART-002",
+  "stem": "As it exits the adductor hiatus, the femoral artery changes its name to which vessel?",
+  "choices": {
+    "A": "Anterior tibial artery",
+    "B": "Profunda femoris artery",
+    "C": "Popliteal artery",
+    "D": "External iliac artery",
+    "E": "Peroneal (fibular) artery"
+  },
+  "key": "C",
+  "rationale_correct": "The femoral artery becomes the popliteal artery as it passes through the adductor hiatus into the popliteal fossa.",
+  "rationale_distractors": {
+    "A": "Anterior tibial is a distal branch of the popliteal, not the immediate name change.",
+    "B": "Profunda femoris is a branch of the femoral in the thigh.",
+    "D": "External iliac is proximal to the inguinal ligament.",
+    "E": "Fibular artery is a branch of posterior tibial, not a direct continuation."
+  },
+  "los": ["LL.Vasculature.FemoralArtery"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/lower-limb-overview.pdf",
+    "page": 4,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-overview-04.png",
+    "citation": "Heck C. Lower Limb Overview Slides — Transitions: femoral to popliteal. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "popliteal", "adductor-hiatus"],
+  "status": "draft"
+}
+

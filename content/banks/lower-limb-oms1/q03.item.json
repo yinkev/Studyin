@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLN-FEM-003",
+  "stem": "A patient has an absent patellar reflex after a pelvic mass compresses a nerve beneath the inguinal ligament. Which nerve is most likely affected?",
+  "choices": {
+    "A": "Obturator",
+    "B": "Sciatic",
+    "C": "Femoral",
+    "D": "Common peroneal (fibular)",
+    "E": "Tibial"
+  },
+  "key": "C",
+  "rationale_correct": "The patellar reflex (L2–L4) tests the femoral nerve via quadriceps contraction.",
+  "rationale_distractors": {
+    "A": "Obturator primarily adducts the thigh; not the knee jerk reflex.",
+    "B": "Sciatic does not mediate the patellar reflex.",
+    "D": "Common peroneal supplies lateral/anterior leg; not quadriceps.",
+    "E": "Tibial supplies posterior thigh/leg; not quadriceps."
+  },
+  "los": ["LL.Nerves.Femoral"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 3,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-3.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Thigh compartments (L2–L4 femoral). Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "reflex", "femoral"],
+  "status": "draft"
+}
+

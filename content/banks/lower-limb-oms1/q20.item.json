@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLC-CLN-002",
+  "stem": "Which scenario best increases risk for deep vein thrombosis (DVT) according to the overview?",
+  "choices": {
+    "A": "Frequent ankle pumping during long flights",
+    "B": "Incompetent deep fascia with prolonged immobilization",
+    "C": "High‑intensity calf exercises",
+    "D": "Standing desk use with periodic walking",
+    "E": "Compression stockings during travel"
+  },
+  "key": "B",
+  "rationale_correct": "Venous stasis from incompetent deep fascia and immobility predisposes to thrombus formation; embolization can cause PE.",
+  "rationale_distractors": {
+    "A": "Movement improves the musculovenous pump, reducing risk.",
+    "C": "Exercise enhances venous return rather than stasis.",
+    "D": "Periodic ambulation reduces stasis.",
+    "E": "Compression stockings reduce stasis risk."
+  },
+  "los": ["LL.Clinical.CommonPathologies"],
+  "difficulty": "medium",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 5,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-5.png",
+    "citation": "Heck C. Lower Limb Overview Handout — DVT and musculovenous pump. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "DVT", "venous-stasis"],
+  "status": "draft"
+}
+

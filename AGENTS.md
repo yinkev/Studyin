@@ -125,7 +125,7 @@ Notes
 
 Keep this SOP current as tooling evolves. Changes require DocScribe + ReleaseManager sign-off.
 - **Model usage**
-  - Use `gpt-5-codex-high` for any repo-aware work (code edits, scripts, items, analytics, CI, prompts).
+  - Use `gpt-5-high` for any repo-aware work (code edits, scripts, items, analytics, CI, prompts).
   - Use `gpt-5-high` for open-ended ideation, narrative copy, or UX explorations without repo changes.
   - Optional: use `gpt-5-codex-mid` for quick triage or small, low-risk edits when cost matters.
 

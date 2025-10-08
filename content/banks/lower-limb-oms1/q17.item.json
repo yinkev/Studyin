@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLV-FEM-ART-001",
+  "stem": "The external iliac artery changes its name to the femoral artery at which landmark?",
+  "choices": {
+    "A": "As it passes deep to the inguinal ligament",
+    "B": "At the level of the patella",
+    "C": "As it exits the adductor hiatus",
+    "D": "At the popliteal fossa",
+    "E": "At the ankle joint"
+  },
+  "key": "A",
+  "rationale_correct": "External iliac becomes femoral as it passes beneath the inguinal ligament.",
+  "rationale_distractors": {
+    "B": "No arterial name change occurs at the patella.",
+    "C": "Femoral becomes popliteal at the adductor hiatus.",
+    "D": "Popliteal region is distal to the name change to popliteal, not femoral.",
+    "E": "No relevant name change occurs at the ankle."
+  },
+  "los": ["LL.Vasculature.FemoralArtery"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 2,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-2.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Transition points. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "femoral-artery", "inguinal-ligament"],
+  "status": "draft"
+}
+

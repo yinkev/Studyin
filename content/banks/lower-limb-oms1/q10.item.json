@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLN-TIB-001",
+  "stem": "Compression of the tibial nerve in the tarsal tunnel most directly weakens which action?",
+  "choices": {
+    "A": "Dorsiflexion of the ankle",
+    "B": "Eversion of the foot",
+    "C": "Plantarflexion of the ankle",
+    "D": "Knee extension",
+    "E": "Hip abduction"
+  },
+  "key": "C",
+  "rationale_correct": "Tibial nerve supplies posterior leg (plantarflexors and toe flexors); entrapment weakens plantarflexion.",
+  "rationale_distractors": {
+    "A": "Dorsiflexion is deep fibular (anterior leg).",
+    "B": "Eversion is superficial fibular (lateral leg).",
+    "D": "Knee extension is femoral (quadriceps).",
+    "E": "Hip abduction is superior gluteal nerve."
+  },
+  "los": ["LL.Nerves.Tibial"],
+  "difficulty": "easy",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 6,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-6.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Posterior leg compartment. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "tibial-nerve", "tarsal-tunnel"],
+  "status": "draft"
+}
+

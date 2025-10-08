@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-ME-008",
+  "stem": "Weakness of thumb abduction/opposition with atrophy of the thenar eminence most strongly suggests a lesion at which location?",
+  "choices": {
+    "A": "Superficial radial nerve at the wrist",
+    "B": "Median nerve in the palm (recurrent motor branch)",
+    "C": "Ulnar canal (Guyon’s tunnel)",
+    "D": "Posterior interosseous nerve",
+    "E": "Axillary nerve"
+  },
+  "key": "B",
+  "rationale_correct": "Thenar weakness/atrophy implies injury to the median nerve’s recurrent motor branch in the hand.",
+  "rationale_distractors": {
+    "A": "Superficial radial is sensory only in the hand.",
+    "C": "Ulnar canal affects interossei/hypothenar and digits 4–5 sensation.",
+    "D": "PIN palsy chiefly impairs extensors without thenar atrophy.",
+    "E": "Axillary nerve affects deltoid/teres minor and shoulder abduction."
+  },
+  "los": ["UL.Nerves.Median"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 13,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-13.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "median-nerve"],
+  "status": "draft"
+}
+

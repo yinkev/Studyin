@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-RA-007",
+  "stem": "A superficial laceration at the dorsum of the wrist transects the radial nerve where it is purely cutaneous. Which finding is most expected?",
+  "choices": {
+    "A": "Loss of wrist extension with intact sensation",
+    "B": "Loss of elbow extension",
+    "C": "Sensory loss over lateral dorsum of hand with preserved motor function",
+    "D": "Thenar eminence atrophy",
+    "E": "Inability to pronate the forearm"
+  },
+  "key": "C",
+  "rationale_correct": "At the wrist the radial nerve contributes only cutaneous fibers; motor function is preserved.",
+  "rationale_distractors": {
+    "A": "Motor loss implies deeper radial motor branch involvement proximally.",
+    "B": "Triceps (elbow extension) reflects a proximal/axillary radial lesion.",
+    "D": "Thenar atrophy is median (recurrent motor) pathology.",
+    "E": "Pronation is mediated by the median nerve (pronators)."
+  },
+  "los": ["UL.Nerves.Radial"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 5,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-05.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "radial-nerve"],
+  "status": "draft"
+}
+

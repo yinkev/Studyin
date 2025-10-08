@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "id": "lower-limb-oms1",
+  "weights": {
+    "LL.Nerves.Femoral": 0.15,
+    "LL.Nerves.Sciatic": 0.15,
+    "LL.Nerves.CommonPeroneal": 0.15,
+    "LL.Nerves.Tibial": 0.15,
+    "LL.Joints.Knee": 0.10,
+    "LL.Muscles.AnteriorLeg": 0.10,
+    "LL.Vasculature.FemoralArtery": 0.10,
+    "LL.Clinical.CommonPathologies": 0.10
+  }
+}
+

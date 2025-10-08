@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULC-CLN-024",
+  "stem": "Peripheral neuropathy from vasculitis causes a posterior interosseous nerve palsy. Which movement is primarily lost?",
+  "choices": {
+    "A": "Finger extension at the metacarpophalangeal joints",
+    "B": "Wrist flexion",
+    "C": "Elbow flexion",
+    "D": "Thumb opposition",
+    "E": "Forearm pronation"
+  },
+  "key": "A",
+  "rationale_correct": "PIN denervates most wrist/finger extensors; MCP extension is characteristically weak with PIN palsy.",
+  "rationale_distractors": {
+    "B": "Wrist flexion is median/ulnar (anterior compartment).",
+    "C": "Elbow flexion is musculocutaneous (biceps/brachialis) and radial (brachioradialis).",
+    "D": "Thumb opposition is median (recurrent motor to thenar).",
+    "E": "Pronators are median nerve (pronator teres/quadratus)."
+  },
+  "los": ["UL.Clinical.CommonPathologies"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/12-10-24_CIL_cases.pdf",
+    "page": 20,
+    "cropPath": "content/evidence/upper-limb-oms1/clinical-UL-20.png",
+    "citation": "Anderson A. CIL – Multisystem autoimmune diseases. Dec 11, 2024."
+  },
+  "tags": ["upper-limb", "PIN", "neuropathy"],
+  "status": "draft"
+}
+

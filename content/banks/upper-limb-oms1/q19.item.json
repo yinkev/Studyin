@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULR-VW-019",
+  "stem": "Why are two orthogonal radiographic views (e.g., AP and lateral) routinely obtained for upper‑limb injuries?",
+  "choices": {
+    "A": "To reduce radiation dose per image",
+    "B": "To increase soft‑tissue contrast",
+    "C": "To minimize motion artifact",
+    "D": "To reduce superimposition and better localize pathology in 3D",
+    "E": "To avoid the need for CT or MRI entirely"
+  },
+  "key": "D",
+  "rationale_correct": "Orthogonal views reduce superimposition and allow better localization; a single projection can miss or obscure findings.",
+  "rationale_distractors": {
+    "A": "Two views increase total dose compared to one.",
+    "B": "Soft‑tissue contrast is modality‑limited on radiographs.",
+    "C": "Motion control is achieved by technique and patient cooperation, not number of views.",
+    "E": "Additional modalities may still be indicated depending on the injury."
+  },
+  "los": ["UL.Radiology.ViewRecognition"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Learning_objectives_for_Radiology_of_the_Upper_Limb.pdf",
+    "page": 1,
+    "cropPath": "content/evidence/upper-limb-oms1/radiology-1.png",
+    "citation": "Rhodes D. Learning objectives for Radiology of the Upper Limb. 2018/2021."
+  },
+  "tags": ["upper-limb", "radiology", "views"],
+  "status": "draft"
+}
+

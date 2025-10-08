@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULN-ME-002",
+  "stem": "A patient cannot form a normal 'OK' sign; the thumb IP and index DIP fail to flex. Which lesion best explains this finding?",
+  "choices": {
+    "A": "Pronator syndrome (median nerve at pronator teres)",
+    "B": "Anterior interosseous branch of the median nerve lesion",
+    "C": "Ulnar canal syndrome (Guyon’s tunnel)",
+    "D": "Posterior interosseous nerve palsy",
+    "E": "Axillary nerve injury"
+  },
+  "key": "B",
+  "rationale_correct": "AIN supplies FPL and the lateral half of FDP; weakness prevents thumb IP and index DIP flexion when making the 'OK' sign.",
+  "rationale_distractors": {
+    "A": "Pronator syndrome typically presents with sensory symptoms; FPL/FDP function is often preserved.",
+    "C": "Ulnar canal syndrome affects digit 5 and medial 4; not the 'OK' sign pattern.",
+    "D": "PIN palsy affects finger/wrist extensors (posterior compartment), not FPL/FDP.",
+    "E": "Axillary nerve deficits involve deltoid/teres minor and shoulder abduction."
+  },
+  "los": ["UL.Nerves.Median"],
+  "difficulty": "easy",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_NotesPDF.pdf",
+    "page": 3,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-notes-3.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb Lecture Notes. Sep 22, 2025."
+  },
+  "tags": ["upper-limb", "median-nerve", "AIN"],
+  "status": "draft"
+}
+

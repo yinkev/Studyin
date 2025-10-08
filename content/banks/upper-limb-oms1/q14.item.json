@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-BP-014",
+  "stem": "A patient with an inferior brachial plexus lesion (C8–T1) shows a 'claw' posture of the hand at rest and wrist extension due to unopposed extensors. Which distribution is most affected?",
+  "choices": {
+    "A": "Axillary nerve to deltoid",
+    "B": "Musculocutaneous nerve to biceps",
+    "C": "Ulnar nerve (± parts of median) to intrinsic hand",
+    "D": "Radial nerve to wrist extensors only",
+    "E": "Spinal accessory nerve to trapezius"
+  },
+  "key": "C",
+  "rationale_correct": "Lower trunk (C8–T1) injury predominantly impacts ulnar distribution and parts of median, producing intrinsic hand weakness and clawing.",
+  "rationale_distractors": {
+    "A": "Axillary is primarily C5–C6 (upper trunk).",
+    "B": "Musculocutaneous is upper trunk (C5–C6).",
+    "D": "Radial involvement alone does not explain the intrinsic hand deficits/clawing.",
+    "E": "Spinal accessory is cranial nerve XI, not brachial plexus."
+  },
+  "los": ["UL.BrachialPlexus.Inferior"],
+  "difficulty": "medium",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 29,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-29.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "brachial-plexus", "C8-T1"],
+  "status": "draft"
+}
+

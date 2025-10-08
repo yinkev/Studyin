@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLM-ANT-001",
+  "stem": "Which leg compartment is most susceptible to acute compartment syndrome according to the overview?",
+  "choices": {
+    "A": "Anterior compartment",
+    "B": "Lateral compartment",
+    "C": "Superficial posterior compartment",
+    "D": "Deep posterior compartment",
+    "E": "No compartment predominates"
+  },
+  "key": "A",
+  "rationale_correct": "The handout notes the anterior compartment as most susceptible to compartment syndrome.",
+  "rationale_distractors": {
+    "B": "Lateral compartment is less commonly cited in the handout.",
+    "C": "Superficial posterior is not labeled highest risk in the overview.",
+    "D": "Deep posterior is not labeled highest risk in the overview.",
+    "E": "The overview cites the anterior compartment specifically."
+  },
+  "los": ["LL.Muscles.AnteriorLeg"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 6,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-6.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Anterior compartment clinical correlate. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "compartment-syndrome", "anterior-leg"],
+  "status": "draft"
+}
+

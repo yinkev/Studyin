@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "id": "upper-limb-radiology-basics",
+  "lo_id": "UL.Radiology.Identify",
+  "title": "Upper Limb Radiology — Modalities & Views",
+  "summary": "Orient to XR, CT, MRI, and US for the upper limb; know what each modality excels at and recognize basic views.",
+  "tags": ["upper-limb", "radiology", "XR", "CT", "MRI", "US"],
+  "source_file": "data/uploads/Learning_objectives_for_Radiology_of_the_Upper_Limb.pdf",
+  "high_yield": [
+    "MRI → best soft tissue contrast; CT/XR → osseous detail; US → real-time soft tissue.",
+    "Recognize common radiographic views and what they best evaluate."
+  ],
+  "pitfalls": ["Don’t conflate dermatomal maps with peripheral cutaneous nerve distributions when correlating imaging and exam."],
+  "animation_timeline": [],
+  "content": [
+    { "type": "heading", "level": 2, "text": "Modalities at a glance" },
+    {
+      "type": "figure",
+      "caption": "Learning objectives reference for upper limb radiology.",
+      "asset": { "path": "content/evidence/upper-limb-oms1/radiology-1.png", "alt": "Radiology LO page" }
+    },
+    {
+      "type": "multiple_choice_question",
+      "id": "ul-rad-modality-soft-tissue",
+      "learningObjective": "UL.Radiology.Identify",
+      "stem": "Which modality generally provides the best soft tissue contrast for the upper limb?",
+      "choices": [
+        { "id": "A", "text": "X‑ray" },
+        { "id": "B", "text": "CT" },
+        { "id": "C", "text": "MRI" },
+        { "id": "D", "text": "Ultrasound" },
+        { "id": "E", "text": "Fluoroscopy" }
+      ],
+      "correctChoice": "C",
+      "rationale": {
+        "correct": "MRI provides excellent soft tissue contrast for muscles, tendons, and ligaments.",
+        "distractors": {
+          "A": "X‑ray is best for gross osseous evaluation and alignment.",
+          "B": "CT provides high‑resolution cortical bone detail but less soft tissue contrast than MRI.",
+          "D": "Ultrasound is excellent for dynamic superficial soft tissue but overall contrast is modality‑ and operator‑dependent.",
+          "E": "Fluoroscopy is motion X‑ray—used intra‑procedurally rather than for cross‑sectional soft tissue contrast."
+        }
+      }
+    }
+  ],
+  "created_at": "2025-10-08T00:26:00.000Z",
+  "updated_at": "2025-10-08T00:26:00.000Z",
+  "metadata": { "module": "upper-limb" }
+}
+
