@@ -9,7 +9,7 @@
     "jobs:refit": "node scripts/jobs/refit-weekly.mjs",
     "dev": "run-p dev:start dev:open",
     "dev:start": "next dev -p 3005",
-    "dev:open": "wait-on http://localhost:3000 && node scripts/tools/open-browser.mjs",
+    "dev:open": "wait-on http://localhost:3005 && DEV_URL=http://localhost:3005 node scripts/tools/open-browser.mjs",
     "build": "next build",
     "start": "next start",
     "test": "vitest --run",
@@ -19,7 +19,7 @@
     "pm:pulse": "node scripts/tools/pm-pulse.mjs",
     "pm:close-superseded": "node scripts/tools/close-superseded-prs.mjs",
     "mcp:inspector": "npx @modelcontextprotocol/inspector codex mcp",
-    "mcp:devtools": "npx chrome-devtools-mcp --target http://localhost:3000 --chrome-port 9222"
+    "mcp:devtools": "npx chrome-devtools-mcp --target http://localhost:3005 --chrome-port 9222"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
