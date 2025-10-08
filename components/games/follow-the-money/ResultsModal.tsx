@@ -8,7 +8,7 @@
 import { MD3Button } from '@/components/ui/MD3Button';
 import { type GameState } from '@/lib/games/follow-the-money/types';
 import { computeRoundXP } from '@/lib/games/follow-the-money/scoring';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 interface ResultsModalProps {
   gameState: GameState;

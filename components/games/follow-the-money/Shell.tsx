@@ -7,7 +7,7 @@
 
 import { type ShellState } from '@/lib/games/follow-the-money/types';
 import { MD3Card } from '@/components/ui/MD3Card';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { forwardRef } from 'react';
 
 interface ShellProps {
