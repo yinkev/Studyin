@@ -187,15 +187,7 @@ export default async function SummaryPage() {
             <TTMBarCanvas analytics={analytics} height={320} />
           </div>
         </div>
-        {/* ECharts charts removed - TODO: Replace with D3/Recharts alternatives */}
-        {/* <Card padding="lg">
-          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Speed vs accuracy</div>
-          <div>Speed/Accuracy chart placeholder</div>
-        </Card>
-        <Card padding="lg">
-          <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Confusion hotspots</div>
-          <div>Confusion chart placeholder</div>
-        </Card> */}
+        {/* Legacy ECharts cards removed; consider D3/Recharts replacements in a follow-up */}
         <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Evidence efficacy</div>
           <div>

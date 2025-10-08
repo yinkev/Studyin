@@ -18,7 +18,17 @@ import {
 } from '../xp-system';
 
 const STORAGE_KEY = 'studyin-xp-progress';
-const LEARNER_ID = 'local-dev'; // TODO: Replace with actual user ID from auth
+// Resolve learner id from localStorage if available (fallback to dev id)
+const getLearnerId = (): string => {
+  if (typeof window !== 'undefined') {
+    try {
+      return localStorage.getItem('studyin:learnerId') || 'local-dev';
+    } catch {
+      return 'local-dev';
+    }
+  }
+  return 'local-dev';
+};
 
 /**
  * Persist XP progress to API
@@ -29,7 +39,7 @@ async function persistToAPI(progress: UserProgress): Promise<void> {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        learnerId: LEARNER_ID,
+        learnerId: getLearnerId(),
         learnerState: {
           gamification: {
             level: progress.level,

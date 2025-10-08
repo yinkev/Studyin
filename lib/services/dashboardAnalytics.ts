@@ -127,7 +127,8 @@ function computeRecentTopics(
   const result = Array.from(topics.entries())
     .map(([loId, stats]) => ({
       loId,
-      name: loId, // TODO: Look up actual name from LO registry
+      // Fallback: display LO id until a registry provides human-readable titles
+      name: loId,
       questionsAnswered: stats.total,
       accuracy: stats.total > 0 ? (stats.correct / stats.total) * 100 : 0,
     }))
