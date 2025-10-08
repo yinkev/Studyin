@@ -1,24 +1,19 @@
 ## Summary
-- [ ] Purpose and scope clearly described
-- [ ] Relevant screenshots/video (if UI change)
-- [ ] PRD/IMPLEMENTATION updated for significant feature changes
 
-## Gates (check when satisfied)
-- [ ] `npm run validate:items`
-- [ ] `npm test -- --run`
-- [ ] `npm run analyze`
-- [ ] Lighthouse budgets (TTI < 2s, FCP < 2s, TBT < 200 ms, CLS < 0.1)
-- [ ] A11y audited (non‑blocking during OKC phase; note any known issues)
-- [ ] Rubric score meets thresholds (attach `public/analytics/rubric-score.json`)
+Describe the change and the user impact.
 
-## Citations & Determinism
-- [ ] MCP citations included (Context7 resolve→fetch→cite; see `docs/WORKFLOW.md`)
-- [ ] No runtime LLMs introduced; deterministic behavior unchanged
+## Checklist
 
-## Evidence
-- [ ] Evidence crops committed (Git LFS) with `{file,page,(bbox|cropPath),citation}`
-- [ ] Item status updated (`draft` → `review` or `published`)
+- [ ] Tests pass (`npm test`)
+- [ ] Build passes (`npm run build`)
+- [ ] Determinism preserved (no `Date.now()` / `Math.random()` in engine)
+- [ ] Docs updated (if applicable)
 
-## Regression Risk
-- [ ] Manual QA performed (list flows)
-- [ ] Rollback plan documented
+## Screenshots / Demos
+
+Optional visual evidence.
+
+## Related Issues
+
+Link to issue(s) and discussion.
+

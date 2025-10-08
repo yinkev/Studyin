@@ -1,52 +1,78 @@
 # Architecture Overview
 
-Behavior-neutral description of Studyin layers, allowed imports, and examples. See README (Architecture Boundaries, Determinism Policy) and AGENTS.md (Architecture Gates) for gates and workflow.
+Studyin is built as a **local-first, deterministic adaptive learning platform**.
 
-## Layers
-
-- Core (`core/**`)
-  - Pure types and use-cases. No direct `scripts/lib/*.mjs` imports in new code.
-  - May consume Engine (`@engine`) and Server types where needed.
-- Engine (`lib/engine/**`, public barrel `@engine`)
-  - Facade over deterministic algorithms; exposes stable APIs for UI/Core/Server.
-  - If algorithms live in `scripts/lib/*.mjs`, access them only via `lib/engine/shims/**`.
-- Server (`lib/server/**`) and Services (`services/**`)
-  - Server-only forms, events, state, adapters. Services provide repository/service abstractions.
-  - Prefer Engine/Core APIs. Avoid direct `scripts/lib/*.mjs` imports in new code.
-- UI (`app/**`, `components/**`)
-  - Next.js pages/components. Depends on Server and Engine public APIs only.
-- Scripts (`scripts/lib/*.mjs`, `scripts/**`)
-  - Deterministic CLIs and engines; used by jobs and analysis. Not imported directly from domain TS/TSX code.
-
-## Allowed Imports (→)
+## System Layers
 
 ```
-Core → Engine → Server/Services → UI
-Scripts/lib .mjs ⇐(via Engine shims) Engine
+┌─────────────────────────────────────┐
+│  UI Layer                           │
+│  (app/*, components/*)              │
+│  Next.js 15, React 19, Material Web │
+└──────────────┬──────────────────────┘
+               ↓ Server Actions
+┌─────────────────────────────────────┐
+│  Server Layer                       │
+│  (lib/server/*)                     │
+│  Forms, events, state management    │
+└──────────────┬──────────────────────┘
+               ↓ Engine API
+┌─────────────────────────────────────┐
+│  Engine Layer                       │
+│  (lib/engine/*)                     │
+│  Rasch, GPCM, Thompson Sampling     │
+└──────────────┬──────────────────────┘
+               ↓ Core types
+┌─────────────────────────────────────┐
+│  Core Layer                         │
+│  (lib/core/*)                       │
+│  Schemas (Zod), types, constants    │
+└─────────────────────────────────────┘
 ```
 
-Forbidden (new code)
-- UI/Core/Services → `scripts/lib/*.mjs` (import through Engine/shims instead)
-- Upward imports against the arrow (e.g., Engine importing UI)
+Import Rules:
+- UI → Server → Engine → Core
+- Lower layers never import from higher layers
+- Analytics scripts (`scripts/lib/**`) are accessed via Engine shims only
 
-## Examples (in-repo)
+## Data Flow
 
-- Core using Engine facade
-  - `core/use-cases/executeStudyAttempt.ts:4-9` imports from `../../lib/study-engine` for STOP_RULES/EAP helpers.
-- Services using Server helpers
-  - `services/state/jsonRepository.ts:1-5` uses `lib/server/study-state` to load/save learner state.
-- Engine algorithm access (current pattern)
-  - `lib/study-engine.ts:1-6` imports deterministic helpers from `scripts/lib/*.mjs`.
-  - Target: wrap these via `lib/engine/shims/**` and re-export from `@engine` for domain consumers.
-- UI depending on Core/Services
-  - `app/study/actions.ts:3-7` wires use-cases and repositories without importing `scripts/lib`.
+### Study Session Flow
+```
+User answers item
+  → POST /api/study/submit
+    → updateAbilityEstimate(response)
+      → Rasch EAP (scripts/lib/rasch.mjs)
+    → selectNextItem(state)
+      → Thompson Sampling (scripts/lib/scheduler.mjs)
+  → Return { nextItem, theta, SE, mastery }
+```
 
-## Determinism Notes
+### Content Pipeline
+```
+PDF upload
+  → POST /api/queue/enqueue
+    → Background worker (scripts/worker.ts)
+      → LLM extraction
+      → Item generation
+      → Blueprint validation
+    → Write to data/lessons/<id>.json
+  → Client polls GET /api/queue/status/:jobId
+```
 
-- Engines and analytics are deterministic. Randomness is seeded; external systems do not affect algorithmic results.
-- “Why this next” should derive from explicit numeric signals (SE, mastery, spacing, exposure) available via Engine APIs.
+## Key Technologies
 
-## Migration Notes
+- Framework: Next.js 15 (App Router), React 19
+- UI: Material Web (MD3), Tailwind CSS 4
+- State: Local JSON files (`data/state/`, `data/lessons/`)
+- Psychometrics: Rasch IRT, GPCM, Elo (deterministic)
+- Testing: Vitest, Playwright
+- Optional Cloud: Supabase (telemetry sync)
 
-- Existing domain→scripts imports are slated for migration to Engine shims/public APIs. Do not introduce new ones. Track deltas in PLAN.md.
+## Design Decisions
+
+See Explanation docs:
+- Why Adaptive Learning — ../explanation/adaptive-learning.md
+- Why Local-First — ../explanation/local-first.md
+- Why Gamification — ../explanation/gamification.md
 
