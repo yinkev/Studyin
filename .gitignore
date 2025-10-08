@@ -1,6 +1,7 @@
 # Node / Next artifacts
 node_modules/
 .next/
+.next* 
 out/
 dist/
 coverage/
@@ -39,3 +40,20 @@ public/analytics/rubric-score.json
 
 # TypeScript incremental build info (do not commit)
 tsconfig.tsbuildinfo
+
+# Tests
+test-results/
+!test-results/.last-run.json
+
+# Temp files
+*.tmp
+*.backup
+*.old
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Local env variants
+.env*.local
