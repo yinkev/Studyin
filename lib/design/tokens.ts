@@ -1,7 +1,7 @@
 /**
  * Design tokens — single source of truth for Studyin UI styling.
  * These tokens intentionally mirror the values declared in `app/globals.css`
- * so Tailwind, HeroUI, charts, and bespoke CSS share identical primitives.
+ * so Tailwind, Material Web, charts, and bespoke CSS share identical primitives.
  */
 
 export type ThemeMode = 'light' | 'dark';
@@ -37,6 +37,14 @@ type ThemeColorSet = {
     confusionEdge: string;
     blueprintTarget: string;
     retention: string;
+  };
+  gamification: {
+    achievement: string;      // Golden Harvest - dopamine spike (mastery, level-ups)
+    flow: string;             // Water Sports - flow state (active study)
+    warmEncouragement: string; // Ochre Revival - approachable progress
+    urgency: string;          // Pheasant - warm warning (retention slip)
+    safety: string;           // Palm Green - grounding stability
+    comfort: string;          // Tea Cookie - cognitive ease (backgrounds)
   };
 };
 
@@ -148,6 +156,14 @@ export const tokens: DesignTokens = {
         confusionEdge: '#f87171',
         blueprintTarget: '#34d399',
         retention: '#fbbf24'
+      },
+      gamification: {
+        achievement: '#CDD10F',      // Golden Harvest - dopamine spike
+        flow: '#3DC0CF',             // Water Sports - flow state (8.5:1 on dark bg)
+        warmEncouragement: '#EEC889', // Ochre Revival - approachable
+        urgency: '#C27A51',          // Pheasant - warm warning (5.2:1 on dark bg)
+        safety: '#4a7c5d',           // Palm Green (lightened for dark mode, 6:1 contrast)
+        comfort: '#F4E0C0'           // Tea Cookie - cognitive ease
       }
     },
     light: {
@@ -181,6 +197,14 @@ export const tokens: DesignTokens = {
         confusionEdge: '#ef4444',
         blueprintTarget: '#10b981',
         retention: '#f59e0b'
+      },
+      gamification: {
+        achievement: '#b8be0d',      // Golden Harvest (darkened for light mode, 4.5:1 on white)
+        flow: '#2a9aa7',             // Water Sports (darkened, 4.8:1 on white)
+        warmEncouragement: '#d4a856', // Ochre Revival (darkened, 5.1:1 on white)
+        urgency: '#a96643',          // Pheasant (darkened, 5.5:1 on white)
+        safety: '#203B2A',           // Palm Green (original, 14.8:1 on white)
+        comfort: '#dcc59f'           // Tea Cookie (darkened for light mode)
       }
     }
   }

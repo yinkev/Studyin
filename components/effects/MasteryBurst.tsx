@@ -4,11 +4,11 @@
  * Mastery Burst Effect — MAX GRAPHICS MODE
  * Explosive particle animation when answering correctly
  * More intense than confetti for mastery moments
- * Uses anime.js + canvas for MAX PERFORMANCE
+ * Implemented with Motion (WAAPI) + canvas for performance
  */
 
 import { useEffect, useRef } from 'react';
-import { animate as anime } from "animejs";
+import { animate, stagger } from 'motion/react';
 
 interface MasteryBurstProps {
   /** Trigger burst when true */
@@ -79,33 +79,35 @@ export function MasteryBurst({
     }
 
     // Explosive radial animation
-    anime({
-      targets: particles,
-      translateX: () => {
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * config.velocity + config.velocity * 0.3;
-        return Math.cos(angle) * distance;
+    const particleAnims = animate(
+      particles,
+      {
+        x: () => {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * config.velocity + config.velocity * 0.3;
+          return Math.cos(angle) * distance;
+        },
+        y: () => {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * config.velocity + config.velocity * 0.3;
+          // Slight upward bias for more dynamic feel
+          return Math.sin(angle) * distance - Math.random() * 100;
+        },
+        rotate: () => Math.random() * 1440 - 720, // Multiple spins
+        scale: [1, Math.random() * 0.5 + 0.3],
+        opacity: [1, 0],
       },
-      translateY: () => {
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * config.velocity + config.velocity * 0.3;
-        // Slight upward bias for more dynamic feel
-        return Math.sin(angle) * distance - Math.random() * 100;
-      },
-      rotate: () => Math.random() * 1440 - 720, // Multiple spins
-      scale: [1, Math.random() * 0.5 + 0.3],
-      opacity: [
-        { value: 1, duration: config.duration * 0.2 },
-        { value: 0, duration: config.duration * 0.8 },
-      ],
-      ease: 'easeOutCubic',
-      duration: config.duration,
-      delay: (anime as any).stagger ? (anime as any).stagger(8) : 0,
-      onComplete: () => {
-        // Cleanup
-        particles.forEach((p) => p.remove());
-        if (onComplete) onComplete();
-      },
+      {
+        duration: config.duration / 1000,
+        easing: [0.33, 1, 0.68, 1],
+        delay: stagger(0.008),
+      }
+    );
+
+    const finishes = Array.isArray(particleAnims) ? particleAnims.map(a => a.finished) : [particleAnims.finished];
+    Promise.all(finishes).then(() => {
+      particles.forEach((p) => p.remove());
+      if (onComplete) onComplete();
     });
 
     // Add radial shockwave
@@ -118,17 +120,12 @@ export function MasteryBurst({
     shockwave.style.zIndex = '99';
     container.appendChild(shockwave);
 
-    anime({
-      targets: shockwave,
-      width: [0, 400],
-      height: [0, 400],
-      translateX: [0, -200],
-      translateY: [0, -200],
-      opacity: [0.6, 0],
-      ease: 'easeOutExpo',
-      duration: 800,
-      onComplete: () => shockwave.remove(),
-    });
+    const shock = animate(
+      shockwave,
+      { width: [0, 400], height: [0, 400], x: [0, -200], y: [0, -200], opacity: [0.6, 0] },
+      { duration: 0.8, easing: [0.19, 1, 0.22, 1] }
+    );
+    (Array.isArray(shock) ? Promise.all(shock.map(a => a.finished)) : shock.finished).then(() => shockwave.remove());
   }, [trigger, origin, particleCount, intensity, colors, onComplete]);
 
   return (
@@ -182,17 +179,11 @@ export function StarBurst({
       stars.push(star);
     }
 
-    anime({
-      targets: stars,
-      scaleY: [0, 1.5, 0],
-      opacity: [0, 1, 0],
-      ease: 'easeOutExpo',
-      duration: 1200,
-      delay: (anime as any).stagger ? (anime as any).stagger(40) : 0,
-      onComplete: () => {
-        stars.forEach((s) => s.remove());
-        if (onComplete) onComplete();
-      },
+    const starAnims = animate(stars, { scaleY: [0, 1.5, 0], opacity: [0, 1, 0] }, { duration: 1.2, easing: [0.19, 1, 0.22, 1], delay: stagger(0.04) });
+    const starFinishes = Array.isArray(starAnims) ? starAnims.map(a => a.finished) : [starAnims.finished];
+    Promise.all(starFinishes).then(() => {
+      stars.forEach((s) => s.remove());
+      if (onComplete) onComplete();
     });
   }, [trigger, origin, onComplete]);
 

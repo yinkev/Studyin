@@ -3,11 +3,11 @@
 /**
  * Confetti Burst Effect
  * Triggers 50+ colorful particles on click/achievement unlock
- * Uses anime.js for smooth physics-based animation
+ * Implemented with Motion (WAAPI) for smooth physics-like animation
  */
 
 import { useEffect, useRef } from 'react';
-import { animate as anime } from "animejs";
+import { animate, stagger } from 'motion/react';
 
 interface ConfettiBurstProps {
   trigger: boolean;
@@ -53,25 +53,30 @@ export function ConfettiBurst({
     }
 
     // Animate particles
-    anime({
-      targets: particles,
-      translateX: () => (Math.random() - 0.5) * 600,
-      translateY: () => {
-        const angle = Math.random() * Math.PI - Math.PI / 2; // -90° to +90°
-        const velocity = Math.random() * 400 + 200;
-        return Math.sin(angle) * velocity;
+    const animations = animate(
+      particles,
+      {
+        x: () => (Math.random() - 0.5) * 600,
+        y: () => {
+          const angle = Math.random() * Math.PI - Math.PI / 2; // -90° to +90°
+          const velocity = Math.random() * 400 + 200;
+          return Math.sin(angle) * velocity;
+        },
+        rotate: () => Math.random() * 720 - 360,
+        opacity: [1, 0],
+        scale: [1, 0.3],
       },
-      rotate: () => Math.random() * 720 - 360,
-      opacity: [1, 0],
-      scale: [1, 0.3],
-      ease: 'easeOutCubic',
-      duration: 2000,
-      delay: (anime as any).stagger ? (anime as any).stagger(10) : 0,
-      onComplete: () => {
-        // Cleanup
-        particles.forEach((p) => p.remove());
-        if (onComplete) onComplete();
+      {
+        duration: 2,
+        easing: [0.33, 1, 0.68, 1],
+        delay: stagger(0.01),
       }
+    );
+
+    const finishes = Array.isArray(animations) ? animations.map(a => a.finished) : [animations.finished];
+    Promise.all(finishes).then(() => {
+      particles.forEach((p) => p.remove());
+      if (onComplete) onComplete();
     });
   }, [trigger, particleCount, colors, origin, onComplete]);
 

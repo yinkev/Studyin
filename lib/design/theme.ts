@@ -1,6 +1,6 @@
 import { getThemeTokens, tokens, type ThemeMode } from './tokens';
 
-type HeroUITheme = {
+type UITheme = {
   colors: Record<string, string>;
   layout?: {
     radius?: Record<string, string>;
@@ -8,13 +8,13 @@ type HeroUITheme = {
   };
 };
 
-type HeroUIThemes = Record<ThemeMode, HeroUITheme>;
+type UIThemes = Record<ThemeMode, UITheme>;
 
 /**
- * HeroUI theme mapping built from the shared design tokens.
- * These objects are consumed by the HeroUI Tailwind plugin inside `tailwind.config.ts`.
- */
-export const heroUIThemes: HeroUIThemes = {
+ * UI theme mapping built from shared design tokens.
+ * Used for Tailwind extensions and to align Material Web component colors.
+*/
+export const uiThemes: UIThemes = {
   light: {
     colors: {
       background: tokens.themes.light.surface.bg1,
@@ -57,7 +57,7 @@ export const heroUIThemes: HeroUIThemes = {
 
 /**
  * Tailwind theme extensions derived from tokens. This keeps utility classes
- * aligned with the same palette the HeroUI components consume.
+ * aligned with the same palette the UI components consume.
  */
 export const tailwindThemeTokens = {
   colors: {
@@ -87,4 +87,3 @@ export const tailwindThemeTokens = {
 export function resolveSurfaceColor(mode: ThemeMode, surface: keyof ReturnType<typeof getThemeTokens>['surface']): string {
   return getThemeTokens(mode).surface[surface];
 }
-
