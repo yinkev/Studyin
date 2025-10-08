@@ -5,8 +5,8 @@
  * Bridges the gap between IRT/Rasch model data and user-facing gamification.
  */
 
-import { LearnerState, LearnerGamification, LearnerAnalytics } from '../server/study-state';
-import { getLevelFromXP, getLevelProgress } from '../xp-system';
+import { LearnerState } from '../server/study-state';
+import { getLevelProgress } from '../xp-system';
 
 export interface DashboardMetrics {
   // Gamification
@@ -74,21 +74,7 @@ export interface DashboardMetrics {
   weaknesses: string[];
 }
 
-/**
- * Compute overall accuracy from learner state items
- */
-function computeAccuracy(items: LearnerState['items']): number {
-  let totalAttempts = 0;
-  let totalCorrect = 0;
-
-  for (const item of Object.values(items)) {
-    totalAttempts += item.attempts;
-    totalCorrect += item.correct;
-  }
-
-  if (totalAttempts === 0) return 0;
-  return (totalCorrect / totalAttempts) * 100;
-}
+// Removed legacy computeAccuracy helper (unused)
 
 /**
  * Get recent activity for last 7 days
@@ -116,7 +102,6 @@ function computeLastWeekActivity(items: LearnerState['items']): number[] {
  * Get recent topics with activity
  */
 function computeRecentTopics(
-  los: LearnerState['los'],
   items: LearnerState['items']
 ): Array<{
   loId: string;
@@ -191,7 +176,7 @@ export function computeDashboardMetrics(state: LearnerState): DashboardMetrics {
   }
 
   const accuracy = questionsAnswered > 0 ? (questionsCorrect / questionsAnswered) * 100 : 0;
-  const recentTopics = computeRecentTopics(state.los, state.items);
+  const recentTopics = computeRecentTopics(state.items);
 
   // Generate achievements
   const achievements = generateAchievements(questionsAnswered, accuracy, gamification.streak, levelProgress.level);

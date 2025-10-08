@@ -58,7 +58,7 @@ export interface UseXPSystemReturn {
   };
 
   // Actions
-  awardXP: (amount: number, reason?: string) => { leveledUp: boolean; newLevel?: number };
+  awardXP: (amount: number, _reason?: string) => { leveledUp: boolean; newLevel?: number };
   resetProgress: () => void;
   updateStreakDaily: () => void;
 
@@ -109,7 +109,7 @@ export function useXPSystem(): UseXPSystemReturn {
    * Award XP to user
    */
   const awardXP = useCallback(
-    (amount: number, reason?: string): { leveledUp: boolean; newLevel?: number } => {
+    (amount: number, _reason?: string): { leveledUp: boolean; newLevel?: number } => {
       let leveledUp = false;
       let newLevel: number | undefined;
 

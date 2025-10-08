@@ -11,11 +11,7 @@ const RATE_LIMIT_WINDOW_MS = Number.parseInt(process.env.INGEST_WINDOW_MS ?? '60
 const RATE_LIMIT_MAX_REQUESTS = Number.parseInt(process.env.INGEST_WINDOW_MAX ?? '60', 10);
 const MAX_BODY_BYTES = Number.parseInt(process.env.INGEST_MAX_BYTES ?? '10240', 10);
 
-const rateBucket = new Map<string, { count: number; resetAt: number }>();
-
-function now(): number {
-  return Date.now();
-}
+// Removed legacy rate limiting utilities (handled upstream)
 
 export function telemetryEnabled(): boolean {
   const flag = process.env.WRITE_TELEMETRY;

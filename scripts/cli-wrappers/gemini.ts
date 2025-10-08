@@ -6,8 +6,6 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import fs from 'fs/promises';
-import path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -189,8 +187,8 @@ Output ONLY valid JSON with NO markdown code fences:
  * @returns Array of OCR results per slide
  */
 export async function execGeminiBatchOCR(
-  pdfPath: string,
-  options: { maxSlides?: number; startSlide?: number } = {}
+  _pdfPath: string,
+  _options: { maxSlides?: number; startSlide?: number } = {}
 ): Promise<GeminiOCRResult[]> {
   // For now, this is a stub - requires PDF splitting
   // In production, you'd use pdf-lib or similar to extract pages
