@@ -32,17 +32,19 @@ export function XPGainToast({ amount, reason, onDismiss, duration = 2000 }: XPGa
     const toast = toastRef.current;
 
     // Slide in from right
+    // @ts-expect-error Motion transform keyframes supported at runtime
     animate(toast, { x: [100, 0], opacity: [0, 1] }, { duration: 0.4, easing: [0.34, 1.56, 0.64, 1] });
 
     // Pulse glow
     animate(
-      toast,
-      { boxShadow: ['0 0 20px rgba(167, 139, 250, 0.5)', '0 0 40px rgba(167, 139, 250, 0.8)', '0 0 20px rgba(167, 139, 250, 0.5)'] },
-      { duration: 1, easing: [0.45, 0, 0.55, 1], repeat: Infinity }
+      toast as any,
+      { boxShadow: ['0 0 20px rgba(167, 139, 250, 0.5)', '0 0 40px rgba(167, 139, 250, 0.8)', '0 0 20px rgba(167, 139, 250, 0.5)'] } as any,
+      { duration: 1, easing: [0.45, 0, 0.55, 1], repeat: Infinity } as any
     );
 
     // Auto-dismiss
     const timeout = setTimeout(() => {
+      // @ts-expect-error Motion transform keyframes supported at runtime
       const out = animate(toast, { x: [0, 100], opacity: [1, 0] }, { duration: 0.3, easing: [0.55, 0.085, 0.68, 0.53] });
       const finished = Array.isArray(out) ? Promise.all(out.map(a => a.finished)) : out.finished;
       Promise.resolve(finished).then(() => onDismiss?.());

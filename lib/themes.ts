@@ -120,7 +120,7 @@ export const darkTheme: ThemeColors = {
 export function getTheme(): Theme {
   if (typeof window === 'undefined') return 'system';
 
-  const stored = localStorage.getItem('studyin-theme') as Theme;
+  const stored = localStorage.getItem(LS_KEYS.THEME) as Theme;
   if (stored && ['system', 'dark', 'light'].includes(stored)) {
     return stored;
   }
@@ -134,7 +134,7 @@ export function getTheme(): Theme {
 export function setTheme(theme: Theme): void {
   if (typeof window === 'undefined') return;
 
-  localStorage.setItem('studyin-theme', theme);
+  localStorage.setItem(LS_KEYS.THEME, theme);
   updateThemeDOM(theme);
 }
 
@@ -191,3 +191,4 @@ export function getActiveTheme(): 'light' | 'dark' {
 export function getThemeColors(): ThemeColors {
   return getActiveTheme() === 'light' ? lightTheme : darkTheme;
 }
+import { LS_KEYS } from './constants';

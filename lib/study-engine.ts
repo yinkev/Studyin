@@ -249,6 +249,10 @@ export interface BlueprintWeights {
 export interface ItemLoIndex {
   id: string;
   los: string[];
+  // Optional fields tolerated in tests/legacy data
+  difficulty?: number;
+  thresholds?: unknown;
+  medianTimeSeconds?: number;
 }
 
 export interface RetentionQueueEntry {

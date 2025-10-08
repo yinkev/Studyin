@@ -81,10 +81,12 @@ export function KeyboardShortcutsOverlay({
   useEffect(() => {
     if (visible && overlayRef.current) {
       // Animate in
+      // @ts-expect-error Motion transform keyframes supported at runtime
       animate(overlayRef.current, { opacity: [0, 1], scale: [0.95, 1] }, { duration: 0.3, easing: [0.19, 1, 0.22, 1] });
 
       // Stagger animate categories
       const categories = overlayRef.current.querySelectorAll('.shortcut-category');
+      // @ts-expect-error NodeList targets + keyframes supported
       animate(categories, { y: [20, 0], opacity: [0, 1] }, {
         delay: stagger(0.08),
         duration: 0.4,

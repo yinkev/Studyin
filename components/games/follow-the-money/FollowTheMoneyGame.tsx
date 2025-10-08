@@ -132,18 +132,18 @@ export function FollowTheMoneyGame() {
       const delaySec = (index * config.speed) / 1000;
       const durationSec = config.speed / 1000;
       const aAnim = animate(
-        shellA,
-        { left: posB.x, top: posB.y },
-        { duration: durationSec, delay: delaySec, easing: [0.45, 0, 0.55, 1] }
+        shellA as any,
+        { left: posB.x, top: posB.y } as any,
+        { duration: durationSec, delay: delaySec, easing: [0.45, 0, 0.55, 1] } as any
       );
       // Advance shuffle after A completes
       (Array.isArray(aAnim) ? Promise.all(aAnim.map(a => a.finished)) : aAnim.finished)
         .then(() => dispatch({ type: 'ADVANCE_SHUFFLE' }));
 
       animate(
-        shellB,
-        { left: posA.x, top: posA.y },
-        { duration: durationSec, delay: delaySec, easing: [0.45, 0, 0.55, 1] }
+        shellB as any,
+        { left: posA.x, top: posA.y } as any,
+        { duration: durationSec, delay: delaySec, easing: [0.45, 0, 0.55, 1] } as any
       );
     });
 

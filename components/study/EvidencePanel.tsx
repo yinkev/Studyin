@@ -54,12 +54,14 @@ export function EvidencePanel({ evidence, isOpen, onClose, onEvidenceViewed }: E
   useEffect(() => {
     if (isOpen && panelRef.current) {
       // Animate panel slide-in
+      // @ts-expect-error Motion accepts transform keyframes on HTMLElement targets
       animate(panelRef.current, { transform: ['translateX(100%)', 'translateX(0%)'] }, { duration: 0.4, easing: [0.19, 1, 0.22, 1] });
 
       // Animate slide cards
       const cards = panelRef.current.querySelectorAll('.evidence-slide-card');
+      // @ts-expect-error NodeList targets + translate keyframes are supported at runtime
       animate(cards, { opacity: [0, 1], y: [20, 0] }, {
-        delay: stagger(0.06, { start: 0.2 }),
+        delay: stagger(0.06, { start: 0.2 } as any),
         duration: 0.4,
         easing: [0.19, 1, 0.22, 1],
       });

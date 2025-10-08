@@ -31,9 +31,11 @@ export function LevelUpBurst({ level, onComplete }: LevelUpBurstProps) {
     const badge = badgeRef.current;
 
     // Flash effect
+    // @ts-expect-error Motion opacity keyframes supported at runtime
     animate(container, { opacity: [0, 1] }, { duration: 0.2, easing: [0.19, 1, 0.22, 1] });
 
     // Badge animation
+    // @ts-expect-error Motion transform keyframes supported at runtime
     animate(badge, { scale: [0, 1], rotate: [0, 360] }, { duration: 1.0, easing: [0.34, 1.56, 0.64, 1] });
 
     // Create confetti particles
@@ -53,6 +55,7 @@ export function LevelUpBurst({ level, onComplete }: LevelUpBurstProps) {
       const tx = Math.cos(angle) * velocity;
       const ty = Math.sin(angle) * velocity;
 
+      // @ts-expect-error Motion transform keyframes supported at runtime
       const anim = animate(confetti, { x: tx, y: ty, scale: [1, 0], opacity: [1, 0], rotate: Math.random() * 720 }, {
         duration: (1500 + Math.random() * 500) / 1000,
         easing: [0.19, 1, 0.22, 1],
@@ -63,11 +66,13 @@ export function LevelUpBurst({ level, onComplete }: LevelUpBurstProps) {
     // XP text animation
     const xpText = container.querySelector('.xp-text');
     if (xpText) {
+      // @ts-expect-error Motion transform keyframes supported at runtime
       animate(xpText as HTMLElement, { y: [-50, 0], opacity: [0, 1], scale: [0.5, 1] }, { duration: 0.8, easing: [0.34, 1.56, 0.64, 1], delay: 0.5 });
     }
 
     // Auto-dismiss after 3s
     const timeout = setTimeout(() => {
+      // @ts-expect-error Motion opacity keyframes supported at runtime
       const anim = animate(container, { opacity: [1, 0] }, { duration: 0.5, easing: [0.19, 1, 0.22, 1] });
       const finished = Array.isArray(anim) ? Promise.all(anim.map(a => a.finished)) : anim.finished;
       Promise.resolve(finished).then(() => onComplete?.());

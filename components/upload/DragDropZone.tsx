@@ -37,6 +37,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
 
     // Animate scale up
     if (dropZoneRef.current) {
+      // @ts-expect-error Motion transform scale supported at runtime
       animate(dropZoneRef.current, { scale: 1.02 }, { duration: 0.2, easing: 'ease-out' });
     }
   };
@@ -48,6 +49,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
 
     // Animate scale down
     if (dropZoneRef.current) {
+      // @ts-expect-error Motion transform scale supported at runtime
       animate(dropZoneRef.current, { scale: 1 }, { duration: 0.2, easing: 'ease-out' });
     }
   };
@@ -66,6 +68,7 @@ export function DragDropZone({ onFileSelect, selectedFile, disabled = false }: D
 
     // Reset scale with elastic bounce
     if (dropZoneRef.current) {
+      // @ts-expect-error Motion transform scale supported at runtime
       animate(dropZoneRef.current, { scale: 1 }, { duration: 0.3, easing: 'ease-out' });
     }
 

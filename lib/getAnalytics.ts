@@ -52,6 +52,8 @@ export interface AnalyticsSummary {
       point_biserial: number | null;
     }>;
   };
+  // Optional: legacy summaries used by some views
+  mastery_per_lo?: Record<string, number>;
   retention_summary?: {
     total_reviews: number;
     correct: number;

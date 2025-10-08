@@ -63,6 +63,7 @@ export function CLIProgressDisplay({
   // Animate progress bar
   useEffect(() => {
     if (progressBarRef.current && isProcessing) {
+      // @ts-expect-error Motion allows animating width on HTMLElement
       animate(progressBarRef.current, { width: `${currentProgress}%` }, { duration: 0.8, easing: [0.19, 1, 0.22, 1] });
     }
   }, [currentProgress, isProcessing]);

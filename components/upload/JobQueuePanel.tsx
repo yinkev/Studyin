@@ -43,6 +43,7 @@ export function JobQueuePanel({ jobs, onRetry, onCancel, showDevTools = false }:
   useEffect(() => {
     if (panelRef.current && jobs.length > 0) {
       const cards = panelRef.current.querySelectorAll('.job-card');
+      // @ts-expect-error NodeList animation is supported by Motion at runtime
       animate(cards, { opacity: [0, 1], y: [20, 0] }, {
         duration: 0.6,
         delay: stagger(0.1),

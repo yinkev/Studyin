@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save state
-    await saveLearnerState(state);
+    await saveLearnerState(learnerId, state);
 
     return NextResponse.json({ success: true });
   } catch (error) {

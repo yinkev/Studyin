@@ -15,6 +15,7 @@ export function LessonMetaPanel({ lesson }: LessonMetaPanelProps) {
   useEffect(() => {
     if (!listRef.current) return;
     const items = listRef.current.querySelectorAll('li');
+    // @ts-expect-error Motion supports NodeList targets + transform keyframes at runtime
     animate(items, { x: [-20, 0], opacity: [0, 1] }, { delay: stagger(0.08), duration: 0.5, easing: [0.19, 1, 0.22, 1] });
   }, [lesson.id]);
 

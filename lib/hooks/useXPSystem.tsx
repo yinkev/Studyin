@@ -16,18 +16,19 @@ import {
   updateStreak,
   XP_REWARDS,
 } from '../xp-system';
+import { LS_KEYS, DEFAULT_LEARNER_ID } from '../constants';
 
-const STORAGE_KEY = 'studyin-xp-progress';
+const STORAGE_KEY = LS_KEYS.XP_PROGRESS;
 // Resolve learner id from localStorage if available (fallback to dev id)
 const getLearnerId = (): string => {
   if (typeof window !== 'undefined') {
     try {
-      return localStorage.getItem('studyin:learnerId') || 'local-dev';
+      return localStorage.getItem(LS_KEYS.LEARNER_ID) || DEFAULT_LEARNER_ID;
     } catch {
-      return 'local-dev';
+      return DEFAULT_LEARNER_ID;
     }
   }
-  return 'local-dev';
+  return DEFAULT_LEARNER_ID;
 };
 
 /**
@@ -210,7 +211,7 @@ export function useStudyXP() {
 
   const awardQuestionXP = useCallback(
     (correct: boolean, timeSeconds: number) => {
-      let baseReward = correct ? XP_REWARDS.QUESTION_CORRECT : XP_REWARDS.QUESTION_INCORRECT;
+      let baseReward: number = correct ? XP_REWARDS.QUESTION_CORRECT : XP_REWARDS.QUESTION_INCORRECT;
 
       if (correct && timeSeconds < 5) {
         baseReward = XP_REWARDS.QUESTION_CORRECT_PERFECT;

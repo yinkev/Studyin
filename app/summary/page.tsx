@@ -62,7 +62,7 @@ export default async function SummaryPage() {
   const rubric = await readJsonIfExists<{ overall_score: number; overall_pass: boolean; critical_ok: boolean; threshold: number }>(rubricPath);
   const attempts = await loadRecentAttempts();
   const masteryScores = analytics?.mastery_per_lo
-    ? Object.entries(analytics.mastery_per_lo).map(([lo_id, score]) => ({ lo_id, score }))
+    ? Object.entries(analytics.mastery_per_lo).map(([lo_id, score]) => ({ lo_id, score: Number(score) }))
     : [];
   return (
     <section style={{
@@ -184,7 +184,7 @@ export default async function SummaryPage() {
         <div className="md3-surface-container md3-elevation-1 md3-shape-large md3-card">
           <div className="pb-4 border-b border-border-subtle mb-4 text-sm font-semibold text-text-high">Mastery · TTM (Canvas)</div>
           <div>
-            <TTMBarCanvas analytics={analytics} height={320} />
+            <TTMBarCanvas analytics={analytics} />
           </div>
         </div>
         {/* Legacy ECharts cards removed; consider D3/Recharts replacements in a follow-up */}

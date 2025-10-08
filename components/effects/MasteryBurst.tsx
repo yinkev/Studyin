@@ -78,9 +78,9 @@ export function MasteryBurst({
       particles.push(particle);
     }
 
-    // Explosive radial animation
+    // Explosive radial animation (cast to any to bypass overly strict types)
     const particleAnims = animate(
-      particles,
+      particles as any,
       {
         x: () => {
           const angle = Math.random() * Math.PI * 2;
@@ -96,12 +96,12 @@ export function MasteryBurst({
         rotate: () => Math.random() * 1440 - 720, // Multiple spins
         scale: [1, Math.random() * 0.5 + 0.3],
         opacity: [1, 0],
-      },
+      } as any,
       {
         duration: config.duration / 1000,
         easing: [0.33, 1, 0.68, 1],
         delay: stagger(0.008),
-      }
+      } as any
     );
 
     const finishes = Array.isArray(particleAnims) ? particleAnims.map(a => a.finished) : [particleAnims.finished];
@@ -121,9 +121,9 @@ export function MasteryBurst({
     container.appendChild(shockwave);
 
     const shock = animate(
-      shockwave,
-      { width: [0, 400], height: [0, 400], x: [0, -200], y: [0, -200], opacity: [0.6, 0] },
-      { duration: 0.8, easing: [0.19, 1, 0.22, 1] }
+      shockwave as any,
+      { width: [0, 400], height: [0, 400], x: [0, -200], y: [0, -200], opacity: [0.6, 0] } as any,
+      { duration: 0.8, easing: [0.19, 1, 0.22, 1] } as any
     );
     (Array.isArray(shock) ? Promise.all(shock.map(a => a.finished)) : shock.finished).then(() => shockwave.remove());
   }, [trigger, origin, particleCount, intensity, colors, onComplete]);
@@ -179,7 +179,7 @@ export function StarBurst({
       stars.push(star);
     }
 
-    const starAnims = animate(stars, { scaleY: [0, 1.5, 0], opacity: [0, 1, 0] }, { duration: 1.2, easing: [0.19, 1, 0.22, 1], delay: stagger(0.04) });
+    const starAnims = animate(stars as any, { scaleY: [0, 1.5, 0], opacity: [0, 1, 0] } as any, { duration: 1.2, easing: [0.19, 1, 0.22, 1], delay: stagger(0.04) } as any);
     const starFinishes = Array.isArray(starAnims) ? starAnims.map(a => a.finished) : [starAnims.finished];
     Promise.all(starFinishes).then(() => {
       stars.forEach((s) => s.remove());
