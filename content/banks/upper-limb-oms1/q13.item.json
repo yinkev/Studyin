@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-BP-013",
+  "stem": "A traction injury affecting the C5–C6 roots produces weakness of shoulder abduction and external rotation with lateral arm sensory changes. Which peripheral nerves are most implicated?",
+  "choices": {
+    "A": "Ulnar and medial antebrachial cutaneous",
+    "B": "Axillary and suprascapular (± musculocutaneous)",
+    "C": "Median (AIN) and radial (PIN)",
+    "D": "Long thoracic and spinal accessory",
+    "E": "Posterior cutaneous nerve of arm and intercostobrachial"
+  },
+  "key": "B",
+  "rationale_correct": "Superior plexus (C5–C6) lesions commonly involve axillary, suprascapular, and musculocutaneous territories.",
+  "rationale_distractors": {
+    "A": "These are lower trunk/medial cord distributions (C8–T1 biased).",
+    "C": "AIN/PIN are distal branch syndromes, not root‑level plexus lesions.",
+    "D": "Long thoracic and spinal accessory produce scapular winging and trapezius weakness but are not classic for C5–C6 traction.",
+    "E": "Cutaneous nerves listed don't explain the motor pattern."
+  },
+  "los": ["UL.BrachialPlexus.Superior"],
+  "difficulty": "medium",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 26,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-26.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "brachial-plexus", "C5-C6"],
+  "status": "draft"
+}
+

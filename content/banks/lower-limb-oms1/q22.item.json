@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLC-CLN-022",
+  "stem": "In a patient with vasculitic peripheral neuropathy, weakness in plantarflexion and loss of the ankle jerk most strongly suggest involvement of which nerve?",
+  "choices": {
+    "A": "Tibial nerve",
+    "B": "Deep fibular (peroneal) nerve",
+    "C": "Superficial fibular (peroneal) nerve",
+    "D": "Femoral nerve",
+    "E": "Sural nerve"
+  },
+  "key": "A",
+  "rationale_correct": "The tibial nerve innervates the posterior compartment (gastrocnemius–soleus); lesions reduce plantarflexion and Achilles reflex.",
+  "rationale_distractors": {
+    "B": "Deep fibular lesions cause dorsiflexion weakness and first web space sensory loss.",
+    "C": "Superficial fibular lesions impair eversion and dorsum foot sensation, not plantarflexion or Achilles reflex.",
+    "D": "Femoral nerve affects knee extension, not ankle plantarflexion.",
+    "E": "Sural nerve is sensory only (posterolateral leg/foot)."
+  },
+  "los": ["LL.Clinical.CommonPathologies"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/12-10-24_CIL_cases.pdf",
+    "page": 20,
+    "cropPath": "content/evidence/lower-limb-oms1/clinical-LL-20-2.png",
+    "citation": "Anderson A. CIL – Multisystem autoimmune diseases. Dec 11, 2024."
+  },
+  "tags": ["lower-limb", "tibial-nerve", "ankle-jerk"],
+  "status": "draft"
+}
+

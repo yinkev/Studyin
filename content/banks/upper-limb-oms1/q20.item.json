@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULR-ID-020",
+  "stem": "Which modality is most operator‑dependent and useful for dynamic assessment of superficial tendons in the upper limb?",
+  "choices": {
+    "A": "X‑ray",
+    "B": "CT",
+    "C": "MRI",
+    "D": "Ultrasound",
+    "E": "PET‑CT"
+  },
+  "key": "D",
+  "rationale_correct": "Ultrasound is operator‑dependent and excels at dynamic, superficial soft‑tissue assessment (e.g., tendons).",
+  "rationale_distractors": {
+    "A": "Radiographs are static and primarily evaluate bone alignment/density.",
+    "B": "CT is static and best for osseous detail.",
+    "C": "MRI is excellent for soft tissue but not dynamic in real‑time.",
+    "E": "PET‑CT evaluates metabolic activity and anatomy; not used for dynamic tendon assessment."
+  },
+  "los": ["UL.Radiology.Identify"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Learning_objectives_for_Radiology_of_the_Upper_Limb.pdf",
+    "page": 1,
+    "cropPath": "content/evidence/upper-limb-oms1/radiology-1.png",
+    "citation": "Rhodes D. Learning objectives for Radiology of the Upper Limb. 2018/2021."
+  },
+  "tags": ["upper-limb", "radiology", "ultrasound"],
+  "status": "draft"
+}
+

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLJ-KNE-002",
+  "stem": "Primary motions at the knee occur in which plane with accessory axial rotation during flexion/extension?",
+  "choices": {
+    "A": "Frontal plane; varus/valgus only",
+    "B": "Transverse plane; axial rotation only",
+    "C": "Sagittal plane; flexion/extension with accessory rotation",
+    "D": "Coronal plane; abduction/adduction only",
+    "E": "No true plane; pure rolling only"
+  },
+  "key": "C",
+  "rationale_correct": "Knee is primarily a sagittal-plane joint (flexion/extension) with gliding/rolling and accessory axial rotation.",
+  "rationale_distractors": {
+    "A": "Varus/valgus are constraints rather than primary motions.",
+    "B": "Axial rotation occurs as an accessory motion, not the sole primary motion.",
+    "D": "Abduction/adduction are limited at the knee.",
+    "E": "Knee is not pure rolling; it includes gliding and rotation."
+  },
+  "los": ["LL.Joints.Knee"],
+  "difficulty": "medium",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/lower-limb-overview.pdf",
+    "page": 15,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-overview-15.png",
+    "citation": "Heck C. Lower Limb Overview Slides — Knee mechanics. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "knee", "biomechanics"],
+  "status": "draft"
+}
+

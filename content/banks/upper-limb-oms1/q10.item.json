@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-ME-010",
+  "stem": "Which finding best distinguishes anterior interosseous nerve (AIN) syndrome from carpal tunnel syndrome?",
+  "choices": {
+    "A": "Pain and paresthesias in digits 1–3",
+    "B": "Weakness of FPL/FDP with failed 'OK' sign but no sensory loss",
+    "C": "Atrophy of interossei with digit 5 numbness",
+    "D": "Wrist drop with dorsal hand numbness",
+    "E": "Thenar atrophy without sensory symptoms"
+  },
+  "key": "B",
+  "rationale_correct": "AIN is a pure motor branch of the median nerve; sensory loss is absent, and 'OK' sign weakness is characteristic.",
+  "rationale_distractors": {
+    "A": "Median sensory symptoms point toward CTS rather than AIN.",
+    "C": "Ulnar neuropathy pattern (interossei, digit 5).",
+    "D": "Radial neuropathy pattern.",
+    "E": "Isolated thenar atrophy without sensory symptoms is not the typical early CTS presentation."
+  },
+  "los": ["UL.Nerves.Median"],
+  "difficulty": "medium",
+  "bloom": "analyze",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 16,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-16.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "median-nerve", "AIN"],
+  "status": "draft"
+}
+

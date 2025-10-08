@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LL-Overview-Detailed",
+  "lo_id": "LL.Joints.Knee",
+  "title": "Lower Limb Overview — Detailed Slides",
+  "summary": "Regions, bones, joints, and transitions with emphasis on knee mechanics and arterial name changes.",
+  "tags": ["lower-limb", "overview", "slides"],
+  "source_file": "data/uploads/lower-limb-overview.pdf",
+  "high_yield": [
+    "Knee is a modified hinge joint allowing rolling, gliding, and rotation",
+    "External iliac → femoral (inguinal ligament) → popliteal (adductor hiatus)"
+  ],
+  "pitfalls": [
+    "Assuming pure hinge at knee without rotation",
+    "Forgetting the adductor hiatus transition to popliteal artery"
+  ],
+  "content": [
+    { "type": "heading", "level": 2, "text": "Knee Joint — Motion" },
+    {
+      "type": "figure",
+      "caption": "Knee hinge with gliding/rolling/rotation (slides, ~p.14).",
+      "asset": { "path": "content/evidence/lower-limb-oms1/ll-overview-14.png", "alt": "Knee joint diagram" }
+    },
+    {
+      "type": "multiple_choice_question",
+      "id": "mcq-ll-slides-01",
+      "learningObjective": "LL.Joints.Knee",
+      "stem": "Which description best characterizes the knee joint?",
+      "choices": [
+        {"id": "A", "text": "Pure ball-and-socket with 3 axes"},
+        {"id": "B", "text": "Saddle joint with two orthogonal axes"},
+        {"id": "C", "text": "Plane joint permitting only gliding"},
+        {"id": "D", "text": "Modified hinge with gliding, rolling, and rotation"},
+        {"id": "E", "text": "Pivot joint allowing pronation/supination"}
+      ],
+      "correctChoice": "D",
+      "rationale": {
+        "correct": "Knee functions as a modified hinge with additional rolling, gliding, and rotation.",
+        "distractors": {
+          "A": "Hip is ball-and-socket; knee is not.",
+          "B": "Saddle joints describe thumb CMC, not knee.",
+          "C": "Knee allows more than gliding.",
+          "E": "Pivot describes radioulnar and atlantoaxial joints."
+        }
+      }
+    }
+  ]
+}
+

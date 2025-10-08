@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULN-RA-005",
+  "stem": "Following compression of the radial nerve in the distal arm, which combined deficit pattern is most characteristic?",
+  "choices": {
+    "A": "Wrist drop with sensory loss over lateral dorsum of hand/digits 1–3",
+    "B": "Loss of shoulder abduction with lateral shoulder numbness",
+    "C": "Inability to oppose the thumb with thenar atrophy",
+    "D": "Ulnar deviation on wrist flexion and numbness in digit 5",
+    "E": "Weak forearm pronation and palm numbness sparing thenar skin"
+  },
+  "key": "A",
+  "rationale_correct": "Distal radial lesions classically cause wrist/digit extensor weakness (wrist drop) and sensory deficits over the lateral dorsal hand.",
+  "rationale_distractors": {
+    "B": "Axillary nerve lesion (surgical neck of humerus) causes deltoid weakness and lateral shoulder paresthesia.",
+    "C": "Median nerve/recurrent motor lesion (thenar) not radial.",
+    "D": "Findings of ulnar lesions (FCU/FDP medial) not radial.",
+    "E": "Pronator syndrome (median) can spare thenar skin due to palmar cutaneous branch."
+  },
+  "los": ["UL.Nerves.Radial"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_NotesPDF.pdf",
+    "page": 2,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-notes-2.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb Lecture Notes. Sep 22, 2025."
+  },
+  "tags": ["upper-limb", "radial-nerve"],
+  "status": "draft"
+}
+

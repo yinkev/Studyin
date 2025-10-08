@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLJ-KNE-001",
+  "stem": "Which description best characterizes the knee joint?",
+  "choices": {
+    "A": "Ball-and-socket allowing three axes",
+    "B": "Saddle with two orthogonal axes",
+    "C": "Plane joint permitting only gliding",
+    "D": "Modified hinge with gliding, rolling, and rotation",
+    "E": "Pivot joint permitting pronation/supination"
+  },
+  "key": "D",
+  "rationale_correct": "Knee functions as a modified hinge with additional rolling, gliding, and rotation.",
+  "rationale_distractors": {
+    "A": "Describes hip, not knee.",
+    "B": "Describes thumb CMC, not knee.",
+    "C": "Knee allows more than gliding.",
+    "E": "Pivot describes radioulnar or atlantoaxial joints."
+  },
+  "los": ["LL.Joints.Knee"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/lower-limb-overview.pdf",
+    "page": 14,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-overview-14.png",
+    "citation": "Heck C. Lower Limb Overview Slides — Joints: Knee. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "knee", "joint"],
+  "status": "draft"
+}
+

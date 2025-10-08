@@ -1,5 +1,14 @@
 {
   "schema_version": "1.0.0",
-  "id": "studyin-template",
-  "weights": {}
+  "id": "upper-limb-oms1",
+  "weights": {
+    "UL.Nerves.Radial": 0.20,
+    "UL.Nerves.Median": 0.20,
+    "UL.Nerves.Ulnar": 0.20,
+    "UL.BrachialPlexus.Superior": 0.05,
+    "UL.BrachialPlexus.Inferior": 0.05,
+    "UL.Radiology.Identify": 0.10,
+    "UL.Radiology.ViewRecognition": 0.10,
+    "UL.Clinical.CommonPathologies": 0.10
+  }
 }

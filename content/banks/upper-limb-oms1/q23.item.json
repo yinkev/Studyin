@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULC-CLN-023",
+  "stem": "A patient with granulomatosis with polyangiitis reports numbness over the dorsolateral hand near the thumb without motor deficits. Which nerve branch is most likely affected?",
+  "choices": {
+    "A": "Superficial radial nerve",
+    "B": "Posterior interosseous nerve",
+    "C": "Lateral antebrachial cutaneous nerve",
+    "D": "Recurrent branch of the median nerve",
+    "E": "Dorsal cutaneous branch of the ulnar nerve"
+  },
+  "key": "A",
+  "rationale_correct": "The superficial radial nerve is purely sensory and supplies the dorsolateral hand near the thumb.",
+  "rationale_distractors": {
+    "B": "PIN is a motor branch; sensory loss would not be isolated with PIN.",
+    "C": "Lateral antebrachial cutaneous supplies lateral forearm, not dorsolateral hand.",
+    "D": "Recurrent median is motor to thenar muscles; no cutaneous innervation.",
+    "E": "Ulnar dorsal cutaneous supplies medial dorsum of the hand."
+  },
+  "los": ["UL.Clinical.CommonPathologies"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/12-10-24_CIL_cases.pdf",
+    "page": 11,
+    "cropPath": "content/evidence/upper-limb-oms1/clinical-UL-11-2.png",
+    "citation": "Anderson A. CIL – Multisystem autoimmune diseases. Dec 11, 2024."
+  },
+  "tags": ["upper-limb", "superficial-radial", "sensory"],
+  "status": "draft"
+}
+

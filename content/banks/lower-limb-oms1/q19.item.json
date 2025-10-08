@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLC-CLN-001",
+  "stem": "Varicose veins of the lower limb are most directly caused by which pathophysiologic change?",
+  "choices": {
+    "A": "Arterial atherosclerosis",
+    "B": "Failure of venous valves in superficial veins",
+    "C": "Rupture of deep venous walls",
+    "D": "Overactivity of the musculovenous pump",
+    "E": "Congenital absence of the femoral vein"
+  },
+  "key": "B",
+  "rationale_correct": "Varicose veins result from venous valve failure causing blood pooling and tortuous superficial veins.",
+  "rationale_distractors": {
+    "A": "Atherosclerosis affects arteries, not the superficial venous valves.",
+    "C": "Varicosities are not due to venous rupture.",
+    "D": "Decreased, not increased, pump function contributes to venous stasis.",
+    "E": "Femoral vein absence is not a typical cause of varicosities."
+  },
+  "los": ["LL.Clinical.CommonPathologies"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 4,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-4.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Varicose veins. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "varicose-veins"],
+  "status": "draft"
+}
+

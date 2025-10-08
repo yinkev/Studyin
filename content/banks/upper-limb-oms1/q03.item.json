@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULN-UL-003",
+  "stem": "After trauma near the medial epicondyle, a patient’s wrist deviates radially when attempting flexion. Which muscle is denervated?",
+  "choices": {
+    "A": "Flexor carpi ulnaris",
+    "B": "Flexor carpi radialis",
+    "C": "Pronator teres",
+    "D": "Extensor carpi ulnaris",
+    "E": "Abductor pollicis brevis"
+  },
+  "key": "A",
+  "rationale_correct": "Ulnar nerve injury at the elbow denervates FCU; unopposed FCR pulls the wrist into radial deviation during attempted flexion.",
+  "rationale_distractors": {
+    "B": "FCR is median-innervated and becomes unopposed; it is not denervated in ulnar nerve injury.",
+    "C": "Pronator teres (median) affects pronation, not radial deviation with wrist flexion.",
+    "D": "ECU (radial) affects extension/ulnar deviation, not flexion pattern here.",
+    "E": "APB is median-innervated thenar muscle; unrelated to this finding."
+  },
+  "los": ["UL.Nerves.Ulnar"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_NotesPDF.pdf",
+    "page": 4,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-notes-4.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb Lecture Notes. Sep 22, 2025."
+  },
+  "tags": ["upper-limb", "ulnar-nerve"],
+  "status": "draft"
+}
+

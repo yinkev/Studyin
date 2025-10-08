@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULR-ID-016",
+  "stem": "For upper‑limb imaging, which modality generally offers the best soft‑tissue contrast (muscles, tendons, ligaments)?",
+  "choices": {
+    "A": "X‑ray",
+    "B": "CT",
+    "C": "MRI",
+    "D": "Ultrasound",
+    "E": "Fluoroscopy"
+  },
+  "key": "C",
+  "rationale_correct": "MRI provides excellent soft‑tissue contrast for the upper limb.",
+  "rationale_distractors": {
+    "A": "Radiographs are best for gross osseous evaluation and alignment.",
+    "B": "CT excels at cortical bone detail; soft‑tissue contrast is less than MRI.",
+    "D": "US is useful and dynamic but contrast depends on operator and target depth.",
+    "E": "Fluoroscopy is real‑time X‑ray used for procedures, not cross‑sectional contrast."
+  },
+  "los": ["UL.Radiology.Identify"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Learning_objectives_for_Radiology_of_the_Upper_Limb.pdf",
+    "page": 1,
+    "cropPath": "content/evidence/upper-limb-oms1/radiology-1.png",
+    "citation": "Rhodes D. Learning objectives for Radiology of the Upper Limb. 2018/2021."
+  },
+  "tags": ["upper-limb", "radiology", "MRI"],
+  "status": "draft"
+}
+

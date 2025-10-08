@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLC-CLN-024",
+  "stem": "In IgA vasculitis, a palpable purpuric rash appears on the lower extremities. This cutaneous finding reflects inflammation of which vessel type?",
+  "choices": {
+    "A": "Small vessels (postcapillary venules) with IgA deposition",
+    "B": "Large elastic arteries",
+    "C": "Medium muscular arteries",
+    "D": "Deep veins of the calf",
+    "E": "Lymphatic capillaries"
+  },
+  "key": "A",
+  "rationale_correct": "IgA (Henoch–Schönlein) vasculitis is a small-vessel leukocytoclastic vasculitis affecting postcapillary venules with IgA immune complex deposition.",
+  "rationale_distractors": {
+    "B": "Large-vessel vasculitides (e.g., giant cell) do not cause palpable purpura.",
+    "C": "Medium-vessel vasculitis (e.g., PAN) produces different cutaneous findings (livedo, nodules).",
+    "D": "DVT is venous thrombosis, not small-vessel leukocytoclastic vasculitis.",
+    "E": "Lymphatic inflammation causes lymphedema/lymphangitis, not purpura."
+  },
+  "los": ["LL.Clinical.CommonPathologies"],
+  "difficulty": "medium",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/12-10-24_CIL_cases.pdf",
+    "page": 6,
+    "cropPath": "content/evidence/lower-limb-oms1/clinical-LL-06.png",
+    "citation": "Anderson A. CIL – Multisystem autoimmune diseases. Dec 11, 2024."
+  },
+  "tags": ["lower-limb", "vasculitis", "purpura"],
+  "status": "draft"
+}
+

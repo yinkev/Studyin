@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "LLN-FEM-002",
+  "stem": "Loss of sensation over the anteromedial leg extending to the medial foot most specifically indicates injury to which branch of the femoral nerve?",
+  "choices": {
+    "A": "Lateral femoral cutaneous nerve",
+    "B": "Obturator nerve (cutaneous branch)",
+    "C": "Saphenous nerve",
+    "D": "Superficial fibular (peroneal) nerve",
+    "E": "Sural nerve"
+  },
+  "key": "C",
+  "rationale_correct": "The saphenous nerve (branch of femoral) supplies anteromedial leg and medial foot cutaneous sensation.",
+  "rationale_distractors": {
+    "A": "Lateral femoral cutaneous supplies lateral thigh skin.",
+    "B": "Obturator cutaneous branch supplies a small medial thigh area.",
+    "D": "Superficial fibular supplies anterolateral leg and dorsum of foot.",
+    "E": "Sural supplies posterolateral leg and lateral foot."
+  },
+  "los": ["LL.Nerves.Femoral"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/Lower_Limb_Overview_Handout_Student.pdf",
+    "page": 8,
+    "cropPath": "content/evidence/lower-limb-oms1/ll-handout-8.png",
+    "citation": "Heck C. Lower Limb Overview Handout — Cutaneous nerves. Jun 16, 2025."
+  },
+  "tags": ["lower-limb", "cutaneous", "femoral"],
+  "status": "draft"
+}
+

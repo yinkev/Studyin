@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULC-CLN-022",
+  "stem": "A patient with vasculitic mononeuritis multiplex has right hand weakness. If the radial nerve is affected in the radial groove, which finding is expected?",
+  "choices": {
+    "A": "Loss of wrist and finger extension with preserved elbow extension",
+    "B": "Loss of elbow extension",
+    "C": "Thenar eminence atrophy",
+    "D": "Inability to flex the distal interphalangeal joint of the index finger",
+    "E": "Loss of sensation over the medial forearm"
+  },
+  "key": "A",
+  "rationale_correct": "Radial groove lesions spare the triceps but denervate wrist and finger extensors, producing wrist drop and finger extension weakness.",
+  "rationale_distractors": {
+    "B": "Elbow extension loss implies triceps involvement from a more proximal lesion.",
+    "C": "Thenar atrophy is a median (recurrent motor) finding.",
+    "D": "DIP flexion of the index finger is AIN (median) mediated.",
+    "E": "Medial forearm cutaneous sensation is from the medial antebrachial cutaneous nerve (brachial plexus medial cord)."
+  },
+  "los": ["UL.Clinical.CommonPathologies"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/12-10-24_CIL_cases.pdf",
+    "page": 10,
+    "cropPath": "content/evidence/upper-limb-oms1/clinical-UL-10.png",
+    "citation": "Anderson A. CIL – Multisystem autoimmune diseases. Dec 11, 2024."
+  },
+  "tags": ["upper-limb", "radial-nerve", "wrist-drop"],
+  "status": "draft"
+}
+

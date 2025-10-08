@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULR-VW-018",
+  "stem": "In musculoskeletal radiography, a 'view' refers to which of the following?",
+  "choices": {
+    "A": "The window/level settings applied to the image",
+    "B": "The pulse sequence used for MRI acquisition",
+    "C": "The Doppler angle used during ultrasound",
+    "D": "The patient/beam/detector positioning used to obtain the image",
+    "E": "The image reconstruction kernel in CT"
+  },
+  "key": "D",
+  "rationale_correct": "A view specifies how the patient is positioned relative to the X‑ray beam and detector (e.g., AP, lateral, oblique).",
+  "rationale_distractors": {
+    "A": "Window/level is post‑processing, not the acquisition geometry.",
+    "B": "Pulse sequences are MRI parameters, not X‑ray view geometry.",
+    "C": "Doppler angle is an ultrasound parameter.",
+    "E": "Reconstruction kernel is a CT parameter applied after acquisition."
+  },
+  "los": ["UL.Radiology.ViewRecognition"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Learning_objectives_for_Radiology_of_the_Upper_Limb.pdf",
+    "page": 1,
+    "cropPath": "content/evidence/upper-limb-oms1/radiology-1.png",
+    "citation": "Rhodes D. Learning objectives for Radiology of the Upper Limb. 2018/2021."
+  },
+  "tags": ["upper-limb", "radiology", "views"],
+  "status": "draft"
+}
+

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-UL-015",
+  "stem": "Which presentation aligns best with ulnar nerve compression in the cubital tunnel (elbow)?",
+  "choices": {
+    "A": "Thenar weakness with paresthesia of digits 1–3",
+    "B": "Often sensory symptoms predominate in digits 4–5; motor may be mild initially",
+    "C": "Painless wrist drop with dorsal radial hand numbness",
+    "D": "Complete loss of thumb opposition with preserved sensation",
+    "E": "Isolated numbness over the lateral arm"
+  },
+  "key": "B",
+  "rationale_correct": "Slides note cubital tunnel syndrome can present with predominantly sensory deficits initially in the ulnar distribution.",
+  "rationale_distractors": {
+    "A": "Median distribution suggests CTS or proximal median lesions.",
+    "C": "Radial neuropathy pattern.",
+    "D": "Thenar opposition loss is median (recurrent motor).",
+    "E": "Lateral arm cutaneous territory relates to axillary/superior lateral cutaneous nerve."
+  },
+  "los": ["UL.Nerves.Ulnar"],
+  "difficulty": "easy",
+  "bloom": "remember",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 22,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-22.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "ulnar-nerve", "cubital-tunnel"],
+  "status": "draft"
+}
+

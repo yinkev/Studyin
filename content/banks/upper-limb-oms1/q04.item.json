@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULN-ME-004",
+  "stem": "When asked to make a fist, a patient’s index and middle fingers remain extended at the MP, PIP, and DIP joints while digits 4–5 flex. Which lesion best explains this 'Hand of Benediction' sign?",
+  "choices": {
+    "A": "Proximal median nerve lesion in the arm/cubital fossa",
+    "B": "Ulnar canal syndrome (Guyon’s tunnel)",
+    "C": "Distal radial nerve compression at the wrist",
+    "D": "Posterior interosseous nerve palsy",
+    "E": "Axillary nerve injury"
+  },
+  "key": "A",
+  "rationale_correct": "Proximal median lesion denervates FDS, FPL, and lateral FDP plus lumbricals to digits 2–3, preventing flexion of digits 1–3 when making a fist.",
+  "rationale_distractors": {
+    "B": "Ulnar canal lesions affect digits 4–5 and may cause mild clawing, not the Benediction pattern on making a fist.",
+    "C": "Distal radial compression produces wrist drop and dorsum hand sensory loss; the fist test pattern is median.",
+    "D": "PIN palsy impairs extension, not the flexion pattern described.",
+    "E": "Axillary nerve deficits affect shoulder abduction (deltoid)."
+  },
+  "los": ["UL.Nerves.Median"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_NotesPDF.pdf",
+    "page": 3,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-notes-3.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb Lecture Notes. Sep 22, 2025."
+  },
+  "tags": ["upper-limb", "median-nerve", "hand-of-benediction"],
+  "status": "draft"
+}
+

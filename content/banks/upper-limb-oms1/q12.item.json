@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULS-UL-012",
+  "stem": "After injury near the medial epicondyle, a patient shows radial deviation when attempting wrist flexion. Which nerve/muscle involvement best explains this?",
+  "choices": {
+    "A": "Median nerve — loss of FCR",
+    "B": "Ulnar nerve — loss of FCU",
+    "C": "Radial nerve — loss of ECRB",
+    "D": "Ulnar nerve — loss of interossei only",
+    "E": "Axillary nerve — loss of deltoid"
+  },
+  "key": "B",
+  "rationale_correct": "Ulnar lesion at elbow denervates FCU, leaving FCR unopposed and pulling the wrist radially during flexion.",
+  "rationale_distractors": {
+    "A": "Median loss of FCR would bias toward ulnar deviation, not radial.",
+    "C": "ECRB is an extensor; the finding concerns flexion direction.",
+    "D": "Interossei loss affects finger ab-/adduction, not wrist flexion vector.",
+    "E": "Axillary nerve deficits affect shoulder abduction."
+  },
+  "los": ["UL.Nerves.Ulnar"],
+  "difficulty": "easy",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_SlidesPOSTpdf.pdf",
+    "page": 21,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-slides-21.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb (Slides). 2022."
+  },
+  "tags": ["upper-limb", "ulnar-nerve"],
+  "status": "draft"
+}
+

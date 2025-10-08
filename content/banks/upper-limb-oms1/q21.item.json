@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULC-CLN-021",
+  "stem": "A 54-year-old man with systemic small-vessel vasculitis develops right hand grip weakness (3/5). Which deficit most specifically localizes an anterior interosseous nerve (AIN) palsy in this context?",
+  "choices": {
+    "A": "Inability to make a firm 'OK' sign due to flexor pollicis longus weakness",
+    "B": "Weakness of flexor carpi ulnaris",
+    "C": "Weakness of extensor carpi radialis brevis",
+    "D": "Atrophy of abductor digiti minimi",
+    "E": "Pronator teres weakness with pain on resisted pronation"
+  },
+  "key": "A",
+  "rationale_correct": "AIN (median) innervates FPL and radial FDP; failure of the precision 'OK' pinch is classic for AIN neuropathy.",
+  "rationale_distractors": {
+    "B": "FCU is innervated by the ulnar nerve, not the AIN.",
+    "C": "ECRB is radial (posterior compartment); AIN does not affect wrist extension.",
+    "D": "ADM is ulnar nerve; its atrophy indicates ulnar neuropathy.",
+    "E": "Pronator teres is median nerve but proximal (not AIN-specific)."
+  },
+  "los": ["UL.Clinical.CommonPathologies"],
+  "difficulty": "medium",
+  "bloom": "apply",
+  "evidence": {
+    "file": "data/uploads/12-10-24_CIL_cases.pdf",
+    "page": 11,
+    "cropPath": "content/evidence/upper-limb-oms1/clinical-UL-11.png",
+    "citation": "Anderson A. CIL – Multisystem autoimmune diseases. Dec 11, 2024."
+  },
+  "tags": ["upper-limb", "AIN", "vasculitis", "mononeuritis"],
+  "status": "draft"
+}
+

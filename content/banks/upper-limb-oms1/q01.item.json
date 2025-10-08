@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ULN-RA-001",
+  "stem": "A laceration injures the superficial branch of the radial nerve on the dorsum of the wrist as it emerges from the brachioradialis. Which finding is most likely?",
+  "choices": {
+    "A": "Wrist drop from loss of wrist/digit extension",
+    "B": "Loss of elbow extension",
+    "C": "Hypesthesia over the lateral dorsum of the hand and digits 1–3",
+    "D": "Thenar eminence atrophy",
+    "E": "Inability to pronate the forearm"
+  },
+  "key": "C",
+  "rationale_correct": "The superficial radial branch is purely cutaneous; injury produces sensory loss over the lateral dorsum of the hand without motor deficits.",
+  "rationale_distractors": {
+    "A": "Motor loss (wrist drop) reflects injury to radial motor fibers more proximally, not the superficial branch.",
+    "B": "Elbow extension loss implies triceps involvement from a proximal/axillary radial lesion.",
+    "D": "Thenar atrophy is median nerve (recurrent motor) pathology.",
+    "E": "Pronation is mediated by median nerve (pronator teres/quadratus)."
+  },
+  "los": ["UL.Nerves.Radial"],
+  "difficulty": "easy",
+  "bloom": "understand",
+  "evidence": {
+    "file": "data/uploads/Nerve_Lesion_UppLimb_NotesPDF.pdf",
+    "page": 1,
+    "cropPath": "content/evidence/upper-limb-oms1/nerve-lesions-notes-1.png",
+    "citation": "Selski D. Nerve Injuries of the Upper Limb Lecture Notes. Sep 22, 2025."
+  },
+  "tags": ["upper-limb", "radial-nerve"],
+  "status": "draft"
+}
+
