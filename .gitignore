@@ -11,6 +11,7 @@ coverage/
 
 # Local agent artifacts
 .code/
+.lighthouseci/
 
 # Logs and diagnostics
 *.log
