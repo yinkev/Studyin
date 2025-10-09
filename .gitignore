@@ -44,6 +44,8 @@ tsconfig.tsbuildinfo
 # Tests
 test-results/
 !test-results/.last-run.json
+tests/**/__snapshots__/
+tests/**/*.spec.js-snapshots/
 
 # Temp files
 *.tmp
