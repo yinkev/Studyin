@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: studyin
+          POSTGRES_USER: studyin_user
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U studyin_user"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://studyin_user:changeme@localhost:5432/studyin
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: studyin
+      DB_USER: studyin_user
+      DB_PASSWORD: changeme
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run Alembic migrations
+        run: |
+          cd backend
+          alembic upgrade head
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          pytest --maxfail=1 --disable-warnings
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run lint
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm run test

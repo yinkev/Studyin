@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches: [develop, main]
+
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to staging
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.STAGING_SSH_HOST }}
+          username: ${{ secrets.STAGING_SSH_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd ${{ secrets.REMOTE_PROJECT_PATH }}
+            git pull origin develop
+            cd backend
+            DB_HOST=${{ secrets.STAGING_DB_HOST }} \
+            DB_PORT=${{ secrets.STAGING_DB_PORT }} \
+            DB_NAME=${{ secrets.STAGING_DB_NAME }} \
+            DB_USER=${{ secrets.STAGING_DB_USER }} \
+            DB_PASSWORD=${{ secrets.STAGING_DB_PASSWORD }} \
+            REDIS_PASSWORD=${{ secrets.STAGING_REDIS_PASSWORD }} \
+            ./scripts/deploy-staging.sh
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to production
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd ${{ secrets.REMOTE_PROJECT_PATH }}
+            git pull origin main
+            cd backend
+            DB_HOST=${{ secrets.PROD_DB_HOST }} \
+            DB_PORT=${{ secrets.PROD_DB_PORT }} \
+            DB_NAME=${{ secrets.PROD_DB_NAME }} \
+            DB_USER=${{ secrets.PROD_DB_USER }} \
+            DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} \
+            REDIS_PASSWORD=${{ secrets.PROD_REDIS_PASSWORD }} \
+            ./scripts/deploy.sh
