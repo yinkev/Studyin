@@ -28,8 +28,9 @@ class Settings(BaseSettings):
     # File upload security
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024  # 50 MB
     USER_STORAGE_QUOTA: int = 5 * 1024 * 1024 * 1024  # 5 GB
-    UPLOAD_DIR: str = str(Path("/var/www/studyin/uploads").resolve())
+    UPLOAD_DIR: str = str((Path(__file__).resolve().parent.parent / "uploads").resolve())
     CDN_DOMAIN: str = "cdn.studyin.app"
+    CHROMA_PERSIST_DIR: str = str((Path(__file__).resolve().parent.parent / "chroma_data").resolve())
 
     # Auth
     JWT_ACCESS_SECRET: str = "local-access-secret"
@@ -42,11 +43,24 @@ class Settings(BaseSettings):
     CLAMAV_PORT: int = 3310
     CLAMAV_SOCKET: str | None = None
 
-    # CORS
-    CORS_ALLOW_ORIGINS: List[str] = ["http://localhost:3000"]
+    # CORS - Using simple string for now to avoid pydantic parsing issues
+    CORS_ALLOW_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
     CORS_ALLOW_ORIGIN_REGEX: str | None = None
-    CORS_ALLOW_METHODS: List[str] = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-    CORS_ALLOW_HEADERS: List[str] = ["Authorization", "Content-Type", "X-CSRF-Token"]
+    CORS_ALLOW_METHODS: str = "GET,POST,PUT,DELETE,PATCH,OPTIONS"
+    CORS_ALLOW_HEADERS: str = "Authorization,Content-Type,X-CSRF-Token"
+
+    # LLM Configuration (Codex CLI - no API keys needed!)
+    CODEX_CLI_PATH: str = "/opt/homebrew/bin/codex"
+    CODEX_DEFAULT_MODEL: str = "gpt-5"  # or "claude-3.5-sonnet", "gpt-5-codex", etc.
+    CODEX_TEMPERATURE: float = 0.7
+    CODEX_MAX_TOKENS: int = 128000  # GPT-5: 128K output, GPT-4o: 16K output, Claude 3.5: 8K output
+    CODEX_STREAM_TIMEOUT: float = 30.0  # Timeout for individual readline operations (seconds)
+    CODEX_MAX_RESPONSE_SIZE: int = 1024 * 1024  # Maximum accumulated response size (1MB)
+    CODEX_PROCESS_CLEANUP_TIMEOUT: float = 5.0  # Timeout for process cleanup in finally block (seconds)
+
+    # Gemini Embeddings
+    GEMINI_API_KEY: str | None = None
+    GEMINI_EMBEDDING_MODEL: str = "text-embedding-004"
 
     # Monitoring
     LOG_LEVEL: str = "INFO"
@@ -64,12 +78,17 @@ class Settings(BaseSettings):
             raise ValueError("ENVIRONMENT must be one of: development, staging, production")
         return normalized
 
-    @field_validator("CORS_ALLOW_ORIGINS", "CORS_ALLOW_METHODS", "CORS_ALLOW_HEADERS", mode="before")
-    @classmethod
-    def _split_csv(cls, value):
-        if isinstance(value, str):
-            return [item.strip() for item in value.split(",") if item.strip()]
-        return value
+    def get_cors_origins_list(self) -> List[str]:
+        """Convert CORS_ALLOW_ORIGINS string to list."""
+        return [item.strip() for item in self.CORS_ALLOW_ORIGINS.split(",") if item.strip()]
+
+    def get_cors_methods_list(self) -> List[str]:
+        """Convert CORS_ALLOW_METHODS string to list."""
+        return [item.strip() for item in self.CORS_ALLOW_METHODS.split(",") if item.strip()]
+
+    def get_cors_headers_list(self) -> List[str]:
+        """Convert CORS_ALLOW_HEADERS string to list."""
+        return [item.strip() for item in self.CORS_ALLOW_HEADERS.split(",") if item.strip()]
 
     @field_validator("MAX_UPLOAD_SIZE", "USER_STORAGE_QUOTA")
     @classmethod
@@ -81,6 +100,11 @@ class Settings(BaseSettings):
     @field_validator("UPLOAD_DIR", mode="after")
     @classmethod
     def _resolve_upload_dir(cls, value: str) -> str:
+        return str(Path(value).resolve())
+
+    @field_validator("CHROMA_PERSIST_DIR", mode="after")
+    @classmethod
+    def _resolve_chroma_dir(cls, value: str) -> str:
         return str(Path(value).resolve())
 
     @model_validator(mode="after")
@@ -100,6 +124,9 @@ class Settings(BaseSettings):
 
         if self.DATABASE_MAX_OVERFLOW < 0:
             raise ValueError("DATABASE_MAX_OVERFLOW cannot be negative")
+
+        Path(self.UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
+        Path(self.CHROMA_PERSIST_DIR).mkdir(parents=True, exist_ok=True)
 
         return self
 
