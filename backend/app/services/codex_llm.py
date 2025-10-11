@@ -2,17 +2,43 @@
 
 This service uses Codex CLI (with OAuth) instead of direct API keys.
 Codex CLI manages authentication and provides access to multiple models.
+
+Security:
+- CLI path whitelist validation
+- Prompt sanitization and length limits
+- Shell metacharacter filtering
+- Safe subprocess argument passing with shlex.quote
+- Comprehensive security event logging
 """
 
 import asyncio
 import json
 import logging
+import os
+import re
+import shlex
+from pathlib import Path
 from time import perf_counter
 from typing import Any, AsyncGenerator, Dict, List, Optional
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+# Security constants - CLI path whitelist
+ALLOWED_CLI_PATHS = frozenset({
+    "/opt/homebrew/bin/codex",
+    "/usr/local/bin/codex",
+    "/usr/bin/codex",
+    str(Path.home() / ".local" / "bin" / "codex"),
+})
+
+# Shell metacharacters that could be used for injection
+# Note: Newlines and carriage returns are allowed in prompts (needed for formatting)
+DANGEROUS_SHELL_CHARS = re.compile(r'[;&|`$(){}[\]<>\\]')
+
+# Allowed model name pattern (alphanumeric, dots, hyphens, underscores only)
+ALLOWED_MODEL_PATTERN = re.compile(r'^[a-zA-Z0-9._-]+$')
 
 
 def _estimate_token_count(text: str, usage: Optional[Dict[str, Any]] = None) -> int:
@@ -29,11 +55,255 @@ def _estimate_token_count(text: str, usage: Optional[Dict[str, Any]] = None) -> 
     return approx
 
 
+def _validate_cli_path(cli_path: str) -> str:
+    """
+    Validate CLI path against whitelist to prevent arbitrary command execution.
+
+    Security: Only allow specific, trusted CLI paths to prevent command injection.
+    Supports both direct paths and symlinks that point to allowed locations.
+
+    Args:
+        cli_path: Path to the Codex CLI executable
+
+    Returns:
+        Validated CLI path (original, not resolved, to preserve symlinks)
+
+    Raises:
+        ValueError: If CLI path is not in the whitelist or doesn't exist
+    """
+    # Get both the original and resolved paths
+    original_path = str(Path(cli_path).absolute())
+    resolved_path = str(Path(cli_path).resolve())
+
+    # Check if either the original path or resolved path is in whitelist
+    # This allows symlinks (e.g., /opt/homebrew/bin/codex) to work
+    if original_path not in ALLOWED_CLI_PATHS and resolved_path not in ALLOWED_CLI_PATHS:
+        logger.error(
+            "security_cli_path_blocked",
+            extra={
+                "attempted_path": cli_path,
+                "original_path": original_path,
+                "resolved_path": resolved_path,
+                "allowed_paths": list(ALLOWED_CLI_PATHS),
+            }
+        )
+        raise ValueError(
+            f"CLI path not in whitelist: {cli_path}. "
+            f"Allowed paths: {', '.join(ALLOWED_CLI_PATHS)}"
+        )
+
+    # Verify file exists and is executable (check original path)
+    if not os.path.exists(original_path):
+        logger.error(
+            "security_cli_path_not_found",
+            extra={"original_path": original_path}
+        )
+        raise ValueError(f"CLI path does not exist: {original_path}")
+
+    if not os.access(original_path, os.X_OK):
+        logger.error(
+            "security_cli_path_not_executable",
+            extra={"original_path": original_path}
+        )
+        raise ValueError(f"CLI path is not executable: {original_path}")
+
+    # Return the original path (preserves symlinks for better compatibility)
+    return original_path
+
+
+def _sanitize_prompt(prompt: str, user_id: Optional[str] = None) -> str:
+    """
+    Sanitize prompt to prevent command injection attacks.
+
+    Security measures:
+    - Length validation (max 50KB)
+    - Shell metacharacter detection and blocking
+    - Null byte filtering
+    - Control character removal
+
+    Args:
+        prompt: Raw prompt from user input
+        user_id: Optional user ID for logging
+
+    Returns:
+        Sanitized prompt
+
+    Raises:
+        ValueError: If prompt contains dangerous characters or exceeds length limit
+    """
+    if not prompt:
+        raise ValueError("Prompt cannot be empty")
+
+    # Check length limit
+    prompt_length = len(prompt.encode('utf-8'))
+    max_length = settings.CODEX_MAX_PROMPT_LENGTH
+    if prompt_length > max_length:
+        logger.error(
+            "security_prompt_too_long",
+            extra={
+                "user_id": user_id,
+                "prompt_length": prompt_length,
+                "max_length": max_length,
+            }
+        )
+        raise ValueError(
+            f"Prompt exceeds maximum length: {prompt_length} bytes > {max_length} bytes"
+        )
+
+    # Check for null bytes (common injection technique)
+    if '\x00' in prompt:
+        logger.error(
+            "security_null_byte_detected",
+            extra={
+                "user_id": user_id,
+                "prompt_preview": prompt[:100],
+            }
+        )
+        raise ValueError("Prompt contains null bytes")
+
+    # Check for dangerous shell metacharacters
+    if DANGEROUS_SHELL_CHARS.search(prompt):
+        dangerous_chars = set(DANGEROUS_SHELL_CHARS.findall(prompt))
+        logger.error(
+            "security_shell_metacharacters_detected",
+            extra={
+                "user_id": user_id,
+                "dangerous_chars": list(dangerous_chars),
+                "prompt_preview": prompt[:100],
+            }
+        )
+        raise ValueError(
+            f"Prompt contains dangerous shell metacharacters: {dangerous_chars}. "
+            "These characters are blocked to prevent command injection."
+        )
+
+    # Remove control characters (except tab, newline, carriage return)
+    # Allow common whitespace but block other control chars
+    sanitized = ''.join(
+        char for char in prompt
+        if char.isprintable() or char in {'\t', '\n', '\r', ' '}
+    )
+
+    if len(sanitized) != len(prompt):
+        logger.warning(
+            "security_control_chars_removed",
+            extra={
+                "user_id": user_id,
+                "original_length": len(prompt),
+                "sanitized_length": len(sanitized),
+            }
+        )
+
+    return sanitized
+
+
+def _validate_model_name(model: Optional[str], user_id: Optional[str] = None) -> Optional[str]:
+    """
+    Validate model name to prevent command injection through model parameter.
+
+    Security: Only allow alphanumeric characters, dots, hyphens, and underscores.
+
+    Args:
+        model: Model name to validate
+        user_id: Optional user ID for logging
+
+    Returns:
+        Validated model name or None
+
+    Raises:
+        ValueError: If model name contains invalid characters
+    """
+    if model is None:
+        return None
+
+    if not ALLOWED_MODEL_PATTERN.match(model):
+        logger.error(
+            "security_invalid_model_name",
+            extra={
+                "user_id": user_id,
+                "model": model,
+            }
+        )
+        raise ValueError(
+            f"Invalid model name: {model}. "
+            "Model names can only contain letters, numbers, dots, hyphens, and underscores."
+        )
+
+    # Additional length check
+    if len(model) > 100:
+        logger.error(
+            "security_model_name_too_long",
+            extra={
+                "user_id": user_id,
+                "model": model,
+                "length": len(model),
+            }
+        )
+        raise ValueError("Model name exceeds maximum length (100 characters)")
+
+    return model
+
+
+def _build_safe_command(
+    cli_path: str,
+    prompt: str,
+    model: Optional[str] = None,
+    json_mode: bool = False,
+) -> List[str]:
+    """
+    Build command arguments with proper shell escaping.
+
+    Security: Use list-based subprocess.exec to avoid shell interpretation.
+    Each argument is properly escaped with shlex.quote for defense in depth.
+
+    Args:
+        cli_path: Validated CLI path
+        prompt: Sanitized prompt
+        model: Validated model name
+        json_mode: Whether to use --json flag
+
+    Returns:
+        List of command arguments (safe for subprocess.exec)
+    """
+    # Build command as list (no shell interpretation)
+    cmd = [
+        cli_path,  # Already validated against whitelist
+        "exec",
+    ]
+
+    if json_mode:
+        cmd.append("--json")
+
+    # Add prompt with proper escaping (defense in depth)
+    # Using shlex.quote even though we're using exec to prevent any
+    # potential issues if the CLI itself uses shell commands internally
+    cmd.append(shlex.quote(prompt))
+
+    if model:
+        cmd.extend(["--model", shlex.quote(model)])
+
+    return cmd
+
+
 class CodexLLMService:
-    """Service for calling LLM operations via Codex CLI."""
+    """Service for calling LLM operations via Codex CLI with security validations."""
 
     def __init__(self, cli_path: str | None = None):
-        self.cli_path = cli_path or settings.CODEX_CLI_PATH
+        """
+        Initialize CodexLLMService with validated CLI path.
+
+        Args:
+            cli_path: Optional path to Codex CLI executable
+
+        Raises:
+            ValueError: If CLI path is not in whitelist or not executable
+        """
+        raw_path = cli_path or settings.CODEX_CLI_PATH
+        self.cli_path = _validate_cli_path(raw_path)
+        logger.info(
+            "codex_service_initialized",
+            extra={"cli_path": self.cli_path}
+        )
 
     async def generate_completion(
         self,
@@ -45,7 +315,12 @@ class CodexLLMService:
         user_id: Optional[str] = None,
     ) -> AsyncGenerator[str, None]:
         """
-        Generate a completion using Codex CLI.
+        Generate a completion using Codex CLI with security validations.
+
+        Security:
+        - Validates and sanitizes prompt (max 50KB, no shell metacharacters)
+        - Validates model name (alphanumeric only)
+        - Uses safe subprocess execution (no shell interpretation)
 
         Args:
             prompt: The prompt to send to the model
@@ -53,19 +328,51 @@ class CodexLLMService:
             max_tokens: Maximum tokens to generate
             temperature: Sampling temperature (0-1)
             stream: Whether to stream the response
+            user_id: Optional user ID for logging
 
         Returns:
             Async generator for streaming tokens (always streams in MVP)
+
+        Raises:
+            ValueError: If prompt or model name contains dangerous characters
         """
+        # Security: Sanitize prompt before processing
+        try:
+            sanitized_prompt = _sanitize_prompt(prompt, user_id=user_id)
+        except ValueError as e:
+            logger.error(
+                "codex_prompt_validation_failed",
+                extra={
+                    "user_id": user_id,
+                    "error": str(e),
+                    "prompt_length": len(prompt),
+                }
+            )
+            raise
+
+        # Security: Validate model name
         effective_model = model or settings.CODEX_DEFAULT_MODEL
+        try:
+            validated_model = _validate_model_name(effective_model, user_id=user_id)
+        except ValueError as e:
+            logger.error(
+                "codex_model_validation_failed",
+                extra={
+                    "user_id": user_id,
+                    "model": effective_model,
+                    "error": str(e),
+                }
+            )
+            raise
+
         invocation_start = perf_counter()
-        prompt_chars = len(prompt)
+        prompt_chars = len(sanitized_prompt)
 
         logger.info(
             "codex_invoked",
             extra={
                 "user_id": user_id,
-                "model": effective_model,
+                "model": validated_model,
                 "stream": stream,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
@@ -75,8 +382,8 @@ class CodexLLMService:
 
         # Return the async generator by yielding from it
         async for chunk in self._stream_completion(
-            prompt=prompt,
-            model=effective_model,
+            prompt=sanitized_prompt,
+            model=validated_model,
             max_tokens=max_tokens,
             temperature=temperature,
             user_id=user_id,
@@ -94,19 +401,23 @@ class CodexLLMService:
         temperature: float,
         user_id: Optional[str],
     ) -> tuple[str, Dict[str, Any]]:
-        cmd = [
-            self.cli_path,
-            "exec",
-            "--json",
-            prompt,
-        ]
+        """
+        Internal method for non-streaming completions.
 
-        if model:
-            cmd.extend(["--model", model])
+        Security: Assumes prompt and model are already validated by public method.
+        """
+        # Build safe command (assumes inputs already validated)
+        cmd = _build_safe_command(
+            cli_path=self.cli_path,
+            prompt=prompt,
+            model=model,
+            json_mode=True,
+        )
 
         # Note: Codex CLI doesn't support --max-tokens or --temperature flags
         # These settings are applied by the CLI based on the model defaults
 
+        # Security: Using create_subprocess_exec (not shell=True) to prevent shell injection
         process = await asyncio.create_subprocess_exec(
             *cmd,
             stdout=asyncio.subprocess.PIPE,
@@ -161,21 +472,22 @@ class CodexLLMService:
         """
         Stream a completion from Codex CLI.
 
+        Security: Assumes prompt and model are already validated by public method.
         The CLI output is streamed line-by-line; consumers can decide how to buffer tokens.
         This is an async generator function that yields text chunks as they arrive.
         """
-        cmd = [
-            self.cli_path,
-            "exec",
-            prompt,
-        ]
-
-        if model:
-            cmd.extend(["--model", model])
+        # Build safe command (assumes inputs already validated)
+        cmd = _build_safe_command(
+            cli_path=self.cli_path,
+            prompt=prompt,
+            model=model,
+            json_mode=False,
+        )
 
         # Note: Codex CLI doesn't support --max-tokens or --temperature flags
         # These settings are applied by the CLI based on the model defaults
 
+        # Security: Using create_subprocess_exec (not shell=True) to prevent shell injection
         process = await asyncio.create_subprocess_exec(
             *cmd,
             stdout=asyncio.subprocess.PIPE,
@@ -447,5 +759,28 @@ Response:"""
         return "".join(chunks)
 
 
-# Singleton instance
-codex_llm = CodexLLMService()
+# Singleton instance - lazy initialization to allow tests to mock CLI path validation
+_codex_llm_instance: Optional[CodexLLMService] = None
+
+
+def get_codex_llm() -> CodexLLMService:
+    """
+    Get or create the singleton CodexLLMService instance.
+
+    Lazy initialization allows tests to mock CLI path validation.
+    """
+    global _codex_llm_instance
+    if _codex_llm_instance is None:
+        _codex_llm_instance = CodexLLMService()
+    return _codex_llm_instance
+
+
+# Backwards compatibility property-style access
+class _CodexLLMLazyProxy:
+    """Lazy proxy for codex_llm singleton to defer initialization until first use."""
+
+    def __getattr__(self, name):
+        return getattr(get_codex_llm(), name)
+
+
+codex_llm = _CodexLLMLazyProxy()

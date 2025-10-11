@@ -57,6 +57,7 @@ class Settings(BaseSettings):
     CODEX_STREAM_TIMEOUT: float = 30.0  # Timeout for individual readline operations (seconds)
     CODEX_MAX_RESPONSE_SIZE: int = 1024 * 1024  # Maximum accumulated response size (1MB)
     CODEX_PROCESS_CLEANUP_TIMEOUT: float = 5.0  # Timeout for process cleanup in finally block (seconds)
+    CODEX_MAX_PROMPT_LENGTH: int = 51200  # Maximum prompt size (50KB) - security limit to prevent memory exhaustion
 
     # Gemini Embeddings
     GEMINI_API_KEY: str | None = None
