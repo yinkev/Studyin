@@ -680,6 +680,7 @@ class CodexLLMService:
         topic: str,
         difficulty: int,
         num_questions: int = 5,
+        context: str | None = None,
     ) -> List[Dict]:
         """
         Generate NBME-style medical questions using Codex.
@@ -692,10 +693,13 @@ class CodexLLMService:
         Returns:
             List of question dictionaries
         """
-        prompt = f"""Generate {num_questions} NBME-style USMLE Step 1 multiple choice questions about {topic}.
-Difficulty level: {difficulty}/5
-Format: Return JSON array with objects containing: question, options (array of 4), correct_index, explanation.
-"""
+        base = f"Generate {num_questions} NBME-style USMLE Step 1 multiple choice questions about {topic}.\n"
+        ctx = f"Context (from the student's materials):\n{context}\n\n" if context else ""
+        guide = (
+            "Difficulty level: "
+            f"{difficulty}/5\nFormat: Return JSON array with objects containing: question, options (array of 4), correct_index, explanation.\n"
+        )
+        prompt = f"""{base}{ctx}{guide}"""
         # Collect all chunks from the async generator
         chunks = []
         async for chunk in self.generate_completion(prompt, model="gpt-5"):

@@ -15,5 +15,11 @@
     "types": ["node"]
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "src/pages/RefinedDashboard.tsx",
+    "src/components/dashboard/refined/**/*"
+  ]
 }

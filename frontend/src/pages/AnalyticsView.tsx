@@ -89,12 +89,12 @@ export function AnalyticsView({ onNavigate }: AnalyticsViewProps) {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-10">
       {/* Header */}
-      <header className="soft-card pixel-border bg-gradient-to-br from-white/90 via-white/70 to-primary/10 px-8 py-10">
+      <header className="soft-card pixel-border glass px-8 py-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="kawaii-icon size-16 text-4xl" aria-hidden="true">
-              📊
-            </span>
+            <div className="size-12 flex items-center justify-center rounded-xl bg-primary/10" aria-hidden="true">
+              <span className="text-primary text-xl">▦</span>
+            </div>
             <div>
               <h1 className="text-brutalist text-foreground">Your Learning Analytics</h1>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -147,11 +147,7 @@ export function AnalyticsView({ onNavigate }: AnalyticsViewProps) {
               </div>
             </div>
             <div className="h-2 w-32 overflow-hidden rounded-full bg-muted/70">
-              <div
-                className="h-full bg-gradient-to-r from-accent via-primary to-secondary transition-all duration-500 ease-soft-bounce"
-                style={{ width: `${totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0}%` }}
-                aria-hidden="true"
-              />
+              <div className="h-full bg-primary transition-all duration-500 ease-soft-bounce" style={{ width: `${totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0}%` }} aria-hidden="true" />
             </div>
           </div>
 

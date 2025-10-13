@@ -28,8 +28,7 @@ export function XPBar({ currentXP, targetXP, level, label = 'XP to next level', 
   return (
     <section
       className={cn(
-        'soft-card pixel-border overflow-hidden',
-        'bg-gradient-to-br from-white/90 via-white/70 to-primary/10',
+        'soft-card pixel-border overflow-hidden glass',
         className
       )}
       aria-live="polite"
@@ -53,7 +52,7 @@ export function XPBar({ currentXP, targetXP, level, label = 'XP to next level', 
       </div>
 
       <div
-        className="relative mt-6 h-5 w-full overflow-hidden rounded-full border border-white/60 bg-gradient-to-r from-white to-white/40 shadow-inner"
+        className="relative mt-6 h-5 w-full overflow-hidden rounded-full border border-white/60 bg-white/60 shadow-inner"
         role="progressbar"
         aria-valuenow={progressPercent}
         aria-valuemin={0}
@@ -62,7 +61,7 @@ export function XPBar({ currentXP, targetXP, level, label = 'XP to next level', 
       >
         <div
           className={cn(
-            'absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary via-secondary to-accent',
+            'absolute inset-y-0 left-0 rounded-full bg-primary',
             'shadow-soft-button transition-all duration-500 ease-soft-bounce'
           )}
           style={{ width: `${clamp(progressPercent, 0, 100)}%` }}

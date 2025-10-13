@@ -10,6 +10,11 @@ from app.api import auth as auth_routes
 from app.api import chat as chat_routes
 from app.api import materials as materials_routes
 from app.api import analytics as analytics_routes
+from app.api import reviews as reviews_routes
+from app.api import insights as insights_routes
+from app.api import questions as questions_routes
+from app.api import teach as teach_routes
+from app.api import digests as digests_routes
 from app.core.logging_config import setup_logging
 from app.core.startup import lifespan
 from app.middleware.csrf import validate_csrf_token
@@ -97,4 +102,9 @@ app.include_router(auth_routes.router)
 app.include_router(materials_routes.router, prefix="/api/materials", tags=["materials"])
 app.include_router(chat_routes.router)
 app.include_router(analytics_routes.router)
+app.include_router(reviews_routes.router)
+app.include_router(insights_routes.router)
+app.include_router(questions_routes.router)
+app.include_router(teach_routes.router)
+app.include_router(digests_routes.router)
 app.include_router(health_router, prefix="/health", tags=["health"])

@@ -1,0 +1,400 @@
+/**
+ * StudyIn Design System 2025 - REFINED EDITION
+ * Professional medical education dashboard
+ * Modern, clean, accessible design with subtle depth
+ * NO GRADIENTS - sophisticated solid colors with minimal effects
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* === REFINED OKLCH COLOR SYSTEM === */
+  /* Professional palette - fewer colors, more cohesion */
+
+  /* Deep Indigo Background (sophisticated dark) */
+  --bg-deepest: oklch(0.14 0.015 265);      /* Deep navy-indigo */
+  --bg-deep: oklch(0.16 0.015 265);         /* Primary background */
+  --bg-surface: oklch(0.19 0.012 265);      /* Surface layer */
+  --bg-elevated: oklch(0.22 0.012 265);     /* Elevated surfaces */
+
+  /* Primary Palette - Refined Indigo (professional, medical) */
+  --color-primary-50: oklch(0.96 0.008 265);
+  --color-primary-100: oklch(0.92 0.015 265);
+  --color-primary-200: oklch(0.84 0.030 265);
+  --color-primary-300: oklch(0.72 0.055 265);
+  --color-primary-400: oklch(0.62 0.085 265);
+  --color-primary-500: oklch(0.55 0.110 265);  /* Main indigo - sophisticated */
+  --color-primary-600: oklch(0.48 0.100 265);
+  --color-primary-700: oklch(0.40 0.085 265);
+  --color-primary-800: oklch(0.32 0.065 265);
+  --color-primary-900: oklch(0.24 0.045 265);
+
+  /* Accent Palette - Vibrant Cyan (attention, CTAs) */
+  --color-accent-50: oklch(0.96 0.008 210);
+  --color-accent-100: oklch(0.90 0.020 210);
+  --color-accent-200: oklch(0.82 0.045 210);
+  --color-accent-300: oklch(0.74 0.075 210);
+  --color-accent-400: oklch(0.68 0.095 210);
+  --color-accent-500: oklch(0.65 0.115 210);  /* Bright cyan - purposeful */
+  --color-accent-600: oklch(0.58 0.100 210);
+  --color-accent-700: oklch(0.50 0.085 210);
+  --color-accent-800: oklch(0.42 0.065 210);
+  --color-accent-900: oklch(0.34 0.045 210);
+
+  /* Success - Medical Green */
+  --color-success-400: oklch(0.70 0.095 155);
+  --color-success-500: oklch(0.65 0.110 155);
+  --color-success-600: oklch(0.58 0.095 155);
+
+  /* Warning - Amber */
+  --color-warning-400: oklch(0.78 0.095 70);
+  --color-warning-500: oklch(0.72 0.110 70);
+  --color-warning-600: oklch(0.65 0.095 70);
+
+  /* Error - Red */
+  --color-error-400: oklch(0.62 0.125 15);
+  --color-error-500: oklch(0.55 0.145 15);
+  --color-error-600: oklch(0.48 0.125 15);
+
+  /* Neutral Palette - True neutrals with minimal hue */
+  --color-neutral-50: oklch(0.16 0.005 265);    /* Near background */
+  --color-neutral-100: oklch(0.20 0.005 265);
+  --color-neutral-200: oklch(0.28 0.005 265);
+  --color-neutral-300: oklch(0.38 0.005 265);
+  --color-neutral-400: oklch(0.50 0.005 265);
+  --color-neutral-500: oklch(0.62 0.005 265);
+  --color-neutral-600: oklch(0.74 0.005 265);
+  --color-neutral-700: oklch(0.84 0.005 265);
+  --color-neutral-800: oklch(0.92 0.005 265);
+  --color-neutral-900: oklch(0.97 0.005 265);   /* Crisp white */
+
+  /* === SEMANTIC COLORS === */
+  --background: var(--bg-deep);
+  --foreground: var(--color-neutral-900);
+
+  --surface: var(--bg-surface);
+  --surface-elevated: var(--bg-elevated);
+
+  --card: var(--bg-surface);
+  --card-foreground: var(--color-neutral-900);
+
+  --primary: var(--color-primary-500);
+  --primary-foreground: oklch(1 0 0);
+
+  --accent: var(--color-accent-500);
+  --accent-foreground: oklch(0.98 0 0);
+
+  --success: var(--color-success-500);
+  --success-foreground: oklch(0.98 0 0);
+
+  --warning: var(--color-warning-500);
+  --warning-foreground: oklch(0.12 0 0);
+
+  --error: var(--color-error-500);
+  --error-foreground: oklch(1 0 0);
+
+  --muted: var(--color-neutral-200);
+  --muted-foreground: var(--color-neutral-500);
+
+  --border: oklch(0.25 0.010 265);
+  --border-subtle: oklch(0.20 0.008 265);
+  --input: var(--bg-elevated);
+  --ring: var(--color-primary-400);
+
+  /* === REFINED GLASSMORPHISM === */
+  /* Subtle, purposeful - not everywhere */
+  --glass-background: oklch(0.19 0.012 265 / 0.85);
+  --glass-border: oklch(0.35 0.020 265 / 0.25);
+  --glass-shadow: 0 4px 24px oklch(0.08 0.020 265 / 0.35);
+  --glass-blur: 12px;
+
+  /* Elevated glass for important cards */
+  --glass-elevated-bg: oklch(0.22 0.015 265 / 0.90);
+  --glass-elevated-border: oklch(0.42 0.030 265 / 0.35);
+  --glass-elevated-shadow: 0 8px 32px oklch(0.08 0.025 265 / 0.45),
+                           0 0 0 1px oklch(0.42 0.030 265 / 0.15);
+
+  /* === REFINED GLOW EFFECTS === */
+  /* Subtle, purposeful - only for emphasis */
+  --glow-primary-subtle: 0 0 24px oklch(0.55 0.110 265 / 0.25);
+  --glow-accent-subtle: 0 0 24px oklch(0.65 0.115 210 / 0.30);
+  --glow-success-subtle: 0 0 24px oklch(0.65 0.110 155 / 0.25);
+
+  /* Strong glow for CTAs and important elements */
+  --glow-accent-strong: 0 0 32px oklch(0.65 0.115 210 / 0.45),
+                        0 0 64px oklch(0.65 0.115 210 / 0.20);
+
+  /* === REFINED ELEVATION SYSTEM === */
+  /* Clean, subtle shadows */
+  --shadow-xs: 0 1px 2px oklch(0.08 0.015 265 / 0.15);
+  --shadow-sm: 0 2px 8px oklch(0.08 0.015 265 / 0.20);
+  --shadow-md: 0 4px 16px oklch(0.08 0.020 265 / 0.25);
+  --shadow-lg: 0 8px 32px oklch(0.08 0.020 265 / 0.30);
+  --shadow-xl: 0 16px 48px oklch(0.08 0.025 265 / 0.35);
+
+  /* === SPACING SCALE === */
+  /* 4px base, harmonious scale */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+
+  /* === BORDER RADIUS === */
+  --radius-xs: 0.375rem;  /* 6px */
+  --radius-sm: 0.5rem;    /* 8px */
+  --radius-md: 0.75rem;   /* 12px */
+  --radius-lg: 1rem;      /* 16px */
+  --radius-xl: 1.5rem;    /* 24px */
+  --radius-2xl: 2rem;     /* 32px */
+  --radius-full: 9999px;
+
+  /* === TYPOGRAPHY === */
+  /* Professional, readable fonts */
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: 'Inter Variable', var(--font-sans);
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+  /* Font Sizes - Type Scale */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-black: 900;
+
+  /* Line Heights - Optimal for readability */
+  --leading-none: 1;
+  --leading-tight: 1.25;   /* Headings */
+  --leading-snug: 1.375;   /* Subheadings */
+  --leading-normal: 1.5;   /* Body text */
+  --leading-relaxed: 1.625; /* Long-form */
+  --leading-loose: 1.75;
+
+  /* Letter Spacing */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+
+  /* === ANIMATION === */
+  /* Smooth, professional transitions */
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slower: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Easing curves */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Spring physics for Motion */
+  --spring-smooth: { stiffness: 100, damping: 18 };
+  --spring-snappy: { stiffness: 200, damping: 20 };
+  --spring-bouncy: { stiffness: 300, damping: 25 };
+
+  /* === Z-INDEX SCALE === */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-fixed: 1200;
+  --z-modal-backdrop: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-tooltip: 1600;
+  --z-toast: 1700;
+}
+
+/* === UTILITY CLASSES === */
+
+/* Glass effects - USE SPARINGLY */
+.glass {
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-elevated {
+  background: var(--glass-elevated-bg);
+  border: 1px solid var(--glass-elevated-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-elevated-shadow);
+}
+
+/* Solid surfaces - PREFERRED for most content */
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-elevated {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+/* Color backgrounds */
+.bg-primary { background-color: var(--primary); }
+.bg-accent { background-color: var(--accent); }
+.bg-success { background-color: var(--success); }
+.bg-warning { background-color: var(--warning); }
+.bg-error { background-color: var(--error); }
+
+/* Text colors */
+.text-primary { color: var(--primary); }
+.text-accent { color: var(--accent); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-error { color: var(--error); }
+
+/* Glow effects - USE VERY SPARINGLY */
+.glow-primary-subtle { box-shadow: var(--glow-primary-subtle); }
+.glow-accent-subtle { box-shadow: var(--glow-accent-subtle); }
+.glow-accent-strong { box-shadow: var(--glow-accent-strong); }
+
+/* Shadows */
+.shadow-xs { box-shadow: var(--shadow-xs); }
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* === ACCESSIBILITY === */
+
+/* Focus visible states - WCAG 2.2 compliant */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* High contrast focus for interactive elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Keyboard navigation indicator */
+.focus-ring {
+  transition: box-shadow var(--transition-fast);
+}
+
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 4px oklch(0.55 0.110 265 / 0.30);
+}
+
+/* === PERFORMANCE === */
+
+/* Reduce effects for low-end devices or user preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .glass,
+  .glass-elevated {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+}
+
+/* Reduce transparency for better readability */
+@media (prefers-contrast: high) {
+  .glass,
+  .glass-elevated {
+    background: var(--surface);
+    border: 2px solid var(--border);
+  }
+}
+
+/* === COMPONENT-SPECIFIC TOKENS === */
+
+/* Cards */
+.card-default {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
+}
+
+.card-interactive {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card-featured {
+  background: var(--glass-elevated-bg);
+  border: 1px solid var(--glass-elevated-border);
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-elevated-shadow);
+  border-radius: var(--radius-xl);
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: var(--glow-primary-subtle);
+  transition: all var(--transition-base);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-600);
+  box-shadow: var(--shadow-md), var(--glow-primary-subtle);
+  transform: translateY(-1px);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  box-shadow: var(--glow-accent-subtle);
+  transition: all var(--transition-base);
+}
+
+.btn-accent:hover {
+  background: var(--color-accent-600);
+  box-shadow: var(--glow-accent-strong);
+  transform: translateY(-1px);
+}

@@ -1,0 +1,315 @@
+/**
+ * StudyIn Design System 2025 - COSMIC THEME
+ * Space-themed medical education dashboard
+ * NO GRADIENTS - solid colors with depth through glassmorphism + glow effects
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* === OKLCH COSMIC COLOR SYSTEM === */
+  /* Space-themed palette with solid colors only */
+
+  /* Deep Space Background */
+  --bg-space-deepest: oklch(0.12 0.02 250);    /* Near-black space */
+  --bg-space-deep: oklch(0.15 0.02 250);       /* Very dark blue-purple */
+  --bg-space-medium: oklch(0.20 0.03 250);     /* Dark nebula */
+  --bg-space-light: oklch(0.25 0.03 250);      /* Lighter cosmic layer */
+
+  /* Primary Palette - Cosmic Purple/Blue */
+  --color-primary-50: oklch(0.95 0.03 280);
+  --color-primary-100: oklch(0.90 0.05 280);
+  --color-primary-200: oklch(0.82 0.10 280);
+  --color-primary-300: oklch(0.70 0.15 280);
+  --color-primary-400: oklch(0.62 0.18 280);
+  --color-primary-500: oklch(0.55 0.20 280);  /* Main cosmic purple */
+  --color-primary-600: oklch(0.48 0.18 280);
+  --color-primary-700: oklch(0.40 0.15 280);
+  --color-primary-800: oklch(0.32 0.12 280);
+  --color-primary-900: oklch(0.24 0.08 280);
+
+  /* Secondary Palette - Star Blue */
+  --color-secondary-50: oklch(0.95 0.03 230);
+  --color-secondary-100: oklch(0.88 0.06 230);
+  --color-secondary-200: oklch(0.78 0.12 230);
+  --color-secondary-300: oklch(0.68 0.16 230);
+  --color-secondary-400: oklch(0.60 0.18 230);
+  --color-secondary-500: oklch(0.54 0.19 230);  /* Bright star blue */
+  --color-secondary-600: oklch(0.48 0.17 230);
+  --color-secondary-700: oklch(0.40 0.14 230);
+  --color-secondary-800: oklch(0.32 0.11 230);
+  --color-secondary-900: oklch(0.24 0.08 230);
+
+  /* Accent Palette - Nebula Teal/Cyan */
+  --color-accent-50: oklch(0.95 0.03 200);
+  --color-accent-100: oklch(0.88 0.06 200);
+  --color-accent-200: oklch(0.78 0.12 200);
+  --color-accent-300: oklch(0.70 0.15 200);
+  --color-accent-400: oklch(0.65 0.16 200);
+  --color-accent-500: oklch(0.60 0.17 200);  /* Nebula teal */
+  --color-accent-600: oklch(0.54 0.15 200);
+  --color-accent-700: oklch(0.46 0.13 200);
+  --color-accent-800: oklch(0.38 0.10 200);
+  --color-accent-900: oklch(0.30 0.07 200);
+
+  /* Aurora Palette - Pink/Magenta for achievements */
+  --color-aurora-50: oklch(0.95 0.03 340);
+  --color-aurora-100: oklch(0.88 0.06 340);
+  --color-aurora-200: oklch(0.78 0.12 340);
+  --color-aurora-300: oklch(0.72 0.15 340);
+  --color-aurora-400: oklch(0.68 0.17 340);
+  --color-aurora-500: oklch(0.63 0.18 340);  /* Aurora pink */
+  --color-aurora-600: oklch(0.56 0.16 340);
+  --color-aurora-700: oklch(0.48 0.14 340);
+  --color-aurora-800: oklch(0.40 0.11 340);
+  --color-aurora-900: oklch(0.32 0.08 340);
+
+  /* Stardust Palette - Warm Gold for highlights */
+  --color-stardust-50: oklch(0.98 0.02 80);
+  --color-stardust-100: oklch(0.92 0.05 80);
+  --color-stardust-200: oklch(0.85 0.10 80);
+  --color-stardust-300: oklch(0.78 0.14 80);
+  --color-stardust-400: oklch(0.72 0.16 80);
+  --color-stardust-500: oklch(0.68 0.17 80);  /* Golden stardust */
+  --color-stardust-600: oklch(0.62 0.15 80);
+  --color-stardust-700: oklch(0.54 0.13 80);
+  --color-stardust-800: oklch(0.46 0.10 80);
+  --color-stardust-900: oklch(0.38 0.07 80);
+
+  /* Neutral Palette - Space Gray with subtle blue tint */
+  --color-neutral-50: oklch(0.18 0.01 250);    /* Deep space gray */
+  --color-neutral-100: oklch(0.22 0.01 250);
+  --color-neutral-200: oklch(0.28 0.01 250);
+  --color-neutral-300: oklch(0.35 0.01 250);
+  --color-neutral-400: oklch(0.45 0.01 250);
+  --color-neutral-500: oklch(0.55 0.01 250);
+  --color-neutral-600: oklch(0.70 0.01 250);
+  --color-neutral-700: oklch(0.82 0.01 250);
+  --color-neutral-800: oklch(0.90 0.01 250);
+  --color-neutral-900: oklch(0.96 0.01 250);   /* Bright white-blue */
+
+  /* === SEMANTIC COLORS (Cosmic Theme) === */
+  --background: var(--bg-space-deep);           /* Deep space background */
+  --foreground: var(--color-neutral-900);       /* Bright text */
+
+  --card: var(--bg-space-medium);               /* Card backgrounds */
+  --card-foreground: var(--color-neutral-900);
+
+  --primary: var(--color-primary-500);          /* Cosmic purple */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: var(--color-secondary-500);      /* Star blue */
+  --secondary-foreground: oklch(1 0 0);
+
+  --accent: var(--color-accent-500);            /* Nebula teal */
+  --accent-foreground: oklch(1 0 0);
+
+  --aurora: var(--color-aurora-500);            /* Achievement pink */
+  --aurora-foreground: oklch(1 0 0);
+
+  --stardust: var(--color-stardust-500);        /* Golden highlights */
+  --stardust-foreground: oklch(0 0 0);
+
+  --muted: var(--color-neutral-200);
+  --muted-foreground: var(--color-neutral-600);
+
+  --destructive: oklch(0.60 0.22 10);           /* Red warning */
+  --destructive-foreground: oklch(1 0 0);
+
+  --border: oklch(0.30 0.05 250 / 0.3);         /* Subtle cosmic border */
+  --input: var(--bg-space-light);
+  --ring: var(--color-primary-400);
+
+  /* === COSMIC GLASSMORPHISM === */
+  /* NO GRADIENTS - frosted glass with cosmic tint */
+  --glass-background: oklch(0.20 0.03 250 / 0.4);
+  --glass-border: oklch(0.50 0.10 280 / 0.2);
+  --glass-shadow: 0 8px 32px oklch(0.10 0.05 250 / 0.5);
+  --glass-blur: 16px;
+
+  /* Cosmic Glass Variants */
+  --glass-purple: oklch(0.25 0.08 280 / 0.35);
+  --glass-blue: oklch(0.25 0.08 230 / 0.35);
+  --glass-teal: oklch(0.25 0.08 200 / 0.35);
+  --glass-pink: oklch(0.25 0.08 340 / 0.35);
+
+  /* Glow Effects (NO GRADIENTS - solid color shadows) */
+  --glow-primary: 0 0 20px oklch(0.55 0.20 280 / 0.4),
+                  0 0 40px oklch(0.55 0.20 280 / 0.2);
+  --glow-secondary: 0 0 20px oklch(0.54 0.19 230 / 0.4),
+                    0 0 40px oklch(0.54 0.19 230 / 0.2);
+  --glow-accent: 0 0 20px oklch(0.60 0.17 200 / 0.4),
+                 0 0 40px oklch(0.60 0.17 200 / 0.2);
+  --glow-aurora: 0 0 20px oklch(0.63 0.18 340 / 0.4),
+                 0 0 40px oklch(0.63 0.18 340 / 0.2);
+  --glow-stardust: 0 0 20px oklch(0.68 0.17 80 / 0.5),
+                   0 0 40px oklch(0.68 0.17 80 / 0.3);
+
+  /* === COSMIC ELEVATION SYSTEM === */
+  /* Soft shadows with cosmic glow */
+  --elevation-1: 0 2px 8px oklch(0.10 0.05 250 / 0.3);
+  --elevation-2: 0 4px 16px oklch(0.10 0.05 250 / 0.4);
+  --elevation-3: 0 8px 24px oklch(0.10 0.05 250 / 0.5);
+  --elevation-4: 0 16px 48px oklch(0.10 0.05 250 / 0.6);
+
+  /* === Spacing Scale === */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.5rem;    /* 24px */
+  --space-6: 2rem;      /* 32px */
+  --space-8: 3rem;      /* 48px */
+  --space-10: 4rem;     /* 64px */
+  --space-12: 6rem;     /* 96px */
+
+  /* === Border Radius === */
+  --radius-sm: 0.5rem;   /* 8px */
+  --radius-md: 0.75rem;  /* 12px */
+  --radius-lg: 1rem;     /* 16px */
+  --radius-xl: 1.5rem;   /* 24px */
+  --radius-2xl: 2rem;    /* 32px */
+  --radius-full: 9999px;
+
+  /* === Typography === */
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', var(--font-sans);
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+
+  /* Line Heights (Optimal readability) */
+  --leading-tight: 1.25;   /* Headings */
+  --leading-snug: 1.375;   /* Subheadings */
+  --leading-normal: 1.5;   /* Body text */
+  --leading-relaxed: 1.625; /* Long-form content */
+
+  /* === Animation === */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Spring Physics (for Motion library) */
+  --spring-stiff: 100;
+  --spring-damping: 15;
+  --spring-mass: 1;
+
+  /* === Z-Index Scale === */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-fixed: 1200;
+  --z-modal-backdrop: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-tooltip: 1600;
+  --z-toast: 1700;
+}
+
+/* === Cosmic Theme IS Dark Mode === */
+/* No light mode toggle - always cosmic */
+
+/* === COSMIC UTILITY CLASSES === */
+
+/* Glassmorphism variants */
+.glass {
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-purple {
+  background: var(--glass-purple);
+  border: 1px solid oklch(0.55 0.20 280 / 0.3);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glow-primary);
+}
+
+.glass-blue {
+  background: var(--glass-blue);
+  border: 1px solid oklch(0.54 0.19 230 / 0.3);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glow-secondary);
+}
+
+.glass-teal {
+  background: var(--glass-teal);
+  border: 1px solid oklch(0.60 0.17 200 / 0.3);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glow-accent);
+}
+
+.glass-pink {
+  background: var(--glass-pink);
+  border: 1px solid oklch(0.63 0.18 340 / 0.3);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glow-aurora);
+}
+
+/* NO GRADIENTS - Solid color backgrounds */
+.bg-primary { background-color: var(--primary); }
+.bg-secondary { background-color: var(--secondary); }
+.bg-accent { background-color: var(--accent); }
+.bg-aurora { background-color: var(--aurora); }
+.bg-stardust { background-color: var(--stardust); }
+
+/* Text colors */
+.text-primary { color: var(--primary); }
+.text-secondary { color: var(--secondary); }
+.text-accent { color: var(--accent); }
+.text-aurora { color: var(--aurora); }
+.text-stardust { color: var(--stardust); }
+
+/* Glow effects (NO GRADIENTS - only shadows) */
+.glow-primary { box-shadow: var(--glow-primary); }
+.glow-secondary { box-shadow: var(--glow-secondary); }
+.glow-accent { box-shadow: var(--glow-accent); }
+.glow-aurora { box-shadow: var(--glow-aurora); }
+.glow-stardust { box-shadow: var(--glow-stardust); }
+
+/* Elevation utilities */
+.elevation-1 { box-shadow: var(--elevation-1); }
+.elevation-2 { box-shadow: var(--elevation-2); }
+.elevation-3 { box-shadow: var(--elevation-3); }
+.elevation-4 { box-shadow: var(--elevation-4); }
+
+/* Accessibility: Focus visible states */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* High contrast focus for interactive elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+
+/* Performance: Reduce glassmorphism for low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .glass,
+  .glass-dark {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+}

@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Upload, MessageSquare, BarChart3 } from 'lucide-react';
-import { XPBar } from '@/components/gamification/XPBar';
-import { StreakCounter } from '@/components/gamification/StreakCounter';
-import { LevelBadge } from '@/components/gamification/LevelBadge';
+import { LayoutDashboard, Upload, MessageSquare, BarChart3, Stethoscope } from 'lucide-react';
+import { ModernXPBar } from '@/components/dashboard/ModernXPBar';
+import { ModernStreakCard } from '@/components/dashboard/ModernStreakCard';
+import { LevelCard } from '@/components/dashboard/LevelCard';
 
-export type View = 'dashboard' | 'upload' | 'chat' | 'analytics';
+export type View = 'dashboard' | 'upload' | 'chat' | 'analytics' | 'quiz' | 'settings';
 
 interface NavBarProps {
   currentView: View;
@@ -28,8 +28,8 @@ export function NavBar({ currentView, onNavigate, stats }: NavBarProps) {
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="relative flex items-center gap-3">
-              <span className="kawaii-icon size-12 text-2xl" aria-hidden="true">
-                🌸
+              <span className="size-12 flex items-center justify-center rounded-xl bg-primary/10" aria-hidden="true">
+                <Stethoscope className="w-6 h-6 text-primary" />
               </span>
               <div>
                 <p className="text-brutalist text-lg leading-none text-foreground">StudyIn</p>
@@ -45,14 +45,25 @@ export function NavBar({ currentView, onNavigate, stats }: NavBarProps) {
               variant={currentView === 'dashboard' ? 'default' : 'ghost'}
               onClick={() => onNavigate('dashboard')}
               className="gap-2 text-sm"
+              data-testid="nav-dashboard"
             >
               <LayoutDashboard className="size-4" aria-hidden="true" />
               Dashboard
             </Button>
             <Button
+              variant={currentView === 'quiz' ? 'default' : 'ghost'}
+              onClick={() => onNavigate('quiz')}
+              className="gap-2 text-sm"
+              data-testid="nav-quiz"
+            >
+              <MessageSquare className="size-4" aria-hidden="true" />
+              Practice
+            </Button>
+            <Button
               variant={currentView === 'analytics' ? 'default' : 'ghost'}
               onClick={() => onNavigate('analytics')}
               className="gap-2 text-sm"
+              data-testid="nav-analytics"
             >
               <BarChart3 className="size-4" aria-hidden="true" />
               Analytics
@@ -61,6 +72,7 @@ export function NavBar({ currentView, onNavigate, stats }: NavBarProps) {
               variant={currentView === 'upload' ? 'default' : 'ghost'}
               onClick={() => onNavigate('upload')}
               className="gap-2 text-sm"
+              data-testid="nav-upload"
             >
               <Upload className="size-4" aria-hidden="true" />
               Upload
@@ -69,6 +81,7 @@ export function NavBar({ currentView, onNavigate, stats }: NavBarProps) {
               variant={currentView === 'chat' ? 'default' : 'ghost'}
               onClick={() => onNavigate('chat')}
               className="gap-2 text-sm"
+              data-testid="nav-chat"
             >
               <MessageSquare className="size-4" aria-hidden="true" />
               Chat
@@ -77,25 +90,21 @@ export function NavBar({ currentView, onNavigate, stats }: NavBarProps) {
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          <LevelBadge
+          <LevelCard
             level={stats.level}
-            masteryPercent={stats.masteryPercent ?? Math.min((stats.currentXP / stats.targetXP) * 100, 100)}
-            title="Resident"
-            className="px-4 py-4"
+            masteryPercent={stats.masteryPercent ?? Math.min((stats.currentXP / Math.max(stats.targetXP,1)) * 100, 100)}
+            className="px-4 py-4 glass"
           />
-          <XPBar
+          <ModernXPBar
             level={stats.level}
             currentXP={stats.currentXP}
             targetXP={stats.targetXP}
-            label="Today's focus XP"
-            className="px-4 py-4"
+            className="px-4 py-4 glass"
           />
-          <StreakCounter
-            variant="compact"
+          <ModernStreakCard
             streak={stats.streak}
-            bestStreak={stats.bestStreak}
+            bestStreak={stats.bestStreak ?? stats.streak}
             lastCheckIn={stats.lastCheckIn}
-            goalMinutes={stats.goalMinutes}
             className="px-4 py-4"
           />
         </div>
