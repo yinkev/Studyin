@@ -36,6 +36,7 @@ export function useChatSessionOptimized(options: OptimizedChatSessionOptions = {
   const [lastError, setLastError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(!lazyConnect);
   const [effortState, setEffortState] = useState<'minimal' | 'low' | 'medium' | 'high'>(options.effort ?? 'high');
+  const [verbosityState, setVerbosityState] = useState<'concise' | 'balanced' | 'detailed'>('balanced');
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
@@ -158,6 +159,7 @@ export function useChatSessionOptimized(options: OptimizedChatSessionOptions = {
       user_level: options.userLevel ?? 3,
       profile: options.profile ?? 'studyin_fast',
       effort: effortState,
+      verbosity: verbosityState,
     };
 
     // Send or queue message
@@ -225,6 +227,10 @@ export function useChatSessionOptimized(options: OptimizedChatSessionOptions = {
     } catch {}
   }, []);
 
+  const setVerbosity = useCallback((verbosity: 'concise' | 'balanced' | 'detailed') => {
+    setVerbosityState(verbosity);
+  }, []);
+
   return {
     status,
     isOnline,
@@ -239,6 +245,7 @@ export function useChatSessionOptimized(options: OptimizedChatSessionOptions = {
     setUserLevel,
     setProfile,
     setEffort,
+    setVerbosity,
     initialize, // New: manual initialization for lazy loading
   };
 }
