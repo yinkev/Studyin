@@ -53,6 +53,17 @@ apiClient.interceptors.response.use(
 
     if (response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
+
+      const storeToken = useAuthStore.getState().accessToken;
+      const requestToken = originalRequest.headers?.Authorization?.replace(/^Bearer\s+/i, '') ?? null;
+
+      if (storeToken && requestToken && requestToken !== storeToken) {
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${storeToken}`;
+        }
+        return apiClient(originalRequest);
+      }
+
       try {
         const accessToken = await refreshAccessToken();
 
@@ -62,11 +73,12 @@ apiClient.interceptors.response.use(
 
         return apiClient(originalRequest);
       } catch (refreshError) {
-        authEvents.emit('logoutForced', { reason: 'refresh_failed' });
-        useAuthStore.getState().logout();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
-        }
+        // MVP: Temporarily disabled auth redirect - using hardcoded user
+        // authEvents.emit('logoutForced', { reason: 'refresh_failed' });
+        // useAuthStore.getState().logout();
+        // if (typeof window !== 'undefined') {
+        //   window.location.href = '/login';
+        // }
         return Promise.reject(refreshError);
       }
     }

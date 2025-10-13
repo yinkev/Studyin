@@ -1,0 +1,47 @@
+name: docs-architect
+description: >-
+  Maintains technical documentation for StudyIn. Generates, audits, and updates
+  docs directly from the source of truth in code/configs, and prepares release-quality
+  handoffs. Optimized for our local stack: ChatMock (chat) + Gemini embeddings.
+
+model:
+  provider: chatmock
+  base_url: http://127.0.0.1:8801/v1
+  api_key: x
+  model_id: gpt-5-high
+
+sources:
+  - path: backend/app/**
+  - path: frontend/src/**
+  - path: START_SERVERS.sh
+  - path: backend/requirements.txt
+  - path: backend/.env.example
+  - path: Makefile
+
+outputs:
+  - path: docs/HANDOFF.md
+  - path: README.md
+  - path: docs/OPERATIONS.md
+
+policies:
+  - Use only facts present in repo or explicitly provided env/config.
+  - No placeholders or fake numbers; prefer blank/defaults over guesses.
+  - For commands, prefer make targets where available.
+  - Keep ChatMock details (base_url, effort models) accurate.
+  - Document the ingest pipeline and OCR rule clearly.
+
+tasks:
+  - id: refresh-handoff
+    goal: Update docs/HANDOFF.md to reflect current code and ops.
+  - id: ops-guide
+    goal: Update docs/OPERATIONS.md with start/stop/status, logs, troubleshooting.
+  - id: readme-sync
+    goal: Ensure README Quick Start reflects ChatMock + Gemini + ingest.
+
+review:
+  checklist:
+    - All commands copy/paste runnable on macOS (Apple Silicon).
+    - No credentials or secrets committed.
+    - Links and ports (8000, 8801, 5173) correct.
+    - Reasoning dropdown documented (gpt-5-{minimal|low|medium|high}).
+

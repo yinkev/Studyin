@@ -1,0 +1,67 @@
+# OS & Editor settings
+.DS_Store
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+pip-wheel-metadata/
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.envrc
+
+# Node / Frontend
+node_modules/
+.next/
+dist/
+build/
+.parcel-cache/
+yarn-error.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Database & storage
+uploads/
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+*.bak
+pgdata/
+
+# Logs
+*.log
+logs/
+
+# Coverage / testing
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Security & secrets
+*.key
+*.pem
+*.crt
+secrets/
+

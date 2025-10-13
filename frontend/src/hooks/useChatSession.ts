@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { trackSessionStart, trackSessionEnd, trackChatMessage } from '@/lib/analytics/tracker';
 
 export type ConnectionStatus =
   | 'idle'
@@ -66,17 +67,22 @@ type ChatServerMessage =
   | ChatServerCompleteMessage
   | ChatServerErrorMessage;
 
-interface ChatSessionOptions {
+export interface ChatSessionOptions {
   url?: string;
   userLevel?: number;
   autoReconnect?: boolean;
   maxReconnectAttempts?: number;
+  profile?: string;
+  /** If false, do not connect on mount; user must click Reconnect */
+  autoConnect?: boolean;
 }
 
 interface OutboundMessage {
   type: 'user_message';
   content: string;
   user_level: number;
+  profile?: string;
+  effort?: 'minimal' | 'low' | 'medium' | 'high';
 }
 
 interface QueuedOutboundMessage {
@@ -96,6 +102,8 @@ export interface ChatSessionState {
   reconnect: () => void;
   retryLastMessage: () => void;
   setUserLevel: (level: number) => void;
+  setProfile: (profile: string) => void;
+  setEffort: (effort: 'minimal' | 'low' | 'medium' | 'high') => void;
 }
 
 const DEFAULT_WS_URL = 'ws://localhost:8000/api/chat/ws';
@@ -128,10 +136,13 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
   const [canRetry, setCanRetry] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
+  const sessionStartTimeRef = useRef<number | null>(null);
   const queueRef = useRef<QueuedOutboundMessage[]>([]);
   const reconnectAttemptsRef = useRef(0);
   const shouldReconnectRef = useRef(autoReconnect);
   const userLevelRef = useRef(options.userLevel ?? 3);
+  const profileRef = useRef(options.profile ?? 'studyin_fast');
+  const effortRef = useRef<'minimal' | 'low' | 'medium' | 'high'>('high');
   const pendingAssistantRef = useRef<string | null>(null);
   const isOnlineRef = useRef(isOnline);
   const lastSentMessageRef = useRef<{ id: string; content: string } | null>(null);
@@ -289,6 +300,13 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
         setCanRetry(false);
         reconnectAttemptsRef.current = 0;
         flushQueue();
+
+        // Track session start
+        if (!reconnecting && !sessionStartTimeRef.current) {
+          sessionStartTimeRef.current = Date.now();
+          trackSessionStart();
+        }
+
         if (reconnecting) {
           toast.success('Connection to the AI coach restored.');
         } else {
@@ -368,11 +386,24 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
   useEffect(() => {
     console.log('[WS] Main useEffect running - mounting');
     shouldReconnectRef.current = autoReconnect;
-    connect();
+    const autoConnect = options.autoConnect ?? true;
+    if (autoConnect) {
+      connect();
+    } else {
+      setStatus('closed');
+    }
 
     return () => {
       console.log('[WS] Main useEffect cleanup - unmounting');
       shouldReconnectRef.current = false;
+
+      // Track session end
+      if (sessionStartTimeRef.current) {
+        const durationMs = Date.now() - sessionStartTimeRef.current;
+        trackSessionEnd(undefined, durationMs);
+        sessionStartTimeRef.current = null;
+      }
+
       closeSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -405,10 +436,16 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
         type: 'user_message',
         content: trimmed,
         user_level: userLevelRef.current,
+        profile: profileRef.current,
+        effort: effortRef.current,
       };
 
       const socket = wsRef.current;
       lastSentMessageRef.current = { id: messageId, content: trimmed };
+
+      // Track chat message
+      trackChatMessage(trimmed.length);
+
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(payload));
         markMessageStatus(messageId, 'sent');
@@ -453,6 +490,8 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
       type: 'user_message',
       content: lastMessage.content,
       user_level: userLevelRef.current,
+      profile: profileRef.current,
+      effort: effortRef.current,
     };
 
     queueRef.current = queueRef.current.filter((item) => item.id !== lastMessage.id);
@@ -478,6 +517,35 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
     userLevelRef.current = Math.min(5, Math.max(1, Math.round(level)));
   }, []);
 
+  const setProfile = useCallback((profile: string) => {
+    if (['studyin_fast', 'studyin_study', 'studyin_deep'].includes(profile)) {
+      profileRef.current = profile;
+    }
+  }, []);
+
+  const setEffort = useCallback((effort: 'minimal' | 'low' | 'medium' | 'high') => {
+    effortRef.current = effort;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('studyin_effort', effort);
+      }
+    } catch (_) {
+      // ignore storage errors
+    }
+  }, []);
+
+  // Load persisted effort on mount
+  useEffect(() => {
+    try {
+      const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('studyin_effort') : null;
+      if (saved === 'minimal' || saved === 'low' || saved === 'medium' || saved === 'high') {
+        effortRef.current = saved;
+      }
+    } catch (_) {
+      // ignore
+    }
+  }, []);
+
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -485,6 +553,8 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
 
     const handleOnline = () => {
       setIsOnline(true);
+      // Only auto-connect on coming online if autoReconnect is enabled
+      if (!shouldReconnectRef.current) return;
       if (status === 'offline' || status === 'error' || status === 'closed') {
         reconnect();
       } else if (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED) {
@@ -521,5 +591,7 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
     reconnect,
     retryLastMessage,
     setUserLevel,
+    setProfile,
+    setEffort,
   };
 }

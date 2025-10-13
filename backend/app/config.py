@@ -49,6 +49,17 @@ class Settings(BaseSettings):
     CORS_ALLOW_METHODS: str = "GET,POST,PUT,DELETE,PATCH,OPTIONS"
     CORS_ALLOW_HEADERS: str = "Authorization,Content-Type,X-CSRF-Token"
 
+    # LLM Provider Switch
+    # - "codex_cli": use the Codex CLI integration (current/default)
+    # - "openai_chatmock": use local OpenAI-compatible server (e.g., ChatMock)
+    # - "openai_cloud": use OpenAI cloud
+    LLM_PROVIDER: str = "codex_cli"
+
+    # OpenAI-compatible settings (used when LLM_PROVIDER starts with "openai_")
+    OPENAI_BASE_URL: str | None = None  # e.g., "http://127.0.0.1:8801/v1" for ChatMock
+    OPENAI_API_KEY: str | None = None   # ChatMock accepts any non-empty value (e.g., "x")
+    OPENAI_DEFAULT_MODEL: str = "gpt-5"  # can be overridden per-request (e.g., gpt-5-high)
+
     # LLM Configuration (Codex CLI - no API keys needed!)
     CODEX_CLI_PATH: str = "/opt/homebrew/bin/codex"
     CODEX_DEFAULT_MODEL: str = "gpt-5"  # or "claude-3.5-sonnet", "gpt-5-codex", etc.
@@ -59,9 +70,10 @@ class Settings(BaseSettings):
     CODEX_PROCESS_CLEANUP_TIMEOUT: float = 5.0  # Timeout for process cleanup in finally block (seconds)
     CODEX_MAX_PROMPT_LENGTH: int = 51200  # Maximum prompt size (50KB) - security limit to prevent memory exhaustion
 
-    # Gemini Embeddings
+    # Gemini Embeddings (Text-only)
     GEMINI_API_KEY: str | None = None
-    GEMINI_EMBEDDING_MODEL: str = "text-embedding-004"
+    GEMINI_EMBEDDING_MODEL: str = "gemini-embedding-001"  # latest text embedding model
+    GEMINI_EMBEDDING_DIM: int = 1536  # recommended default; make it configurable
 
     # Monitoring
     LOG_LEVEL: str = "INFO"

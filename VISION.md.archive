@@ -1,0 +1,346 @@
+# StudyIn: Personal Medical Learning System
+
+## Current State (Week 2 MVP)
+✅ Upload PDFs → RAG retrieval → AI chat with streaming
+✅ Speed controls (reasoning: low/medium/high, verbosity: low/medium/high)
+✅ Responsive UI (mobile + desktop)
+✅ Citation sidebar (shows relevant passages)
+
+## Core Philosophy: Adaptive Multi-Modal Teaching
+
+**NOT Socratic-only** (can't answer what you don't know yet)
+**NOT Lectures** (goes over my head)
+**YES Active Learning** (interactive, iterative, scaffolded)
+
+### Three Teaching Modes (Adaptive Based on Mastery):
+
+**1. First Pass → Active Learning (Scaffolded)**
+- Build knowledge step-by-step with safety net
+- "What do you think controls blood flow?" → [Can ask "show me"]
+- Direct explanation when needed, not pure Socratic
+
+**2. Review → Deliberate Practice**
+- Spaced repetition with hints available
+- "Walk me through cardiac cycle" → [Guided if stuck]
+
+**3. Mastery → Clinical Reasoning (Socratic)**
+- Real scenarios, pure Socratic questioning
+- "68yo with EF 35%, what's happening during systole?"
+
+## Competitive Reality: What Makes This Defensible
+
+### What Already Exists (Good Products):
+- **Amboss/UWorld:** Best Qbanks + explanations ($329-429/year)
+- **Anki:** Proven spaced repetition (FREE)
+- **Osmosis:** Video learning + mnemonics ($250/year)
+
+### What's Coming (6-12 Months):
+- **All major platforms will add AI chat** (conversational tutor will be table stakes)
+- **Notion/Obsidian will add AI tutoring** (RAG over personal docs will be common)
+
+### What WON'T Be Commoditized (Your Moat):
+
+**1. Deep Personalization (Individual Learning Profile)**
+```
+Competitors: Population averages
+You: "You forget anatomy in 3 days, biochem in 1 day"
+     "You learn cardio best with diagrams first"
+     "You study best at 9pm, 25-min blocks"
+```
+
+**2. Longitudinal Relationship (2+ Year Journey)**
+```
+Mascot remembers: "You struggled with cardio in M1, crushed it in M2"
+                  "You're ready for clinical rotations now"
+Switching cost: Years of data + emotional connection
+```
+
+**3. Adaptive Multi-Modal Teaching**
+```
+Competitors: Same format (flashcards or MCQs)
+You: First pass = active learning
+     Review = practice questions
+     Mastery = clinical scenarios
+     (Adapts per topic based on YOUR mastery)
+```
+
+**4. Fully Dynamic (Not Hardcoded)**
+```
+Competitors: Hardcoded topics, prerequisites, questions
+You: LLM extracts topics from YOUR content
+     LLM detects prerequisites dynamically
+     LLM generates questions from YOUR PDFs
+```
+
+### Why Someone Would Use This (Instead of Amboss/Anki):
+1. ✅ Want to learn from THEIR school's materials (not just generic USMLE)
+2. ✅ Prefer conversation over flashcards/MCQs
+3. ✅ Want ONE tool (not juggling 3+ apps)
+4. ✅ Want personalization that improves over years
+5. ✅ Want their data to stay theirs
+
+---
+
+## Ultimate Vision: Exam Readiness Engine
+
+### The Goal
+System tells me:
+- ✅ "You're 73% ready for your in-house exam"
+- ✅ "Review these 5 topics before Wednesday"
+- ✅ "At current pace, you'll be Step 1 ready in 6 months"
+- ✅ "Your weak areas: arrhythmias, pharmacokinetics"
+
+### Adaptive Learning Specialist (Learns About YOU)
+After 2 weeks of usage, system knows:
+- Which topics you forget quickly vs. retain well
+- Which teaching styles work for which subjects
+- Your optimal study patterns (time, duration, frequency)
+- When to push harder vs. when to provide scaffolding
+
+### Mascot Personality (Like Notion AI)
+- Consistent companion through 2-4 year journey
+- Celebrates progress, encourages during struggles
+- "Haven't studied pharm in 5 days, let's review?"
+- Emotional connection reduces loneliness of studying
+
+### World-Class Algorithms (What the Best Use)
+
+**1. USMLE Question Banks (UWorld, Amboss)**
+- Item Response Theory (IRT) - measures question difficulty + your ability
+- Performance tracking by topic
+- Predictive scores based on NBME correlations
+- Adaptive difficulty (harder questions as you improve)
+
+**2. NCLEX (Nursing Boards)**
+- Computer Adaptive Testing (CAT)
+- Stops when 95% confident you pass/fail
+- Adjusts difficulty in real-time based on performance
+
+**3. Anki (Spaced Repetition)**
+- SM-2 algorithm (SuperMemo)
+- Forgetting curve prediction
+- Optimal review intervals (1 day → 3 days → 1 week → 1 month)
+
+**4. Khan Academy**
+- Knowledge graphs (prerequisites)
+- Mastery levels: attempted → familiar → proficient → mastered
+- Fills knowledge gaps before advancing
+
+**5. Duolingo**
+- Decay prediction (when you'll forget)
+- Daily goals with streak tracking
+- Adaptive difficulty per skill
+
+**6. Modern Ed-Tech (Coursera, Udacity)**
+- Bayesian Knowledge Tracing
+- Deep Learning models for performance prediction
+- Prerequisite detection (can't learn X without knowing Y)
+
+### What I Want to Build
+
+**Phase 1: Data Collection (Now - 2 weeks)**
+Track everything:
+- Every question I ask (with extracted topics)
+- What context was shown (which PDF sections)
+- How long I spent on each topic
+- Follow-up questions (indicates confusion)
+- Quiz performance (when I add practice questions)
+
+**Phase 2: Basic Analytics (Weeks 3-4)**
+- Topics studied + frequency
+- Last reviewed date
+- "Suggested reviews" based on time decay
+- Simple dashboard showing coverage
+
+**Phase 3: Spaced Repetition (Weeks 5-8)**
+- Forgetting curve per topic
+- "Review these 3 topics today"
+- Optimal scheduling (like Anki)
+- Track what I actually forget vs. retain
+
+**Phase 4: Knowledge Graph (Weeks 9-12)**
+- Auto-detect prerequisites
+- "You asked about heart failure but haven't studied cardiac cycle"
+- Suggest learning paths
+- Fill knowledge gaps before advancing
+
+**Phase 5: Exam Readiness Predictor (Months 4-6)**
+- USMLE Step 1 content outline (% per organ system)
+- My coverage vs. exam weight
+- "You've studied 8% of cardio (exam is 12%)"
+- Practice question performance → predicted score
+- "Based on current performance, predicted Step 1: 230"
+
+**Phase 6: Prescriptive AI Coach (Months 6+)**
+- Daily study plans
+- "Today: Review cardio (forgetting soon), learn 2 new pharm concepts, do 10 practice Qs"
+- Adaptive difficulty
+- Detect when I'm ready for harder material
+
+## Technical Approach
+
+### Data Model
+```python
+# Core tables needed:
+1. learning_events (every interaction)
+   - question, extracted_topics, context_chunks_used
+   - timestamp, session_duration, teaching_mode
+
+2. topic_mastery (aggregated)
+   - topic_name, exposure_count, last_studied
+   - confidence_level (learning/practicing/mastered)
+   - quiz_performance (accuracy per topic)
+
+3. content_mapping (links PDFs to topics)
+   - chunk_id → topics covered
+   - topic → prerequisites (auto-detected)
+   - topic → exam_importance_weight
+
+4. forgetting_predictions
+   - topic, last_studied, predicted_forget_date
+   - actual_forgot (did I need to review?)
+   - half_life (how long until 50% retention)
+```
+
+### Algorithms to Implement
+
+**Spaced Repetition (SM-2 inspired):**
+```python
+# After each review
+if performance_good:
+    next_interval = previous_interval * 2.5
+else:
+    next_interval = 1 day  # restart
+
+# Adjust based on actual forgetting
+if i_forgot_before_scheduled_review:
+    half_life *= 0.8  # decay faster than expected
+else:
+    half_life *= 1.1  # retain longer
+```
+
+**Exam Readiness Score:**
+```python
+readiness = sum(
+    topic_coverage[topic] * exam_weight[topic] * mastery_level[topic]
+    for topic in exam_content_outline
+)
+
+# Example:
+# Cardio: 60% covered × 12% exam weight × 70% mastery = 5.04%
+# Renal: 80% covered × 8% exam weight × 90% mastery = 5.76%
+# Total readiness: sum all = 73%
+```
+
+**Forgetting Curve (Ebbinghaus + personalized):**
+```python
+retention(t) = e^(-t / half_life)
+
+# half_life personalized per topic
+# Anatomy: might be 3 days
+# Biochem pathways: might be 1 day (harder to retain)
+```
+
+**Knowledge Graph Prerequisites:**
+```python
+# Use LLM to detect:
+"Can't understand X without knowing Y"
+
+# Build DAG:
+Cardiac Cycle → Heart Sounds → Murmurs
+             ↘ ECG → Arrhythmias
+             ↘ Heart Failure → Pharmacology
+```
+
+## Exam-Specific Adaptations
+
+### USMLE Step 1
+- Content outline: Biochem 10%, Micro 8%, Cardio 12%, etc.
+- Track coverage per system
+- Compare to UWorld averages
+- Predict score based on practice exam performance
+
+### In-House Exams
+- Upload exam objectives
+- Track coverage against those specific topics
+- "You've covered 85% of exam content, weak in: [list]"
+
+### Clinical Rotations
+- Track clinical scenarios practiced
+- "You've seen 12 cardio cases, 3 neuro, need more GI exposure"
+
+## Build Strategy: Focus on the Moat
+
+### NOW (Week 1-2): Use MVP, Find Pain Points
+- ✅ MVP works (RAG + chat + speed controls)
+- Study with it daily
+- Note what sucks
+
+### NEXT (Weeks 3-4): Data Foundation
+**Critical:** Start tracking EVERYTHING
+- Every question asked (with LLM-extracted topics)
+- Context chunks shown
+- Session duration, follow-ups
+- Teaching mode used (will add modes later)
+
+**Why:** Can't build personalization without data
+
+### THEN (Weeks 5-8): Adaptive Teaching Modes
+- Implement 3 modes (active learning, practice, clinical)
+- Track mastery level per topic
+- Auto-select mode based on exposure
+
+### AFTER (Months 3-6): The Moat Features
+1. Personal learning profile (YOUR forgetting patterns)
+2. Mascot personality (emotional connection)
+3. Exam readiness prediction (medical-specific)
+4. Dynamic knowledge graphs (LLM-detected prerequisites)
+
+### NEVER Build (Will Be Commoditized):
+❌ TypeScript migration (no user value)
+❌ Bento Grid (doesn't help learning)
+❌ Over-engineering anything
+
+### Key Principle: DYNAMIC, Not Hardcoded
+```python
+# YES: LLM extracts topics dynamically
+topics = llm.extract_topics(question, context)
+
+# NO: Hardcoded topic list
+TOPICS = ["cardiac cycle", "anatomy", ...]  # breaks with new content
+```
+
+## Success Metrics
+
+**Short-term (1 month):**
+- Am I using this daily?
+- Does it help me retain information?
+- Is it faster than searching PDFs manually?
+
+**Medium-term (3 months):**
+- Can I track what I'm forgetting?
+- Does spaced repetition improve retention?
+- Am I covering exam content systematically?
+
+**Long-term (6+ months):**
+- Does it predict my exam readiness accurately?
+- Am I scoring higher on practice exams?
+- Do I feel more confident going into exams?
+
+## Inspiration Sources
+
+- **Anki:** Spaced repetition gold standard
+- **UWorld:** Best USMLE question bank (IRT + performance tracking)
+- **Duolingo:** Gamification + decay prediction
+- **Khan Academy:** Knowledge graphs + mastery
+- **SuperMemo:** Original spaced repetition algorithm
+- **Coursera:** Adaptive learning paths
+
+## Reality Check
+
+**Current:** Working MVP, can study with it today
+**Next 2 weeks:** Use it, collect data, find pain points
+**Next 3 months:** Build analytics based on real usage
+**Next 6 months:** Exam readiness engine
+
+**Philosophy:** Build what I actually need, not what sounds cool.

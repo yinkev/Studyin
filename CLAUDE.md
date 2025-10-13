@@ -2,7 +2,35 @@
 
 > **Living Document**: Track how we use Claude Code and Codex CLI for this project
 
-Last Updated: 2025-10-09
+Last Updated: 2025-10-12
+
+---
+
+## 🎯 Project Context (READ THIS FIRST!)
+
+**This is a PERSONAL project, but it needs to WORK reliably.**
+
+### Key Facts:
+- **Owner**: Single developer (kyin) building a real medical education platform
+- **Purpose**: Functional learning tool for personal use + portfolio piece
+- **Scale**: Personal use initially, but built with production quality
+- **Standards**: It has to actually work - no cutting corners on functionality
+
+### What This Means for Claude Code:
+- ✅ **Production-quality code** - security, performance, reliability matter
+- ✅ **Focus on what works** - pragmatic solutions over theoretical perfection
+- ✅ **Real-world testing** - features need to actually function end-to-end
+- ✅ **Smart priorities** - fix critical issues, optimize high-impact areas
+- ⚖️ **Balance formality with practicality** - no bureaucracy, but don't skip important stuff
+- ❌ **Don't overwhelm with process** - skip ROI analyses, org charts, stakeholder sign-offs
+- ❌ **Don't over-engineer** - solve actual problems, not hypothetical ones
+
+### The Right Approach:
+- **Security issues that break functionality** → Fix them (they matter)
+- **Performance issues users will feel** → Fix them (they matter)
+- **Tests for critical paths** → Write them (they matter)
+- **Enterprise bureaucracy** → Skip it (doesn't matter for solo dev)
+- **Theoretical edge cases** → Defer unless they actually happen
 
 ---
 

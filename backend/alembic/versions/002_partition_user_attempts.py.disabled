@@ -1,0 +1,133 @@
+"""Add partitioning to user_question_attempts"""
+
+from __future__ import annotations
+
+from alembic import op
+
+revision = "002"
+down_revision = None  # First migration
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    op.execute(
+        """
+        CREATE TABLE user_question_attempts_new (
+            id UUID NOT NULL,
+            user_id UUID NOT NULL,
+            question_id UUID NOT NULL,
+            selected_index INTEGER NOT NULL,
+            is_correct BOOLEAN NOT NULL,
+            confidence_rating INTEGER CHECK (confidence_rating >= 1 AND confidence_rating <= 5),
+            time_taken_seconds INTEGER NOT NULL CHECK (time_taken_seconds >= 0),
+            attempt_type VARCHAR(50) NOT NULL,
+            session_id UUID,
+            answered_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+            PRIMARY KEY (id, answered_at),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+        ) PARTITION BY RANGE (answered_at);
+        """
+    )
+
+    op.execute(
+        """
+        CREATE TABLE IF NOT EXISTS user_question_attempts_archive
+        PARTITION OF user_question_attempts_new
+        DEFAULT;
+        """
+    )
+
+    op.execute(
+        """
+        DO $$
+        DECLARE
+            start_month DATE := date_trunc('month', CURRENT_DATE)::date;
+            month_offset INTEGER;
+            partition_start DATE;
+            partition_end DATE;
+            partition_suffix TEXT;
+            partition_name TEXT;
+        BEGIN
+            FOR month_offset IN 0..17 LOOP
+                partition_start := (start_month + (month_offset - 1) * INTERVAL '1 month')::date;
+                partition_end := (partition_start + INTERVAL '1 month')::date;
+                partition_suffix := to_char(partition_start, 'YYYY_MM');
+                partition_name := format('user_question_attempts_%s', partition_suffix);
+
+                EXECUTE format(
+                    'CREATE TABLE IF NOT EXISTS %I '
+                    'PARTITION OF user_question_attempts_new '
+                    'FOR VALUES FROM (%L) TO (%L);',
+                    partition_name,
+                    partition_start,
+                    partition_end
+                );
+
+                EXECUTE format(
+                    'CREATE INDEX IF NOT EXISTS idx_attempts_%s_user_id '
+                    'ON %I (user_id, answered_at);',
+                    partition_suffix,
+                    partition_name
+                );
+
+                EXECUTE format(
+                    'CREATE INDEX IF NOT EXISTS idx_attempts_%s_question_id '
+                    'ON %I (question_id);',
+                    partition_suffix,
+                    partition_name
+                );
+
+                EXECUTE format(
+                    'CREATE INDEX IF NOT EXISTS idx_attempts_%s_session_id '
+                    'ON %I (session_id) '
+                    'WHERE session_id IS NOT NULL;',
+                    partition_suffix,
+                    partition_name
+                );
+            END LOOP;
+        END $$;
+        """
+    )
+
+    op.execute(
+        """
+        DO $$
+        BEGIN
+            IF EXISTS (
+                SELECT 1 FROM information_schema.tables
+                WHERE table_name = 'user_question_attempts'
+            ) THEN
+                INSERT INTO user_question_attempts_new
+                SELECT * FROM user_question_attempts;
+                DROP TABLE user_question_attempts;
+            END IF;
+        END $$;
+        """
+    )
+
+    op.execute(
+        """
+        ALTER TABLE user_question_attempts_new
+        RENAME TO user_question_attempts;
+        """
+    )
+
+
+def downgrade() -> None:
+    op.execute(
+        """
+        CREATE TABLE user_question_attempts_backup AS
+        SELECT * FROM user_question_attempts;
+        """
+    )
+
+    op.execute("DROP TABLE user_question_attempts;")
+
+    op.execute(
+        """
+        ALTER TABLE user_question_attempts_backup
+        RENAME TO user_question_attempts;
+        """
+    )

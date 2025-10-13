@@ -34,8 +34,10 @@ ALLOWED_CLI_PATHS = frozenset({
 })
 
 # Shell metacharacters that could be used for injection
-# Note: Newlines and carriage returns are allowed in prompts (needed for formatting)
-DANGEROUS_SHELL_CHARS = re.compile(r'[;&|`$(){}[\]<>\\]')
+# Note: We use shlex.quote() + subprocess.exec (no shell=True) which makes many characters safe
+# Safe characters: () [] {} ; (cannot be used for injection without shell interpretation)
+# Blocked characters: & | ` $ < > \ (could potentially be dangerous even with our protections)
+DANGEROUS_SHELL_CHARS = re.compile(r'[&|`$<>\\]')
 
 # Allowed model name pattern (alphanumeric, dots, hyphens, underscores only)
 ALLOWED_MODEL_PATTERN = re.compile(r'^[a-zA-Z0-9._-]+$')
@@ -249,6 +251,7 @@ def _build_safe_command(
     prompt: str,
     model: Optional[str] = None,
     json_mode: bool = False,
+    profile: Optional[str] = None,
 ) -> List[str]:
     """
     Build command arguments with proper shell escaping.
@@ -259,8 +262,9 @@ def _build_safe_command(
     Args:
         cli_path: Validated CLI path
         prompt: Sanitized prompt
-        model: Validated model name
-        json_mode: Whether to use --json flag
+        model: Validated model name (usually not needed with profiles)
+        json_mode: Whether to use --json flag for structured output
+        profile: Codex profile name (e.g., "studyin_fast", "studyin_study", "studyin_deep")
 
     Returns:
         List of command arguments (safe for subprocess.exec)
@@ -271,16 +275,22 @@ def _build_safe_command(
         "exec",
     ]
 
+    # Use profile if specified (preferred over individual config)
+    if profile:
+        cmd.extend(["--profile", profile])
+
+    # JSON mode for clean structured output (no parsing needed)
     if json_mode:
         cmd.append("--json")
+
+    # Model override (usually not needed with profiles)
+    if model:
+        cmd.extend(["--model", model])
 
     # Add prompt with proper escaping (defense in depth)
     # Using shlex.quote even though we're using exec to prevent any
     # potential issues if the CLI itself uses shell commands internally
     cmd.append(shlex.quote(prompt))
-
-    if model:
-        cmd.extend(["--model", shlex.quote(model)])
 
     return cmd
 
@@ -313,6 +323,7 @@ class CodexLLMService:
         temperature: float = 0.7,
         stream: bool = False,
         user_id: Optional[str] = None,
+        profile: Optional[str] = None,
     ) -> AsyncGenerator[str, None]:
         """
         Generate a completion using Codex CLI with security validations.
@@ -324,11 +335,12 @@ class CodexLLMService:
 
         Args:
             prompt: The prompt to send to the model
-            model: Model name (e.g., "gpt-5", "claude-3.5-sonnet")
+            model: Model name (usually not needed with profiles)
             max_tokens: Maximum tokens to generate
             temperature: Sampling temperature (0-1)
             stream: Whether to stream the response
             user_id: Optional user ID for logging
+            profile: Codex profile (e.g., "studyin_fast", "studyin_study", "studyin_deep")
 
         Returns:
             Async generator for streaming tokens (always streams in MVP)
@@ -389,6 +401,7 @@ class CodexLLMService:
             user_id=user_id,
             invocation_start=invocation_start,
             prompt_chars=prompt_chars,
+            profile=profile,
         ):
             yield chunk
 
@@ -412,6 +425,7 @@ class CodexLLMService:
             prompt=prompt,
             model=model,
             json_mode=True,
+            profile=None,  # Not used for non-streaming
         )
 
         # Note: Codex CLI doesn't support --max-tokens or --temperature flags
@@ -468,20 +482,22 @@ class CodexLLMService:
         user_id: Optional[str],
         invocation_start: float,
         prompt_chars: int,
+        profile: Optional[str] = None,
     ) -> AsyncGenerator[str, None]:
         """
-        Stream a completion from Codex CLI.
+        Stream a completion from Codex CLI using JSON mode.
 
         Security: Assumes prompt and model are already validated by public method.
-        The CLI output is streamed line-by-line; consumers can decide how to buffer tokens.
+        Uses --json flag for structured output, parses JSON events.
         This is an async generator function that yields text chunks as they arrive.
         """
-        # Build safe command (assumes inputs already validated)
+        # Build safe command with JSON mode and profile
         cmd = _build_safe_command(
             cli_path=self.cli_path,
             prompt=prompt,
             model=model,
-            json_mode=False,
+            json_mode=True,  # Always use JSON for clean parsing
+            profile=profile,
         )
 
         # Note: Codex CLI doesn't support --max-tokens or --temperature flags
@@ -494,42 +510,17 @@ class CodexLLMService:
             stderr=asyncio.subprocess.PIPE,
         )
 
-        accumulated_parts: List[str] = []
+        accumulated_text: List[str] = []
         first_token_logged = False
+
         try:
             if not process.stdout:
-                total_duration_ms = round((perf_counter() - invocation_start) * 1000, 2)
-                logger.info(
-                    "codex_first_token",
-                    extra={
-                        "user_id": user_id,
-                        "model": model,
-                        "duration_ms": total_duration_ms,
-                        "stream": True,
-                        "prompt_chars": prompt_chars,
-                        "temperature": temperature,
-                        "max_tokens": max_tokens,
-                    },
-                )
-                logger.info(
-                    "codex_complete",
-                    extra={
-                        "user_id": user_id,
-                        "model": model,
-                        "total_duration_ms": total_duration_ms,
-                        "tokens_generated": 0,
-                        "tokens_per_sec": None,
-                        "stream": True,
-                        "received_chunks": 0,
-                        "prompt_chars": prompt_chars,
-                    },
-                )
                 return
 
             while True:
                 # Add timeout protection to prevent hanging on slow/stalled streams
                 try:
-                    chunk = await asyncio.wait_for(
+                    line = await asyncio.wait_for(
                         process.stdout.readline(),
                         timeout=settings.CODEX_STREAM_TIMEOUT
                     )
@@ -547,48 +538,57 @@ class CodexLLMService:
                         f"LLM streaming timeout - no response in {settings.CODEX_STREAM_TIMEOUT} seconds"
                     )
 
-                if not chunk:
+                if not line:
                     break
 
-                text = chunk.decode("utf-8", errors="ignore")
-                if not text:
+                # Parse JSON line
+                try:
+                    event = json.loads(line.decode("utf-8", errors="ignore"))
+                except json.JSONDecodeError:
+                    # Skip non-JSON lines
                     continue
 
-                accumulated_parts.append(text)
+                # Extract agent message text from item.completed events
+                if event.get("type") == "item.completed":
+                    item = event.get("item", {})
+                    if item.get("type") == "agent_message":
+                        text = item.get("text", "")
+                        if text:
+                            accumulated_text.append(text)
 
-                # Add response size limit to prevent memory exhaustion
-                accumulated_size = sum(len(part.encode("utf-8")) for part in accumulated_parts)
-                if accumulated_size > settings.CODEX_MAX_RESPONSE_SIZE:
-                    logger.error(
-                        "codex_response_too_large",
-                        extra={
-                            "user_id": user_id,
-                            "model": model,
-                            "accumulated_bytes": accumulated_size,
-                            "limit_bytes": settings.CODEX_MAX_RESPONSE_SIZE,
-                        }
-                    )
-                    raise RuntimeError(
-                        f"LLM response exceeded size limit ({accumulated_size} > {settings.CODEX_MAX_RESPONSE_SIZE} bytes)"
-                    )
+                            # Add response size limit
+                            accumulated_size = sum(len(t.encode("utf-8")) for t in accumulated_text)
+                            if accumulated_size > settings.CODEX_MAX_RESPONSE_SIZE:
+                                logger.error(
+                                    "codex_response_too_large",
+                                    extra={
+                                        "user_id": user_id,
+                                        "model": model,
+                                        "accumulated_bytes": accumulated_size,
+                                        "limit_bytes": settings.CODEX_MAX_RESPONSE_SIZE,
+                                    }
+                                )
+                                raise RuntimeError(
+                                    f"LLM response exceeded size limit"
+                                )
 
-                if not first_token_logged:
-                    first_token_ms = round((perf_counter() - invocation_start) * 1000, 2)
-                    logger.info(
-                        "codex_first_token",
-                        extra={
-                            "user_id": user_id,
-                            "model": model,
-                            "duration_ms": first_token_ms,
-                            "stream": True,
-                            "prompt_chars": prompt_chars,
-                            "temperature": temperature,
-                            "max_tokens": max_tokens,
-                        },
-                    )
-                    first_token_logged = True
+                            if not first_token_logged:
+                                first_token_ms = round((perf_counter() - invocation_start) * 1000, 2)
+                                logger.info(
+                                    "codex_first_token",
+                                    extra={
+                                        "user_id": user_id,
+                                        "model": model,
+                                        "duration_ms": first_token_ms,
+                                        "stream": True,
+                                        "prompt_chars": prompt_chars,
+                                        "temperature": temperature,
+                                        "max_tokens": max_tokens,
+                                    },
+                                )
+                                first_token_logged = True
 
-                yield text
+                            yield text
 
             returncode = await process.wait()
             if returncode != 0:
@@ -619,7 +619,7 @@ class CodexLLMService:
                         "max_tokens": max_tokens,
                     },
                 )
-            response_text = "".join(accumulated_parts)
+            response_text = "".join(accumulated_text)
             tokens_generated = _estimate_token_count(response_text, usage=None)
             tokens_per_sec = (
                 round(tokens_generated / (total_duration_ms / 1000), 2)
@@ -636,7 +636,7 @@ class CodexLLMService:
                     "tokens_generated": tokens_generated,
                     "tokens_per_sec": tokens_per_sec,
                     "stream": True,
-                    "received_chunks": len(accumulated_parts),
+                    "received_chunks": len(accumulated_text),
                     "prompt_chars": prompt_chars,
                     "temperature": temperature,
                     "max_tokens": max_tokens,
@@ -765,14 +765,23 @@ _codex_llm_instance: Optional[CodexLLMService] = None
 
 def get_codex_llm() -> CodexLLMService:
     """
-    Get or create the singleton CodexLLMService instance.
+    Get or create the singleton LLM service instance.
 
-    Lazy initialization allows tests to mock CLI path validation.
+    If LLM_PROVIDER starts with "openai_", return the OpenAI-backed
+    implementation instead of Codex CLI. Lazy import avoids hard deps
+    when not using the OpenAI path.
     """
-    global _codex_llm_instance
-    if _codex_llm_instance is None:
-        _codex_llm_instance = CodexLLMService()
-    return _codex_llm_instance
+    provider = (settings.LLM_PROVIDER or "codex_cli").lower()
+    if provider.startswith("openai_"):
+        # Defer import to avoid circular deps and optional SDK install
+        from app.services.openai_llm import get_openai_llm  # type: ignore
+
+        return get_openai_llm()
+    else:
+        global _codex_llm_instance
+        if _codex_llm_instance is None:
+            _codex_llm_instance = CodexLLMService()
+        return _codex_llm_instance
 
 
 # Backwards compatibility property-style access

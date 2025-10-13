@@ -9,8 +9,10 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from app.api.deps import HARDCODED_USER_ID, ensure_hardcoded_user
 from app.config import settings
 from app.db.session import get_db
-from app.services.codex_llm import codex_llm
-from app.services.rag_service import RagContextChunk, get_rag_service
+from app.services.codex_llm import get_codex_llm
+from app.services.rag_service import RagContextChunk
+from app.services.rag_service_cached import get_cached_rag_service
+from app.services.cache_rag import RagCacheService
 
 try:  # pragma: no cover - optional dependency guard
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,6 +30,8 @@ class WebSocketMessage(TypedDict, total=False):
     type: Literal["user_message"]
     content: str
     user_level: int
+    profile: str  # "studyin_fast", "studyin_study", or "studyin_deep"
+    effort: str   # optional: minimal | low | medium | high
 
 
 class ChatHistoryEntry(TypedDict):
@@ -94,7 +98,8 @@ async def chat_websocket(
 
     await websocket.accept()
     user = await ensure_hardcoded_user(session)
-    rag_service = get_rag_service()
+    rag_service = get_cached_rag_service(RagCacheService())
+    codex_llm = get_codex_llm()
     history: List[ChatHistoryEntry] = []
     user_id_str = str(user.id or HARDCODED_USER_ID)
     session_start = perf_counter()
@@ -169,6 +174,11 @@ async def chat_websocket(
             user_level = message.get("user_level") or 3
             user_level = max(1, min(user_level, 5))
 
+            # Extract profile with validation
+            profile = message.get("profile") or "studyin_fast"
+            if profile not in ("studyin_fast", "studyin_study", "studyin_deep"):
+                profile = "studyin_fast"  # Default to fast mode
+
             history.append({"role": "user", "content": content})
 
             rag_start = perf_counter()
@@ -190,8 +200,9 @@ async def chat_websocket(
                     },
                 )
             except Exception as retrieval_error:  # pragma: no cover - defensive guard
+                # Graceful fallback: proceed without RAG so chat still works
                 logger.exception(
-                    "rag_retrieval_failed",
+                    "rag_retrieval_failed_fallback",
                     extra={
                         "user_id": user_id_str,
                         "query_preview": content[:100],
@@ -199,13 +210,7 @@ async def chat_websocket(
                         "error": str(retrieval_error),
                     },
                 )
-                await websocket.send_json(
-                    {
-                        "type": "error",
-                        "message": "We hit an issue retrieving your study materials. Try again shortly.",
-                    }
-                )
-                continue
+                chunks = []
 
             await websocket.send_json(
                 {
@@ -222,14 +227,22 @@ async def chat_websocket(
                 context_block=context_block,
             )
 
+            # Optional per-request reasoning effort → model mapping
+            effort = (message.get("effort") or "").strip().lower()
+            if effort in {"minimal", "low", "medium", "high"}:
+                effective_model = f"gpt-5-{effort}"
+            else:
+                effective_model = settings.CODEX_DEFAULT_MODEL
+
             try:
                 stream = codex_llm.generate_completion(
                     prompt,
-                    model=settings.CODEX_DEFAULT_MODEL,
+                    model=effective_model,
                     max_tokens=settings.CODEX_MAX_TOKENS,
                     temperature=settings.CODEX_TEMPERATURE,
                     stream=True,
                     user_id=user_id_str,
+                    profile=profile,
                 )
             except Exception as llm_error:  # pragma: no cover - defensive guard
                 logger.exception(

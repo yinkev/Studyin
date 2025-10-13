@@ -21,3 +21,9 @@ class Material(Base):
     processing_status: Mapped[str] = mapped_column(String, nullable=False, default="pending")
 
     owner = relationship("User", backref="materials")
+    chunks = relationship(
+        "MaterialChunk",
+        back_populates="material",
+        cascade="all, delete-orphan",
+        order_by="MaterialChunk.chunk_index",
+    )
