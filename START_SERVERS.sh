@@ -108,7 +108,6 @@ else
     fi
 fi
 
-"" #
 # Start backend server (ensure venv + deps; run with venv's uvicorn)
 if ! lsof -ti:8000 > /dev/null 2>&1; then
     echo ""

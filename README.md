@@ -186,6 +186,56 @@ chatmock serve \
 
 Clients use baseURL http://127.0.0.1:8801/v1 and any non‑empty API key (e.g., "x").
 
+### One‑Command Dev Start/Stop
+
+```bash
+# From repo root
+./START_SERVERS.sh   # starts Postgres/Redis (via brew if needed), backend (8000), frontend (5173), ChatMock (8801)
+./END_SERVERS.sh     # stops listeners on 8000/5173/8801
+```
+
+Logs:
+- Backend: `/tmp/studyin-backend.log`
+- Frontend: `/tmp/studyin-frontend.log`
+- ChatMock: `~/.chatmock_server.log`
+
+---
+
+## ☁️ Deploy (GitHub → Vercel)
+
+Vercel deploys on each push to `main`.
+
+- Production Branch: `main`
+- Root Directory: `frontend`
+- Framework Preset: Vite
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Node: `20.x`
+
+Environment (Production):
+- `VITE_API_URL` → e.g., `https://api.yourdomain.com`
+- `VITE_WS_URL` → `wss://api.yourdomain.com/api/chat/ws` (note: wss, not ws)
+- `VITE_ENVIRONMENT` → `production`
+- `VITE_SENTRY_DSN` → optional
+
+Backend CORS (staging/production): set in backend `.env` on the server
+
+```
+ENVIRONMENT=production
+CORS_ALLOW_ORIGINS=https://<your-domain>,https://<project>.vercel.app
+# optionally allow previews
+CORS_ALLOW_ORIGIN_REGEX=https://.*\.vercel\.app$
+```
+
+Verify backend before deploy: `curl -I https://api.yourdomain.com/health` → 200.
+
+---
+
+## 🔄 CI/CD
+
+GitHub Actions run backend tests (Postgres+Redis services) and frontend tests.
+Deploy jobs exist for `develop` (staging) and `main` (production) via SSH scripts under `.github/workflows/deploy.yml`.
+
 ### Ingest PDFs into RAG
 
 ```bash
