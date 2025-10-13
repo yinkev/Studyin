@@ -19,9 +19,10 @@ interface NavBarProps {
     masteryPercent?: number;
     goalMinutes?: number;
   };
+  dueCount?: number;
 }
 
-export function NavBar({ currentView, onNavigate, stats }: NavBarProps) {
+export function NavBar({ currentView, onNavigate, stats, dueCount = 0 }: NavBarProps) {
   return (
     <nav className="sticky top-0 z-20 border-b border-border/50 bg-white/75 backdrop-blur-2xl">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-4">
@@ -76,6 +77,11 @@ export function NavBar({ currentView, onNavigate, stats }: NavBarProps) {
             >
               <LayoutDashboard className="size-4" aria-hidden="true" />
               Review
+              {dueCount > 0 && (
+                <span className="ml-2 rounded-full bg-primary text-primary-foreground text-[10px] px-2 py-0.5 font-semibold">
+                  {dueCount}
+                </span>
+              )}
             </Button>
             <Button
               variant={currentView === 'upload' ? 'default' : 'ghost'}

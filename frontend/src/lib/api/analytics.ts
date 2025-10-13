@@ -67,3 +67,22 @@ export async function getPerformanceWindows(): Promise<PerformanceWindowResponse
   );
   return response.data;
 }
+
+// Gamification progress (for Navbar tiles)
+export interface GamificationProgress {
+  current_xp: number;
+  current_level: number;
+  xp_to_next_level: number;
+  level_progress_percentage: number;
+  total_achievements: number;
+  recent_achievements: any[];
+  xp_history: Array<{ date: string; daily_xp: number; total_xp: number }>;
+  streak_history: Array<{ date: string; streak: number }>;
+}
+
+export async function getGamificationProgress(): Promise<GamificationProgress> {
+  const response = await apiClient.get<GamificationProgress>(
+    '/api/analytics/gamification/progress'
+  );
+  return response.data;
+}

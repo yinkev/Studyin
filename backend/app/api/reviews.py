@@ -91,6 +91,30 @@ async def get_due_cards(
     )
 
 
+@router.get("/count")
+async def count_due_cards(
+    include_new: Annotated[bool, Query()] = True,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Return total number of cards currently due.
+
+    Optimized count query separate from the list endpoint.
+    """
+    from sqlalchemy import select, and_
+    from app.models.fsrs import FSRSCard
+
+    now = datetime.datetime.now(datetime.UTC)
+    conditions = [FSRSCard.user_id == current_user.id, FSRSCard.due_date <= now]
+    if not include_new:
+        conditions.append(FSRSCard.state != "new")
+
+    stmt = select(FSRSCard.id).where(and_(*conditions))
+    result = await db.execute(stmt)
+    count = len(result.scalars().all())
+    return {"due": count}
+
+
 @router.post("/{card_id}", response_model=ReviewSuccessResponse)
 async def submit_review(
     card_id: UUID,

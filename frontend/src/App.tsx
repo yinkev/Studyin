@@ -35,7 +35,7 @@ function resolveInitialView(): View {
 function App() {
   const [currentView, setCurrentView] = useState<View>(resolveInitialView());
   // No placeholders: initialize with zeros and let real analytics populate later
-  const [gamificationStats] = useState(() => ({
+  const [gamificationStats, setGamificationStats] = useState(() => ({
     level: 1,
     currentXP: 0,
     targetXP: 0,
@@ -45,8 +45,36 @@ function App() {
     masteryPercent: 0,
     goalMinutes: 0,
   }));
+  const [dueCount, setDueCount] = useState(0);
 
   const chatSession = useChatSession({ autoReconnect: false, autoConnect: false });
+
+  // Fetch dynamic stats (gamification + reviews) once on mount
+  // Keep simple and light to avoid adding heavy state management
+  // These endpoints are already implemented on the backend
+  if (typeof window !== 'undefined') {
+    // lazy import to avoid bundling cost until runtime
+    import('@/lib/api/analytics').then(async (m) => {
+      try {
+        const g = await m.getGamificationProgress?.();
+        if (g) {
+          setGamificationStats((s) => ({
+            ...s,
+            level: g.current_level ?? s.level,
+            currentXP: g.current_xp ?? s.currentXP,
+            targetXP: (g.current_level ?? 1) * 100,
+            streak: g.streak_history?.at(-1)?.streak ?? s.streak,
+          }));
+        }
+      } catch {}
+    });
+    import('@/lib/api/reviews').then(async (m) => {
+      try {
+        const c = await m.getDueCount?.(true);
+        setDueCount(Number(c || 0));
+      } catch {}
+    });
+  }
 
   // Expose view for E2E diagnostics in dev
   if (import.meta.env.DEV && typeof window !== 'undefined') {
@@ -70,7 +98,7 @@ function App() {
         )}
         {currentView !== 'dashboard' && (
           <div className="min-h-screen flex flex-col">
-            <NavBar currentView={currentView} onNavigate={setCurrentView} stats={gamificationStats} />
+            <NavBar currentView={currentView} onNavigate={setCurrentView} stats={gamificationStats} dueCount={dueCount} />
             <main className="flex-1">
               {currentView === 'analytics' && <AnalyticsView onNavigate={setCurrentView} />}
               {currentView === 'upload' && <UploadView onNavigate={setCurrentView} />}
