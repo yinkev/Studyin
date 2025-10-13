@@ -756,7 +756,7 @@ Response:"""
         chunks = []
         async for chunk in self.generate_completion(
             prompt,
-            model="claude-3.5-sonnet",
+            model=settings.CODEX_DEFAULT_MODEL or "gpt-5",
             temperature=0.8,
         ):
             chunks.append(chunk)
