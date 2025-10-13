@@ -22,6 +22,8 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
   const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<number | null>(null);
   const [result, setResult] = useState<{ correct: boolean; explanation: string } | null>(null);
+  const [difficulty, setDifficulty] = useState(3);
+  const [count, setCount] = useState(5);
 
   const hasMore = index < questions.length;
   const current = hasMore ? questions[index] : null;
@@ -33,13 +35,28 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
     setChosen(null);
     setResult(null);
     try {
-      const resp = await apiClient.post('/api/questions/generate', {
-        topic,
-        difficulty: 3,
-        num_questions: 5,
-        use_context: true,
-      });
+      const resp = await apiClient.post('/api/questions/generate', { topic, difficulty, num_questions: count, use_context: true });
       setQuestions(resp.data.questions || []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startNextUnanswered = async () => {
+    setLoading(true);
+    setQuestions([]);
+    setIndex(0);
+    setChosen(null);
+    setResult(null);
+    try {
+      const resp = await apiClient.get('/api/questions/next', { params: { topic, limit: count } });
+      const data = resp.data || [];
+      if (data.length === 0) {
+        // Fallback: generate if none pending
+        await startQuick5();
+      } else {
+        setQuestions(data);
+      }
     } finally {
       setLoading(false);
     }
@@ -68,8 +85,13 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
 
       <div className="flex items-center gap-2 mb-4">
         <Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic" />
+        <Input type="number" min={1} max={10} value={count} onChange={(e)=> setCount(Math.min(10, Math.max(1, Number(e.target.value)||5)))} className="w-20" />
+        <Input type="number" min={1} max={5} value={difficulty} onChange={(e)=> setDifficulty(Math.min(5, Math.max(1, Number(e.target.value)||3)))} className="w-20" />
         <Button onClick={startQuick5} disabled={loading || !topic.trim()} className="gap-2">
-          {loading && <Loader2 className="w-4 h-4 animate-spin" />} Start 5
+          {loading && <Loader2 className="w-4 h-4 animate-spin" />} Generate
+        </Button>
+        <Button onClick={startNextUnanswered} disabled={loading || !topic.trim()} variant="outline">
+          Next Unanswered
         </Button>
       </div>
 
