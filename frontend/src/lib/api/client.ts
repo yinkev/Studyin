@@ -17,8 +17,18 @@ export interface RetriableAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
 }
 
+function resolveBaseURL(): string | undefined {
+  const envUrl = import.meta.env.VITE_API_URL as string | undefined;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim().length > 0) return envUrl;
+  if (typeof window !== 'undefined') {
+    // Default to current origin for local dev if not provided
+    return window.location.origin;
+  }
+  return undefined;
+}
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: resolveBaseURL(),
   timeout: 30000,
   withCredentials: true,
 });
