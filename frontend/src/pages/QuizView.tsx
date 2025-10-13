@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { apiClient } from '@/lib/api/client';
 import type { View } from '@/components/NavBar';
+import { createInsight } from '@/lib/api/insights';
 
 type MCQ = {
   id: string;
@@ -104,6 +105,7 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
                 </p>
                 <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{result.explanation}</p>
                 <div className="mt-3 flex gap-2">
+                  <Button variant="outline" onClick={async ()=>{ try{ await createInsight({ source:'mcq', content: `Q: ${current.stem}\nA: ${result.explanation}` }); } catch(_){} }}>Save as Insight</Button>
                   <Button onClick={next}>Next</Button>
                   <Button variant="ghost" onClick={() => onNavigate('dashboard')}>Finish</Button>
                 </div>
@@ -117,4 +119,3 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
 }
 
 export default QuizView;
-

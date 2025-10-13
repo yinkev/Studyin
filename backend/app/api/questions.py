@@ -20,6 +20,7 @@ from app.schemas.questions import (
 from app.services.codex_llm import get_codex_llm
 from app.services.rag_service import get_rag_service
 from app.services.analytics.tracker import AnalyticsTracker
+from app.services.fsrs_service import FSRSService
 
 router = APIRouter(prefix="/api/questions", tags=["questions"])
 
@@ -128,6 +129,17 @@ async def answer_question(
     # Simple XP: base 10, difficulty multiplier
     xp_earned = (10 + (q.difficulty - 3) * 2) * (2 if is_correct else 1)
 
+    # Optionally create an FSRS card when user answers (correct or incorrect)
+    fsrs_card_id = None
+    try:
+        fsrs = FSRSService(db)
+        # Build flashcard content from question and explanation
+        flash = f"Q: {q.stem}\nA: {q.explanation}"
+        card = await fsrs.create_card(user_id=current_user.id, flashcard_content=flash)
+        fsrs_card_id = card.id
+    except Exception:
+        fsrs_card_id = None
+
     # Track analytics
     tracker = AnalyticsTracker(db)
     try:
@@ -151,6 +163,5 @@ async def answer_question(
         correct=is_correct,
         explanation=q.explanation,
         xp_earned=int(xp_earned),
-        fsrs_card_id=None,
+        fsrs_card_id=fsrs_card_id,
     )
-

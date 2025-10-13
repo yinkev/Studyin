@@ -39,6 +39,7 @@ import {
 } from '@/components/dashboard';
 
 import { getDashboardData, transformWeakTopicsToSkills, transformKnowledgeGapsToQuests, type DashboardData } from '@/lib/api/dashboard';
+import { DigestPanel } from '@/components/dashboard/DigestPanel';
 import { apiClient } from '@/lib/api/client';
 
 interface GamificationSnapshot {
@@ -248,6 +249,9 @@ export function CosmicDashboard({ onNavigate, stats, currentView }: CosmicDashbo
               </button>
             </div>
           </div>
+
+          {/* Daily Digest */}
+          <DigestPanel />
           {/* Header */}
           <motion.div variants={itemVariants} className="flex items-center justify-between">
             <div>
