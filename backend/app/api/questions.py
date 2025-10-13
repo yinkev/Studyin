@@ -4,7 +4,7 @@ import uuid
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user_or_demo, get_db
@@ -86,10 +86,54 @@ async def generate_questions(
 
 @router.get("/", response_model=List[QuestionResponse])
 async def list_questions(
+    topic: str | None = None,
+    difficulty: int | None = None,
+    limit: int = 50,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_or_demo),
 ):
-    res = await db.execute(select(Question).where(Question.user_id == current_user.id).order_by(Question.created_at.desc()).limit(50))
+    stmt = select(Question).where(Question.user_id == current_user.id)
+    if topic:
+        stmt = stmt.where(Question.topic.ilike(f"%{topic}%"))
+    if isinstance(difficulty, int):
+        stmt = stmt.where(Question.difficulty == difficulty)
+    stmt = stmt.order_by(Question.created_at.desc()).limit(min(max(limit,1),200))
+    res = await db.execute(stmt)
+    rows = res.scalars().all()
+    return [
+        QuestionResponse.model_validate(
+            {
+                "id": q.id,
+                "topic": q.topic,
+                "stem": q.stem,
+                "options": q.options,
+                "difficulty": q.difficulty,
+            }
+        )
+        for q in rows
+    ]
+
+
+@router.get("/next", response_model=List[QuestionResponse])
+async def next_unanswered(
+    topic: str,
+    limit: int = 5,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_or_demo),
+):
+    """Return the next unanswered questions for a topic."""
+    QA = QuestionAttempt
+    Q = Question
+    # Select questions with no attempts by this user
+    stmt = (
+        select(Q)
+        .where(Q.user_id == current_user.id)
+        .where(Q.topic.ilike(f"%{topic}%"))
+        .where(~Q.id.in_(select(QA.question_id).where(QA.user_id == current_user.id)))
+        .order_by(Q.created_at.desc())
+        .limit(min(max(limit,1), 20))
+    )
+    res = await db.execute(stmt)
     rows = res.scalars().all()
     return [
         QuestionResponse.model_validate(

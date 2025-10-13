@@ -21,7 +21,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_current_user_or_demo as get_current_user, get_db
 from app.models.user import User
 from app.schemas.fsrs import (
     BulkCreateCardsRequest,
