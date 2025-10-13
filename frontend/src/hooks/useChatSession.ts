@@ -119,8 +119,31 @@ function generateId(): string {
 }
 
 function buildWebSocketUrl(baseUrl: string): string {
-  // For MVP, no token needed (hardcoded user)
-  // In production, add: ?token=${encodeURIComponent(token)}
+  // Build a WS URL that respects the current page protocol.
+  // If baseUrl already includes ws(s)://, normalize protocol to page's protocol.
+  try {
+    if (typeof window !== 'undefined') {
+      const pageIsHTTPS = window.location.protocol === 'https:';
+      const desiredProtocol = pageIsHTTPS ? 'wss:' : 'ws:';
+      if (baseUrl.startsWith('ws://') || baseUrl.startsWith('wss://')) {
+        const url = new URL(baseUrl);
+        url.protocol = desiredProtocol;
+        return url.toString();
+      }
+      // If baseUrl is http(s), convert to ws(s)
+      if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
+        const httpUrl = new URL(baseUrl);
+        httpUrl.protocol = desiredProtocol;
+        return httpUrl.toString();
+      }
+      // Treat as path, prepend current origin with ws(s)
+      const origin = new URL(window.location.origin);
+      origin.protocol = desiredProtocol;
+      return new URL(baseUrl, origin).toString();
+    }
+  } catch (_) {
+    // fall through to baseUrl
+  }
   return baseUrl;
 }
 

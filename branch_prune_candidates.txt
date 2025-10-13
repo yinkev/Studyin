@@ -1,0 +1,3 @@
+# Candidates merged into main (safe to delete):
+  origin/HEAD -> origin/main
+  origin/main

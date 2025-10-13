@@ -1,0 +1,1692 @@
+DEBUGGING_SUMMARY.md:183:- ✅ Real-time chat with AI coach
+DEBUGGING_SUMMARY.md:244:2. ✅ **Test the chat functionality** - Send messages to the AI coach
+FINAL_TEST_RESULTS.md:171:3. **Ask real study questions**:
+FINAL_TEST_RESULTS.md:200:       question TEXT,
+FINAL_TEST_RESULTS.md:221:- Foundation for adaptive teaching modes (Phase 2)
+FINAL_TEST_RESULTS.md:267:   - Caching common questions
+FINAL_TEST_RESULTS.md:314:- Ask real questions
+DECISIONS.md:147:Need to integrate LLM capabilities for RAG, AI coach, question generation.
+DECISIONS.md:443:- Pixel art mascot/coach character
+SESSION_HANDOFF_2025-10-13_v2.md:51:ef775d0 fix: WebSocket streaming + production hardening for AI coach
+SESSION_HANDOFF_2025-10-13_v2.md:394:- **Consistency**: Presets embody coherent teaching philosophies
+SESSION_HANDOFF_2025-10-13_v2.md:398:- ✅ Embodies teaching philosophy
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:87:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:92:CREATE INDEX idx_user_attempts_user_question ON user_attempts(user_id, question_id);
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:126:**Issue Location**: `generate_questions()` method (lines 678-716, codex_llm.py)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:131:prompt = f"""Generate {num_questions} NBME-style USMLE Step 1 multiple choice questions about {topic}.
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:133:Format: Return JSON array with objects containing: question, options (array of 4), correct_index, explanation.
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:150:    num_questions=request.num_questions,
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:156:The `generate_questions()` method in `codex_llm.py` is used directly by the plan, but it doesn't accept `context` parameter.
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:158:**Solution**: Refactor `generate_questions()` to accept context
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:162:async def generate_questions(
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:166:    num_questions: int = 5,
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:170:    """Generate NBME-style medical questions using Codex."""
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:173:    prompt = f"""You are an expert medical educator creating USMLE Step 1 practice questions.
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:178:**Task**: Generate {num_questions} high-quality multiple choice questions about **{topic}**.
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:230:# codex_llm.py - Update generate_questions()
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:231:async def generate_questions(
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:235:    num_questions: int = 5,
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:240:    """Generate NBME-style medical questions using Codex."""
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:260:CODEX_QUESTION_GEN_MODEL: str = "gpt-5"  # Separate config for question gen
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:261:CODEX_TEACHING_MODEL: str = "claude-3.5-sonnet"  # Different for teaching
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:279:   -- Current: User can answer same question multiple times simultaneously
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:308:   -- Problem: Orphaned questions lose their source context
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:312:   -- B) CASCADE: Delete questions when material deleted
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:313:   -- C) RESTRICT: Prevent material deletion if questions exist
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:315:   -- Recommendation: RESTRICT for MVP (preserve questions)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:331:POST /api/questions/generate
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:332:  → QuestionGeneratorService.generate_questions()
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:336:  ← Return questions (total: 5-15 seconds)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:345:POST /api/questions/generate
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:349:GET /api/questions/jobs/{job_id}
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:351:  → Return questions when ready
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:354:WebSocket /api/questions/generate/stream
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:356:  → Stream questions as they're generated
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:361:- ✅ When you want to generate 20+ questions at once
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:362:- ❌ Not for MVP (5 questions in 5-10 seconds is acceptable)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:377:**Problem**: Regenerating identical questions wastes LLM calls ($$$)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:383:   cache_key = f"questions:{topic}:{difficulty}:{hash(context)}"
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:384:   # TTL: 24 hours (questions stay fresh)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:400:- ✅ After users start generating questions regularly
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:474:- Track which prompts produce better questions
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:478:**When to Implement**: After generating 1,000+ questions and collecting quality metrics
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:502:   - High confidence incorrect = misleading question
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:505:   - > 10% flags = remove question
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:517:- After 500+ question attempts
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:535:   # Limit: 100 questions per day
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:579:- ⚠️ Need question caching
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:580:- ⚠️ Consider pre-generating questions for popular topics
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:587:- 🔴 Need background job queue for question generation
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:588:- 🔴 Need CDN for static question assets
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:592:- 🔴 Separate question generation service
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:595:- 🔴 Elasticsearch for question search
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:601:- Average question generation: 2K tokens output
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:602:- Cost per question: ~$0.02
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:636:CREATE INDEX idx_questions_user_topic ON questions(user_id, topic);
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:637:CREATE INDEX idx_questions_user_difficulty ON questions(user_id, difficulty);
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:640:CREATE INDEX idx_questions_quality ON questions(quality_score DESC)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:643:-- For finding similar questions (prevent duplicates):
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:644:CREATE INDEX idx_questions_topic_difficulty ON questions(topic, difficulty, user_id);
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:650:ALTER TABLE questions ADD COLUMN tsv tsvector
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:652:CREATE INDEX idx_questions_fts ON questions USING GIN(tsv);
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:654:-- Add question tags
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:655:ALTER TABLE questions ADD COLUMN tags TEXT[];
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:656:CREATE INDEX idx_questions_tags ON questions USING GIN(tags);
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:675:-- Primary query pattern: Get user's attempts for a question
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:676:CREATE INDEX idx_user_attempts_user_question ON user_attempts(user_id, question_id);
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:699:POST   /api/questions/generate          # ✅ Good: Clear action
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:700:GET    /api/questions                   # ✅ Good: List with filters
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:701:GET    /api/questions/:id               # ✅ Good: Single resource
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:702:POST   /api/questions/:id/answer        # ✅ Good: Action on resource
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:703:GET    /api/questions/due               # ⚠️ Should be: /api/questions/due/reviews
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:704:DELETE /api/questions/:id               # ✅ Good: Resource deletion
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:711:   POST /api/questions/batch-generate
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:712:   # Generate multiple question sets at once
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:719:   POST /api/questions/preview
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:720:   # Generate questions but don't save (for review before accepting)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:721:   # Response: Generated questions with "accept" button
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:726:   POST /api/questions/answers/batch
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:727:   # Submit multiple answers at once (for timed quizzes)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:732:   POST /api/questions/collections
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:733:   # Create question collections for specific exam prep
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:754:- ✅ Can show users which part of material inspired each question
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:756:**Improvement**: Add chunk relevance to question quality
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:785:xp_earned = int(base_xp * difficulty_multipliers.get(question.difficulty, 1.0))
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:841:- ✅ Time taken per question
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:859:JOIN questions q ON ua.question_id = q.id
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:894:1. **Rate limiting on question generation** (expensive operation)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:898:   async def generate_questions(...):
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:903:   # Check that question belongs to user
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:904:   if question.user_id != current_user.id:
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:905:       raise HTTPException(403, "Not your question")
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:907:   # Check that question wasn't just answered (prevent spam)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:913:3. **Content filtering on generated questions**
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:915:   # Check for inappropriate content in generated questions
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:917:   def validate_question_content(question: Dict) -> bool:
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:920:       content = f"{question['vignette']} {question['explanation']}"
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:929:- ✅ Unit tests for question generator
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:938:       """Test full workflow: upload PDF → generate questions → answer → review."""
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:940:       # Generate questions from material
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:941:       # Answer questions
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:951:       questions = await generate_questions(topic="cardiology", num=10)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:959:       """Ensure users can't access other users' questions."""
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:960:       user1_question = await create_question(user_id=user1.id)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:962:           f"/api/questions/{user1_question.id}",
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:974:               await generate_questions(topic="test")
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1018:# Separate question generation service
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1019:question-generator:
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1020:  image: studyin-question-gen:latest
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1044:- 🟡 **Fix generate_questions() to use RAG context** (Important)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1051:- ✅ Test with real questions
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1064:- 🟢 Add question caching (when costs matter)
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1085:2. 🟡 Fix question generation to use RAG context
+QUESTION_GENERATION_ARCHITECTURE_REVIEW.md:1102:You've designed a solid system. Fix the partitioning issue, implement the RAG context integration properly, and you'll have a production-quality question generation system that scales from 1 to 1,000 users without major rewrites.
+TESTING_RESULTS.md:124:- Claude 3.5 Sonnet excellent for teaching
+READY_TO_RUN.md:86:- Socratic teaching responses
+CLAUDE.md:46:- **Use For**: LLM integration in the app (RAG, question generation, AI coach)
+CLAUDE.md:220:# backend/app/services/ai_coach/coach.py
+CLAUDE.md:221:# Uses Codex CLI for teaching
+CLAUDE.md:223:async def generate_teaching_response(
+CLAUDE.md:225:    question: str,
+CLAUDE.md:228:    """Generate Socratic teaching response"""
+CLAUDE.md:235:                question=question,
+CLAUDE.md:247:# Uses Codex CLI for MCQ generation
+CLAUDE.md:252:    num_questions: int
+CLAUDE.md:254:    """Generate NBME-style questions"""
+CLAUDE.md:262:                num=num_questions
+CLAUDE.md:266:    return parse_questions(response)
+CLAUDE.md:277:You: "I'm implementing AI coach with WebSocket for real-time chat.
+CLAUDE.md:329:You: "Review my AI coach implementation:
+CLAUDE.md:469:- AI coach responses
+CLAUDE.md:495:**Codex CLI**: Generate teaching responses, learning paths
+CLAUDE.md:499:**Codex CLI**: Generate NBME-style MCQs
+CLAUDE.md:540:User question: {question}
+CLAUDE.md:543:Provide Socratic teaching response."""
+IMPLEMENTATION_PLAN.md:966:- [ ] Can chat with AI coach
+IMPLEMENTATION_PLAN.md:967:- [ ] Can take quizzes with NBME-style questions
+TECH_STACK.md:125:- **Usage**: Document processing, question generation
+TECH_STACK.md:228:- Interactive teaching (Socratic method)
+TECH_STACK.md:243:- MCQ generation (cost-effective)
+TECH_STACK.md:244:- Batch question creation
+TECH_STACK.md:251:- Good question generation quality
+TECH_STACK.md:314:**Target Cost**: $10-15/month for 100 questions/day (76% reduction from naive $45)
+TECH_STACK.md:326:1. **Query**: User question or context
+integration_guide.md:98:    # Generate a question
+integration_guide.md:99:    question = await engine.generate_question(session, user, "Cardiac Physiology")
+integration_guide.md:100:    print("Generated Question:", question)
+integration_guide.md:102:    # Test teaching
+integration_guide.md:103:    teaching = await engine.teach_concept(session, user, "Myocardial infarction")
+integration_guide.md:104:    print("\nTeaching Content:", teaching[:200])
+integration_guide.md:256:        "prompt": "Generate a USMLE question about cardiac physiology"
+integration_guide.md:317:    teaching = await engine.teach_concept(
+integration_guide.md:320:    print(teaching[:300])
+integration_guide.md:325:        # Generate question
+integration_guide.md:326:        question = await engine.generate_question(session, user)
+integration_guide.md:328:        print(question["vignette"])
+integration_guide.md:329:        print(question["question"])
+integration_guide.md:330:        for key, value in question["options"].items():
+integration_guide.md:334:        user_answer = question["correct_answer"]  # Simulating correct answer
+integration_guide.md:338:            session, user, question, user_answer, time_spent=75.0
+integration_guide.md:443:@app.post("/api/question/generate")
+integration_guide.md:444:async def generate_question(request: QuestionRequest):
+integration_guide.md:445:    """Generate a practice question"""
+integration_guide.md:450:    question = await learning_engine.generate_question(session, user, request.topic)
+integration_guide.md:452:    return question
+integration_guide.md:457:    # Get session and question from cache/database
+integration_guide.md:460:    # question = ...
+integration_guide.md:463:        session, user, question, request.user_answer, request.time_spent
+integration_guide.md:539:   - Increase cache TTL for frequently asked questions
+integration_guide.md:582:   - Pre-generate common questions during off-peak
+PERFORMANCE_OPTIMIZATION_REPORT.md:128:**Cache Hit Rate**: ~60-80% for typical student study sessions (asking similar questions)
+DATABASE_ARCHITECTURE.md:36:2. **JSON Support**: JSONB for flexible storage of question options, metadata, and analytics
+DATABASE_ARCHITECTURE.md:38:4. **Full-Text Search**: Built-in FTS for searching materials and questions
+DATABASE_ARCHITECTURE.md:58:2. **Cache Layer**: Cache frequently accessed data (user stats, question banks)
+DATABASE_ARCHITECTURE.md:68:- Background job queues (document processing, question generation)
+DATABASE_ARCHITECTURE.md:131:├── questions/      # Question bank
+DATABASE_ARCHITECTURE.md:132:│   ├── questions
+DATABASE_ARCHITECTURE.md:139:│   └── practice_session_questions
+DATABASE_ARCHITECTURE.md:141:├── ai_coach/       # AI Coach
+DATABASE_ARCHITECTURE.md:182:    materials ||--o{ questions : generates
+DATABASE_ARCHITECTURE.md:183:    questions ||--o{ question_options : has
+DATABASE_ARCHITECTURE.md:184:    questions ||--o{ question_explanations : explains
+DATABASE_ARCHITECTURE.md:186:    questions ||--o{ user_question_attempts : answered_by
+DATABASE_ARCHITECTURE.md:190:    practice_sessions ||--o{ practice_session_questions : contains
+DATABASE_ARCHITECTURE.md:191:    questions ||--o{ practice_session_questions : included_in
+DATABASE_ARCHITECTURE.md:201:    questions ||--o{ user_progress : measured_by
+DATABASE_ARCHITECTURE.md:204:    questions ||--o{ sm2_review_cards : scheduled_for
+DATABASE_ARCHITECTURE.md:325:    questions {
+DATABASE_ARCHITECTURE.md:383:        int total_questions
+DATABASE_ARCHITECTURE.md:393:    practice_session_questions {
+DATABASE_ARCHITECTURE.md:557:        float avg_time_per_question
+DATABASE_ARCHITECTURE.md:727:CREATE TYPE job_type AS ENUM ('parse', 'embed', 'generate_questions', 'analyze');
+DATABASE_ARCHITECTURE.md:775:CREATE TABLE questions (
+DATABASE_ARCHITECTURE.md:813:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+DATABASE_ARCHITECTURE.md:828:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+DATABASE_ARCHITECTURE.md:844:-- User question attempts
+DATABASE_ARCHITECTURE.md:848:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+DATABASE_ARCHITECTURE.md:877:    total_questions INTEGER NOT NULL DEFAULT 0,
+DATABASE_ARCHITECTURE.md:888:    CONSTRAINT valid_counts CHECK (correct_count <= total_questions),
+DATABASE_ARCHITECTURE.md:892:-- Practice session questions (many-to-many)
+DATABASE_ARCHITECTURE.md:893:CREATE TABLE practice_session_questions (
+DATABASE_ARCHITECTURE.md:896:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+DATABASE_ARCHITECTURE.md:904:    CONSTRAINT unique_session_question UNIQUE (session_id, question_id),
+DATABASE_ARCHITECTURE.md:913:CREATE TYPE conversation_type AS ENUM ('teaching', 'review', 'exploration', 'clarification');
+DATABASE_ARCHITECTURE.md:994:-- User progress (aggregate per question)
+DATABASE_ARCHITECTURE.md:998:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+DATABASE_ARCHITECTURE.md:1048:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+DATABASE_ARCHITECTURE.md:1077:    code VARCHAR(100) UNIQUE NOT NULL, -- e.g., 'first_question', 'streak_7'
+DATABASE_ARCHITECTURE.md:1193:    avg_time_per_question FLOAT,
+DATABASE_ARCHITECTURE.md:1321:CREATE INDEX idx_questions_material_id ON questions(material_id) WHERE material_id IS NOT NULL;
+DATABASE_ARCHITECTURE.md:1322:CREATE INDEX idx_questions_topic ON questions(topic);
+DATABASE_ARCHITECTURE.md:1323:CREATE INDEX idx_questions_difficulty ON questions(difficulty);
+DATABASE_ARCHITECTURE.md:1324:CREATE INDEX idx_questions_verified ON questions(is_verified) WHERE is_verified = true;
+DATABASE_ARCHITECTURE.md:1325:CREATE INDEX idx_questions_flagged ON questions(is_flagged) WHERE is_flagged = true;
+DATABASE_ARCHITECTURE.md:1326:CREATE INDEX idx_questions_quality ON questions(quality_score DESC) WHERE quality_score > 0.7;
+DATABASE_ARCHITECTURE.md:1328:-- Composite index for question filtering
+DATABASE_ARCHITECTURE.md:1329:CREATE INDEX idx_questions_topic_difficulty ON questions(topic, difficulty);
+DATABASE_ARCHITECTURE.md:1332:CREATE INDEX idx_questions_vignette_search ON questions USING GIN (
+DATABASE_ARCHITECTURE.md:1342:-- User question attempts
+DATABASE_ARCHITECTURE.md:1348:-- Composite index for user question history
+DATABASE_ARCHITECTURE.md:1349:CREATE INDEX idx_attempts_user_question ON user_question_attempts(user_id, question_id, answered_at DESC);
+DATABASE_ARCHITECTURE.md:1361:-- Practice session questions
+DATABASE_ARCHITECTURE.md:1362:CREATE INDEX idx_session_questions_session_id ON practice_session_questions(session_id);
+DATABASE_ARCHITECTURE.md:1363:CREATE INDEX idx_session_questions_question_id ON practice_session_questions(question_id);
+DATABASE_ARCHITECTURE.md:1627:from app.models.question import Question
+DATABASE_ARCHITECTURE.md:1824:            'questions', (SELECT COUNT(*) FROM user_question_attempts WHERE user_id = target_user_id),
+DATABASE_ARCHITECTURE.md:1958:# app/services/ai_coach/rag.py
+DATABASE_ARCHITECTURE.md:1970:        query: User's question
+DATABASE_ARCHITECTURE.md:2091:studyin:cache:questions:{topic}:{difficulty} # Cached question lists
+DATABASE_ARCHITECTURE.md:2322:        # Get questions after cursor
+DATABASE_ARCHITECTURE.md:2323:        cursor_question = await session.get(Question, cursor)
+DATABASE_ARCHITECTURE.md:2324:        query = query.where(Question.created_at < cursor_question.created_at)
+DATABASE_ARCHITECTURE.md:2328:    questions = results.scalars().all()
+DATABASE_ARCHITECTURE.md:2330:    has_more = len(questions) > limit
+DATABASE_ARCHITECTURE.md:2332:        questions = questions[:limit]
+DATABASE_ARCHITECTURE.md:2334:    next_cursor = questions[-1].id if has_more else None
+DATABASE_ARCHITECTURE.md:2337:        "questions": questions,
+DATABASE_ARCHITECTURE.md:2345:# Batch insert questions
+DATABASE_ARCHITECTURE.md:2346:async def bulk_insert_questions(questions: List[dict]):
+DATABASE_ARCHITECTURE.md:2350:        questions
+DATABASE_ARCHITECTURE.md:2474:                code="first_question",
+DATABASE_ARCHITECTURE.md:2476:                description="Answer your first question",
+DATABASE_ARCHITECTURE.md:2506:                description="Answer 10 questions in a row correctly",
+DATABASE_ARCHITECTURE.md:2516:                description="Answer a question in under 30 seconds",
+思考.md:74:- **Relatedness**: AI coach provides connection
+思考.md:79:- AI coach: Socratic teaching, not lecturing (relatedness)
+思考.md:137:# Even better thought: "What if different question types have different XP?"
+思考.md:153:Problem: Need LLM integration for RAG, AI coach, questions
+思考.md:397:Goal: Medical teaching with personalized content
+思考.md:503:- LLM down → Show pre-generated questions
+思考.md:534:            content="AI coach temporarily unavailable. Please try again.",
+TEST_COVERAGE_ANALYSIS.md:91:- ❌ **No tests for question generation**
+TEST_COVERAGE_ANALYSIS.md:92:- ❌ **No tests for teaching response generation**
+TEST_COVERAGE_ANALYSIS.md:538:1. **Add question generation tests** - NBME-style MCQs
+TEST_COVERAGE_ANALYSIS.md:540:3. **Add quiz session tests** - Timing, scoring, progress
+TEST_COVERAGE_ANALYSIS.md:544:1. **Add quiz component tests** - Question display, timer
+TEST_COVERAGE_ANALYSIS.md:546:3. **Add E2E test for quiz workflow** - Full quiz session
+TEST_COVERAGE_ANALYSIS.md:589:│       └── questions.py
+TEST_COVERAGE_ANALYSIS.md:682:def test_generate_mcqs_returns_nbme_style_questions():
+TEST_COVERAGE_ANALYSIS.md:684:    questions = await service.generate_questions(
+TEST_COVERAGE_ANALYSIS.md:687:        num_questions=5
+TEST_COVERAGE_ANALYSIS.md:690:    assert len(questions) == 5
+TEST_COVERAGE_ANALYSIS.md:691:    assert all('question' in q for q in questions)
+TEST_COVERAGE_ANALYSIS.md:692:    assert all('options' in q and len(q['options']) == 4 for q in questions)
+TEST_COVERAGE_ANALYSIS.md:693:    assert all('correct_index' in q for q in questions)
+TEST_COVERAGE_ANALYSIS.md:694:    assert all('explanation' in q for q in questions)
+TEST_COVERAGE_ANALYSIS.md:697:# pytest tests/unit/services/test_codex_llm_unit.py::test_generate_mcqs_returns_nbme_style_questions
+TEST_COVERAGE_ANALYSIS.md:700:async def generate_questions(self, topic, difficulty, num_questions):
+TEST_COVERAGE_ANALYSIS.md:701:    prompt = f"Generate {num_questions} NBME-style questions about {topic}..."
+TEST_COVERAGE_ANALYSIS.md:708:async def generate_questions(self, topic, difficulty, num_questions):
+TEST_COVERAGE_ANALYSIS.md:709:    """Generate NBME-style medical questions."""
+TEST_COVERAGE_ANALYSIS.md:710:    prompt = self._build_question_prompt(topic, difficulty, num_questions)
+TEST_COVERAGE_ANALYSIS.md:712:    return self._parse_questions(response)
+TEST_COVERAGE_ANALYSIS.md:892:- Integration tests for quiz sessions
+TEST_COVERAGE_ANALYSIS.md:893:- E2E test for full quiz workflow
+TEST_COVERAGE_ANALYSIS.md:1247:    """Test question generation returns parsed questions."""
+TEST_COVERAGE_ANALYSIS.md:1248:    mock_questions = [
+TEST_COVERAGE_ANALYSIS.md:1250:            "question": "What is the cardiac output?",
+TEST_COVERAGE_ANALYSIS.md:1261:            json.dumps({"output": json.dumps(mock_questions)}).encode(),
+TEST_COVERAGE_ANALYSIS.md:1267:        result = await codex_service.generate_questions(
+TEST_COVERAGE_ANALYSIS.md:1270:            num_questions=1
+TEST_COVERAGE_ANALYSIS.md:1274:    assert result[0]["question"] == "What is the cardiac output?"
+TEST_COVERAGE_ANALYSIS.md:1298:    """Test question generation endpoint with mocked Codex CLI."""
+TEST_COVERAGE_ANALYSIS.md:1300:    async def fake_generate_questions(topic, difficulty, num_questions):
+TEST_COVERAGE_ANALYSIS.md:1303:                "question": f"Question {i} about {topic}",
+TEST_COVERAGE_ANALYSIS.md:1306:                "explanation": f"Explanation for question {i}"
+TEST_COVERAGE_ANALYSIS.md:1308:            for i in range(num_questions)
+TEST_COVERAGE_ANALYSIS.md:1313:        "generate_questions",
+TEST_COVERAGE_ANALYSIS.md:1314:        fake_generate_questions
+TEST_COVERAGE_ANALYSIS.md:1318:        "/api/questions/generate",
+TEST_COVERAGE_ANALYSIS.md:1323:            "num_questions": 5
+TEST_COVERAGE_ANALYSIS.md:1329:    assert len(data["questions"]) == 5
+TEST_COVERAGE_ANALYSIS.md:1330:    assert all("question" in q for q in data["questions"])
+TEST_COVERAGE_ANALYSIS.md:1331:    assert all(len(q["options"]) == 4 for q in data["questions"])
+TEST_COVERAGE_ANALYSIS.md:1335:    """Test rate limiting on question generation endpoint."""
+TEST_COVERAGE_ANALYSIS.md:1340:            "/api/questions/generate",
+TEST_COVERAGE_ANALYSIS.md:1345:                "num_questions": 1
+TEST_COVERAGE_ANALYSIS.md:1686:- [ ] Generate questions (NBME-style)
+TEST_COVERAGE_ANALYSIS.md:1687:- [ ] Generate questions (parse error)
+TEST_COVERAGE_ANALYSIS.md:1688:- [ ] Generate teaching response
+FRONTEND_ARCHITECTURE.md:49:- Client Components for interactivity (quiz, chat, gamification)
+FRONTEND_ARCHITECTURE.md:77:- Interactive UI (quiz, chat, gamification)
+FRONTEND_ARCHITECTURE.md:166:│   │   │   ├── quiz/
+FRONTEND_ARCHITECTURE.md:167:│   │   │   │   ├── [quizId]/
+FRONTEND_ARCHITECTURE.md:168:│   │   │   │   │   └── page.tsx       # Active quiz (Client)
+FRONTEND_ARCHITECTURE.md:234:│   │   ├── quiz/                      # Quiz components
+FRONTEND_ARCHITECTURE.md:290:│   │   │   ├── quiz.ts                # Quiz endpoints
+FRONTEND_ARCHITECTURE.md:318:│   │   ├── quizStore.ts               # Active quiz state
+FRONTEND_ARCHITECTURE.md:330:│       ├── quiz.ts                    # Quiz types
+FRONTEND_ARCHITECTURE.md:357:│       └── quiz-flow.spec.ts
+FRONTEND_ARCHITECTURE.md:378:// - User profile, materials, questions, progress
+FRONTEND_ARCHITECTURE.md:384:// - Active quiz state, session state
+FRONTEND_ARCHITECTURE.md:454:**Quiz Store** (`stores/quizStore.ts`):
+FRONTEND_ARCHITECTURE.md:472:  quizId: string | null;
+FRONTEND_ARCHITECTURE.md:473:  questions: Question[];
+FRONTEND_ARCHITECTURE.md:486:  loadQuiz: (quizId: string, questions: Question[]) => void;
+FRONTEND_ARCHITECTURE.md:497:      quizId: null,
+FRONTEND_ARCHITECTURE.md:498:      questions: [],
+FRONTEND_ARCHITECTURE.md:507:        const { answers, questions } = get();
+FRONTEND_ARCHITECTURE.md:508:        return answers.every(a => a !== null) && answers.length === questions.length;
+FRONTEND_ARCHITECTURE.md:512:        const { answers, questions } = get();
+FRONTEND_ARCHITECTURE.md:515:          if (answer === questions[i]?.correctIndex) correct++;
+FRONTEND_ARCHITECTURE.md:517:        return questions.length > 0 ? (correct / questions.length) * 100 : 0;
+FRONTEND_ARCHITECTURE.md:520:      loadQuiz: (quizId, questions) => set({
+FRONTEND_ARCHITECTURE.md:521:        quizId,
+FRONTEND_ARCHITECTURE.md:522:        questions,
+FRONTEND_ARCHITECTURE.md:523:        answers: new Array(questions.length).fill(null),
+FRONTEND_ARCHITECTURE.md:524:        confidenceRatings: new Array(questions.length).fill(null),
+FRONTEND_ARCHITECTURE.md:529:      }, false, 'quiz/load'),
+FRONTEND_ARCHITECTURE.md:538:        }, false, 'quiz/answer'),
+FRONTEND_ARCHITECTURE.md:542:          currentIndex: Math.min(state.currentIndex + 1, state.questions.length - 1)
+FRONTEND_ARCHITECTURE.md:543:        }), false, 'quiz/next'),
+FRONTEND_ARCHITECTURE.md:548:        }), false, 'quiz/previous'),
+FRONTEND_ARCHITECTURE.md:551:        set({ endTime: new Date(), isSubmitted: true }, false, 'quiz/submit'),
+FRONTEND_ARCHITECTURE.md:555:          quizId: null,
+FRONTEND_ARCHITECTURE.md:556:          questions: [],
+FRONTEND_ARCHITECTURE.md:563:        }, false, 'quiz/reset'),
+FRONTEND_ARCHITECTURE.md:667:  questions: ['questions'] as const,
+FRONTEND_ARCHITECTURE.md:668:  question: (id: string) => ['questions', id] as const,
+FRONTEND_ARCHITECTURE.md:669:  questionsByTopic: (topic: string) => ['questions', 'topic', topic] as const,
+FRONTEND_ARCHITECTURE.md:1190:    queryKey: ['quizzes'],
+FRONTEND_ARCHITECTURE.md:1197:  return <QuizListPresenter quizzes={data} />;
+FRONTEND_ARCHITECTURE.md:1202:  quizzes: Quiz[];
+FRONTEND_ARCHITECTURE.md:1205:export function QuizListPresenter({ quizzes }: QuizListPresenterProps) {
+FRONTEND_ARCHITECTURE.md:1208:      {quizzes.map(quiz => (
+FRONTEND_ARCHITECTURE.md:1209:        <QuizCard key={quiz.id} quiz={quiz} />
+FRONTEND_ARCHITECTURE.md:1219:// components/quiz/QuestionCard.tsx
+FRONTEND_ARCHITECTURE.md:1226:export function QuestionCard({ question, children }: { question: Question; children: React.ReactNode }) {
+FRONTEND_ARCHITECTURE.md:1228:    <QuestionContext.Provider value={question}>
+FRONTEND_ARCHITECTURE.md:1238:  const question = useContext(QuestionContext);
+FRONTEND_ARCHITECTURE.md:1239:  return <p className="text-xl font-bold text-gray-900 mb-6">{question?.vignette}</p>;
+FRONTEND_ARCHITECTURE.md:1243:  const question = useContext(QuestionContext);
+FRONTEND_ARCHITECTURE.md:1246:      {question?.options.map((option, index) => (
+FRONTEND_ARCHITECTURE.md:1261:<QuestionCard question={currentQuestion}>
+FRONTEND_ARCHITECTURE.md:1475:queryKey: ['quiz', 'active'],
+FRONTEND_ARCHITECTURE.md:1779:│   ├── quiz/[quizId]/page.tsx
+FRONTEND_ARCHITECTURE.md:1846:  { name: 'Quiz', href: '/quiz', icon: Brain },
+FRONTEND_ARCHITECTURE.md:2236:  question: Question;
+FRONTEND_ARCHITECTURE.md:2241:  question,
+FRONTEND_ARCHITECTURE.md:2246:      <h2>{question.vignette}</h2>
+FRONTEND_ARCHITECTURE.md:2252:  return prevProps.question.id === nextProps.question.id;
+FRONTEND_ARCHITECTURE.md:2261:function QuizSummary({ answers, questions }: QuizSummaryProps) {
+FRONTEND_ARCHITECTURE.md:2264:    return calculateDetailedAnalytics(answers, questions);
+FRONTEND_ARCHITECTURE.md:2265:  }, [answers, questions]);
+FRONTEND_ARCHITECTURE.md:2289:      question={currentQuestion}
+FRONTEND_ARCHITECTURE.md:2785:  test('user can complete a quiz', async ({ page }) => {
+FRONTEND_ARCHITECTURE.md:2786:    // Navigate to quiz
+FRONTEND_ARCHITECTURE.md:2788:    await expect(page).toHaveURL('**/quiz');
+FRONTEND_ARCHITECTURE.md:2790:    // Start quiz
+FRONTEND_ARCHITECTURE.md:2793:    // Answer all questions
+FRONTEND_ARCHITECTURE.md:2801:      // Next question (or submit on last)
+FRONTEND_ARCHITECTURE.md:2869:- [ ] Create quiz store (Zustand)
+FRONTEND_ARCHITECTURE.md:2870:- [ ] Build question card component
+FRONTEND_ARCHITECTURE.md:2874:- [ ] Build quiz summary page
+FRONTEND_ARCHITECTURE.md:2943:✅ **Real-time**: WebSocket integration for AI coach
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:37:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:42:CREATE INDEX idx_user_attempts_user_question ON user_attempts(user_id, question_id);
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:71:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:103:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:122:    INDEX idx_user_attempts_user_question (user_id, question_id),
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:139:**File**: `backend/app/models/question.py` (unchanged from original)
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:158:    """User attempt on a question (immutable event log)."""
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:175:        ForeignKey("questions.id", ondelete="CASCADE"),
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:202:    question = relationship("Question", back_populates="attempts")
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:233:    """FSRS spaced repetition state for each (user, question) pair."""
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:246:        ForeignKey("questions.id", ondelete="CASCADE"),
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:277:    question = relationship("Question")
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:293:from app.models.question import Question
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:313:"""Create questions, user_attempts, and srs_card_state tables (FSRS-based)
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:331:    # Create questions table (unchanged)
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:333:        'questions',
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:368:    # Indexes for questions
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:369:    op.create_index('ix_questions_user_id', 'questions', ['user_id'])
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:370:    op.create_index('ix_questions_material_id', 'questions', ['material_id'])
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:371:    op.create_index('ix_questions_topic', 'questions', ['topic'])
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:372:    op.create_index('ix_questions_difficulty', 'questions', ['difficulty'])
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:373:    op.create_index('ix_questions_created_at', 'questions', ['created_at'])
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:390:        sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ondelete='CASCADE'),
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:404:    op.create_index('ix_user_attempts_user_question', 'user_attempts', ['user_id', 'question_id'])
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:421:        sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ondelete='CASCADE'),
+QUESTION_GENERATION_IMPLEMENTATION_FIXED.md:431:    op.drop_table('questions')
+ARCHITECTURE_DIAGRAM.md:82:         │ • Socratic       │ │ • MCQ Gen    │ │ • Bulk Analysis  │
+ARCHITECTURE_DIAGRAM.md:118:### Scenario 1: Generate MCQ Question
+ARCHITECTURE_DIAGRAM.md:121:User Request: "Generate cardiology question"
+ARCHITECTURE_DIAGRAM.md:133:│    • Similar question cached?         │
+ARCHITECTURE_DIAGRAM.md:142:│    • Select question type             │
+ARCHITECTURE_DIAGRAM.md:156:│    • Load MCQ template                │
+ARCHITECTURE_DIAGRAM.md:164:│    • Task: MCQ generation             │
+ARCHITECTURE_DIAGRAM.md:172:│    • Generate question                │
+ARCHITECTURE_DIAGRAM.md:220:│    • Template: Adaptive teaching      │
+ARCHITECTURE_DIAGRAM.md:231:│    • Task: Socratic teaching          │
+ARCHITECTURE_DIAGRAM.md:234:│      (best at adaptive teaching)      │
+ARCHITECTURE_DIAGRAM.md:242:│      - Socratic questions             │
+ARCHITECTURE_DIAGRAM.md:412:│ • 3 easier questions                │
+ARCHITECTURE_DIAGRAM.md:430:│ • 10-15 questions                   │
+ARCHITECTURE_DIAGRAM.md:433:│   - Adjust every 5 questions        │
+ARCHITECTURE_DIAGRAM.md:458:│ • 5 questions at target level       │
+TEST_IMPLEMENTATION_ROADMAP.md:371:    expect(screen.getByPlaceholderText(/ask a question/i)).toBeInTheDocument();
+TEST_IMPLEMENTATION_ROADMAP.md:388:    const input = screen.getByPlaceholderText(/ask a question/i);
+TEST_IMPLEMENTATION_ROADMAP.md:389:    await user.type(input, 'Test question');
+TEST_IMPLEMENTATION_ROADMAP.md:430:        await tracker.award_xp(user_id, 100, "quiz_completion")
+SESSION_HANDOFF_2025-10-12.md:36:- ✅ **WebSocket**: Real-time AI coach chat fully functional
+SESSION_HANDOFF_2025-10-12.md:358:# Codex CLI (for AI coach)
+SESSION_HANDOFF_2025-10-12.md:489:- [ ] AI coach responds to questions
+SESSION_HANDOFF_2025-10-12.md:571:   - [ ] Implement profile-specific teaching styles
+SESSION_HANDOFF_2025-10-12.md:575:   - [ ] Implement NBME-style MCQ generation
+SESSION_HANDOFF_2025-10-12.md:576:   - [ ] Add question bank management
+SESSION_HANDOFF_2025-10-12.md:786:  - Multiple teaching profiles
+SESSION_HANDOFF_2025-10-12.md:863:   - Complete MCQ generation feature
+SESSION_HANDOFF_2025-10-12.md:864:   - Add question bank UI
+SESSION_HANDOFF_2025-10-12.md:935:1. Add more teaching profiles (easy)
+ANSWERS_TO_KEY_QUESTIONS.md:8:- Socratic teaching and adaptive explanations
+ANSWERS_TO_KEY_QUESTIONS.md:18:- ✅ Excellent at structured output (JSON for questions)
+ANSWERS_TO_KEY_QUESTIONS.md:26:if task_type in ["socratic_teaching", "medical_reasoning", "performance_analysis"]:
+ANSWERS_TO_KEY_QUESTIONS.md:35:- MCQ generation (high volume)
+ANSWERS_TO_KEY_QUESTIONS.md:45:- ✅ Good at structured tasks like MCQ generation
+ANSWERS_TO_KEY_QUESTIONS.md:50:Generating 100 questions/day:
+ANSWERS_TO_KEY_QUESTIONS.md:89:            "socratic_teaching": ModelType.CLAUDE_35_SONNET,
+ANSWERS_TO_KEY_QUESTIONS.md:91:            "adaptive_teaching": ModelType.CLAUDE_35_SONNET,
+ANSWERS_TO_KEY_QUESTIONS.md:296:5. Use Socratic questions to engage critical thinking
+ANSWERS_TO_KEY_QUESTIONS.md:304:5. Active recall questions
+ANSWERS_TO_KEY_QUESTIONS.md:313:- Error-aware teaching (addresses misconceptions)
+ANSWERS_TO_KEY_QUESTIONS.md:324:Generate a USMLE Step 1 clinical vignette question.
+ANSWERS_TO_KEY_QUESTIONS.md:338:2. Clear question stem
+ANSWERS_TO_KEY_QUESTIONS.md:355:   - High-yield teaching points
+ANSWERS_TO_KEY_QUESTIONS.md:368:- Educational value beyond the question
+ANSWERS_TO_KEY_QUESTIONS.md:378:Analyze this student's question history:
+ANSWERS_TO_KEY_QUESTIONS.md:403:   - Practice question focus areas
+ANSWERS_TO_KEY_QUESTIONS.md:442:            {"date": "2025-01-20", "milestone": "Completed 100 questions"}
+ANSWERS_TO_KEY_QUESTIONS.md:525:    - You completed: {last_session.questions_answered} questions
+ANSWERS_TO_KEY_QUESTIONS.md:581:        self.window_size = 5  # questions to consider
+ANSWERS_TO_KEY_QUESTIONS.md:590:        recent_questions = recent_performance[-self.window_size:]
+ANSWERS_TO_KEY_QUESTIONS.md:591:        accuracy = sum(q['correct'] for q in recent_questions) / len(recent_questions)
+ANSWERS_TO_KEY_QUESTIONS.md:660:# Similar questions get cached responses
+ANSWERS_TO_KEY_QUESTIONS.md:671:# - First question: $0.015 (API call)
+ANSWERS_TO_KEY_QUESTIONS.md:672:# - Second question: $0.000 (cached)
+ANSWERS_TO_KEY_QUESTIONS.md:677:- 60% of questions are variations of common queries
+ANSWERS_TO_KEY_QUESTIONS.md:679:- Monthly savings: ~$120 for 100 questions/day
+ANSWERS_TO_KEY_QUESTIONS.md:719:    async def batch_questions(self, topics):
+ANSWERS_TO_KEY_QUESTIONS.md:721:        # Generate 10 questions in ONE call
+ANSWERS_TO_KEY_QUESTIONS.md:724:        Generate 10 USMLE questions covering:
+ANSWERS_TO_KEY_QUESTIONS.md:778:            "Consider increasing cache TTL for FAQ questions",
+ANSWERS_TO_KEY_QUESTIONS.md:844:    # Level 1: Check semantic cache for similar question
+ANSWERS_TO_KEY_QUESTIONS.md:851:        return get_pregenerated_question(request.topic)
+ANSWERS_TO_KEY_QUESTIONS.md:856:        "message": "High demand. Your question is queued.",
+ANSWERS_TO_KEY_QUESTIONS.md:916:### Conservative Estimate (100 questions/day)
+ANSWERS_TO_KEY_QUESTIONS.md:920:- 100 questions × $0.015 (Claude) = $1.50/day
+ANSWERS_TO_KEY_QUESTIONS.md:937:MCQ Generation: $3/month (GPT-4o-mini)
+ANSWERS_TO_KEY_QUESTIONS.md:957:5. ✅ MCQ generation
+ANSWERS_TO_KEY_QUESTIONS.md:958:6. ✅ Adaptive teaching
+ANSWERS_TO_KEY_QUESTIONS.md:986:    "cost_per_question": "$0.004",
+ANSWERS_TO_KEY_QUESTIONS.md:1007:   - Get MCQ generation working first
+ANSWERS_TO_KEY_QUESTIONS.md:1008:   - Add adaptive teaching second
+WEBSOCKET_CONNECTION_FIX.md:140:    """WebSocket endpoint for the AI coaching chat interface."""
+WEBSOCKET_CONNECTION_FIX.md:161:Connected to the AI coach. ✅
+WEBSOCKET_CONNECTION_FIX.md:185:   - ✅ "Connected to the AI coach" toast notification
+TEST_STRATEGY_EXECUTIVE_SUMMARY.md:25:❌ **RAG service tests** - Foundation of AI coach, 0% coverage
+ARCHITECTURE.md:21:StudyIn is a modern, scalable medical learning platform built with a microservices-oriented architecture, featuring real-time AI coaching, adaptive learning algorithms, and comprehensive analytics.
+ARCHITECTURE.md:292:    async def generate_question(
+ARCHITECTURE.md:301:        # Check cache for similar questions
+ARCHITECTURE.md:302:        cache_key = f"question:{topic}:{difficulty}"
+ARCHITECTURE.md:312:        question = self.parse_question(response)
+ARCHITECTURE.md:318:            question.json()
+ARCHITECTURE.md:322:        await self.save_question(question, user_id)
+ARCHITECTURE.md:324:        return question
+ARCHITECTURE.md:811:    'Total questions generated',
+ARCHITECTURE.md:838:    action="generate_question",
+CRITICAL_FIX_AUTH.md:5:**Impact**: Unblocks registration, login, file upload, AI coach
+API_DOCUMENTATION.md:121:    "total_questions": 450,
+API_DOCUMENTATION.md:391:      "questions": 45,
+API_DOCUMENTATION.md:397:      "questions": 50,
+API_DOCUMENTATION.md:402:    "anatomy": { "accuracy": 82.3, "questions": 120 },
+API_DOCUMENTATION.md:403:    "physiology": { "accuracy": 78.5, "questions": 95 },
+API_DOCUMENTATION.md:404:    "pathology": { "accuracy": 71.2, "questions": 85 }
+API_DOCUMENTATION.md:421:    "total_questions": 1450,
+API_DOCUMENTATION.md:432:      "questions": 55,
+API_DOCUMENTATION.md:456:    "total_questions": 450,
+API_DOCUMENTATION.md:459:    "average_time_per_question": 45.2,
+API_DOCUMENTATION.md:475:    "Practice more case-based questions",
+API_DOCUMENTATION.md:596:POST /api/questions/generate
+API_DOCUMENTATION.md:611:  "questions": [
+API_DOCUMENTATION.md:614:      "question": "A 65-year-old man presents with chest pain...",
+API_DOCUMENTATION.md:640:POST /api/questions/answer
+API_DOCUMENTATION.md:795:# Generate questions
+API_DOCUMENTATION.md:796:questions = client.questions.generate(
+API_DOCUMENTATION.md:802:for q in questions:
+API_DOCUMENTATION.md:803:    print(q.question)
+API_DOCUMENTATION.md:805:    result = client.questions.answer(q.id, answer)
+API_DOCUMENTATION.md:855:For API support and questions:
+TEST_COVERAGE_ANALYSIS_COMPREHENSIVE.md:231:10. Asks first question about uploaded material
+TEST_COVERAGE_ANALYSIS_COMPREHENSIVE.md:249:5. Asks series of questions (conversational flow)
+TEST_COVERAGE_ANALYSIS_COMPREHENSIVE.md:250:6. Receives Socratic teaching responses
+TEST_COVERAGE_ANALYSIS_COMPREHENSIVE.md:291:1. User asks question in AI Coach
+TEST_COVERAGE_ANALYSIS_COMPREHENSIVE.md:973:            "content": "Test question",
+TEST_COVERAGE_ANALYSIS_COMPREHENSIVE.md:1203:    expect(screen.getByPlaceholderText(/ask a question/i)).toBeInTheDocument();
+TEST_COVERAGE_ANALYSIS_COMPREHENSIVE.md:1216:    const input = screen.getByPlaceholderText(/ask a question/i);
+IMPLEMENTATION_COMPLETE.md:247:- [ ] Check for "Connected to StudyIn AI coach" message
+IMPLEMENTATION_COMPLETE.md:259:- [ ] Ask relevant question via chat
+IMPLEMENTATION_COMPLETE.md:313:- **Total Response:** <10s for typical question
+IMPLEMENTATION_COMPLETE.md:359:   - Test RAG with various questions
+MVP_CRITICAL_FIXES.md:170:`user_question_attempts` table will grow to millions of rows (every question answered = 1 row). Without partitioning, queries become slow and eventually unusable.
+MVP_CRITICAL_FIXES.md:221:            FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+MVP_CRITICAL_FIXES.md:310:VALUES (uuid_generate_v4(), 'user-uuid', 'question-uuid', 0, true, 45, 'practice', NOW());
+MVP_CRITICAL_FIXES.md:1355:# - Insert 100 question attempts with various dates
+PRD.md:18:**StudyIn** is a psychology-first gamified learning platform designed to transform USMLE Step 1 preparation from a stressful, overwhelming experience into an engaging, personalized journey. By combining advanced AI coaching, evidence-based learning science, and delightful gamification wrapped in a unique Soft Kawaii Brutalist UI, StudyIn addresses the core pain points of medical students: anxiety, motivation fatigue, and ineffective study methods.
+PRD.md:63:3. **Interactive AI Coach**: Socratic teaching AI that adapts to student's level, asks probing questions, provides hints (not answers), and encourages critical thinking.
+PRD.md:65:4. **NBME-Style MCQ Practice**: AI generates Step 1-representative multiple choice questions with detailed explanations, using student's own materials.
+PRD.md:76:- **AI-Powered**: Personalized coaching, not one-size-fits-all
+PRD.md:93:   - Questions per session: Target 20-40 MCQs
+PRD.md:103:   - Feature usage: 80%+ of users using AI coach weekly
+PRD.md:142:- Uses Anki (3000+ cards), UWorld (2000+ questions), First Aid (reference)
+PRD.md:149:- AI coach provides companionship and guidance
+PRD.md:189:- AI coach provides targeted practice
+PRD.md:218:- Practices questions repeatedly
+PRD.md:222:- AI coach provides Socratic questioning (deep understanding)
+PRD.md:225:- Non-judgmental AI coach builds confidence
+PRD.md:296:- Adjust path based on quiz performance
+PRD.md:315:As a medical student, I want to interact with an AI coach that teaches me using the Socratic method, asking questions and providing hints instead of just giving me answers.
+PRD.md:320:- Ask probing questions to stimulate thinking
+PRD.md:359:### FR4: NBME-Style MCQ Generation
+PRD.md:362:As a medical student, I want to practice with NBME-style multiple choice questions generated from my own study materials, so I can test my knowledge in the format I'll see on the real exam.
+PRD.md:367:- Generate MCQs from uploaded content
+PRD.md:370:- 1000+ questions per standard curriculum
+PRD.md:371:- Quality scoring (reject low-quality questions)
+PRD.md:382:- Mark questions for review
+PRD.md:383:- Track performance per question
+PRD.md:384:- Avoid showing same question too soon
+PRD.md:385:- Add custom questions manually
+PRD.md:388:- Timed mode (1.5 min per question, NBME pace)
+PRD.md:395:- [ ] Generates 100+ questions from 200-page textbook
+PRD.md:398:- [ ] Quality score > 4/5 for generated questions
+PRD.md:399:- [ ] User can filter questions by topic and difficulty
+PRD.md:400:- [ ] Timed mode enforces 1.5 min per question
+PRD.md:453:- Earn XP for: answering questions, completing reviews, study sessions, streaks
+PRD.md:467:- Unlock achievements for milestones (first quiz, 100 questions, etc.)
+PRD.md:522:- Predicted Step 1 score (based on question performance)
+PRD.md:597:- Quiz question generation < 5 seconds
+PRD.md:614:- Database can handle 1M+ questions
+PRD.md:696:- New users complete first quiz within 10 minutes
+PRD.md:705:- Time to complete first quiz < 10 min
+PRD.md:763:│  │  (Analytics)  │  │   (MCQs)      │  │   (WebSocket)    │ │
+PRD.md:779:│  │  (JWT)       │  │   (MCQs)     │  │   (Real-time)     │  │
+PRD.md:807:│  │ - Parse PDF/DOCX   │  │  - LLM MCQ generation    │ │
+PRD.md:895:9. AI Coach: "Great job! Now let's test your knowledge with a few questions."
+PRD.md:897:10. Transition to quiz mode
+PRD.md:899:11. User answers 10 MCQs
+PRD.md:901:12. After each question:
+PRD.md:932:6. System shows question from 3 days ago (based on SM-2)
+PRD.md:1023:- [ ] Build MCQ generation with LLM
+PRD.md:1025:- [ ] Create quiz UI
+PRD.md:1026:- [ ] Build question bank management
+PRD.md:1064:**Risk**: AI coach provides incorrect medical information, student studies wrong facts.
+PRD.md:1071:- Quality scoring for generated questions
+PRD.md:1088:- Core features (flashcards, pre-generated questions) work without LLM
+PRD.md:1109:**Risk**: AI-generated questions are too easy, too hard, or not NBME-representative.
+PRD.md:1114:- Quality scoring algorithm (reject low-quality questions)
+PRD.md:1115:- User can rate question quality
+PRD.md:1117:- Option to add manually curated questions
+PRD.md:1118:- Partner with medical educators for question bank review
+PRD.md:1143:- [ ] User completes 500+ questions
+PRD.md:1174:**Socratic Method**: Teaching by asking questions, not giving answers
+PRD.md:1176:**UWorld**: Popular USMLE question bank (2000+ questions)
+DEVELOPER_ONBOARDING.md:24:- 🤖 Real-time AI coaching with WebSocket streaming
+DEVELOPER_ONBOARDING.md:426:    async def generate_question(
+DEVELOPER_ONBOARDING.md:432:        """Generate a personalized question."""
+DEVELOPER_ONBOARDING.md:461:@router.post("/question")
+DEVELOPER_ONBOARDING.md:462:async def create_question(
+DEVELOPER_ONBOARDING.md:466:    return await service.generate_question(**data.dict())
+DEVELOPER_ONBOARDING.md:1109:- 💬 **Ask questions**: We're here to help
+TECH_SPEC.md:36:| LLM Integration | Codex CLI | latest | AI coach, question generation |
+TECH_SPEC.md:60:│   │   │   ├── quiz/
+TECH_SPEC.md:84:│   │   ├── quiz/                     # Quiz components
+TECH_SPEC.md:108:│   │   │   ├── quiz.ts               # Quiz endpoints
+TECH_SPEC.md:125:│   │   ├── quizStore.ts              # Quiz state
+TECH_SPEC.md:133:│       ├── quiz.ts                   # Quiz types
+TECH_SPEC.md:283:**Quiz Store** (`stores/quizStore.ts`):
+TECH_SPEC.md:299:  questions: Question[];
+TECH_SPEC.md:307:  loadQuestions: (questions: Question[]) => void;
+TECH_SPEC.md:316:  questions: [],
+TECH_SPEC.md:323:  loadQuestions: (questions) => set({
+TECH_SPEC.md:324:    questions,
+TECH_SPEC.md:325:    answers: new Array(questions.length).fill(null),
+TECH_SPEC.md:326:    confidenceRatings: new Array(questions.length).fill(null),
+TECH_SPEC.md:340:    currentIndex: Math.min(state.currentIndex + 1, state.questions.length - 1),
+TECH_SPEC.md:350:    questions: [],
+TECH_SPEC.md:538:│   │   ├── quiz.py                   # Quiz endpoints
+TECH_SPEC.md:559:│   │   ├── question.py               # Question model
+TECH_SPEC.md:567:│   │   ├── question.py               # Question schemas
+TECH_SPEC.md:575:│   │   ├── question.py               # Question repository
+TECH_SPEC.md:583:│   │   ├── question_generator.py    # MCQ generation
+TECH_SPEC.md:586:│   │   └── ai_coach/                 # AI coach module
+TECH_SPEC.md:588:│   │       ├── coach.py              # Main coach logic
+TECH_SPEC.md:596:│   │   └── question_worker.py        # Generate questions
+TECH_SPEC.md:842:    questions = relationship("Question", back_populates="material", cascade="all, delete-orphan")
+TECH_SPEC.md:845:**Question Model** (`models/question.py`):
+TECH_SPEC.md:856:    __tablename__ = "questions"
+TECH_SPEC.md:885:    material = relationship("Material", back_populates="questions")
+TECH_SPEC.md:886:    progress_entries = relationship("Progress", back_populates="question")
+TECH_SPEC.md:976:        """Calculate XP for answering a question"""
+TECH_SPEC.md:1002:        # Optimal time: 90 seconds per question
+TECH_SPEC.md:1147:GET    /api/questions             # List questions (filtered)
+TECH_SPEC.md:1148:GET    /api/questions/:id         # Get question details
+TECH_SPEC.md:1149:POST   /api/questions/generate    # Generate questions from material
+TECH_SPEC.md:1150:PATCH  /api/questions/:id         # Update question (flagging, etc.)
+TECH_SPEC.md:1151:DELETE /api/questions/:id         # Delete question
+TECH_SPEC.md:1152:POST   /api/questions/:id/answer  # Submit answer (record progress)
+TECH_SPEC.md:1158:POST   /api/quiz/session          # Create quiz session
+TECH_SPEC.md:1159:GET    /api/quiz/session/:id      # Get session details
+TECH_SPEC.md:1160:POST   /api/quiz/session/:id/submit  # Submit quiz session
+TECH_SPEC.md:1161:GET    /api/quiz/due-reviews      # Get due reviews for today
+TECH_SPEC.md:1176:WS     /ws/chat                   # WebSocket for AI coach chat
+TECH_SPEC.md:1237:questions_answered = Counter('questions_answered_total', 'Total questions answered', ['topic', 'correct'])
+WEBSOCKET_FIXES.md:183:3. Type a question in chat
+WEBSOCKET_FIXES.md:358:   # Should see: {"type":"info","message":"Connected to StudyIn AI coach.",...}
+AGENTS.md:72:"Implement WebSocket client for AI coach chat"
+AGENTS.md:94:- AI coach implementation
+AGENTS.md:105:- [ ] Phase 3: AI coach, learning paths
+AGENTS.md:213:- NBME-style question generation
+AGENTS.md:214:- Context-aware teaching
+AGENTS.md:218:- [ ] Phase 3: AI coach prompts
+AGENTS.md:345:- ai-engineer: "Design RAG + LLM pipeline for AI coach"
+AGENTS.md:347:- prompt-engineer: "Create medical education teaching prompts"
+AGENTS.md:358:- code-reviewer: "Review AI coach implementation"
+AGENTS.md:362:- test-automator: "Write tests for AI coach"
+PHASES.md:93:**Goal**: Use Codex CLI to generate personalized learning paths and coach interactions
+PHASES.md:101:- [ ] Create prompt templates for medical teaching
+PHASES.md:123:**Goal**: AI-generated MCQs with NBME-style formatting
+PHASES.md:126:- [ ] Build MCQ generation with Codex CLI
+PHASES.md:127:- [ ] Create question validation and quality scoring
+PHASES.md:128:- [ ] Implement question bank storage
+PHASES.md:129:- [ ] Build quiz session management
+PHASES.md:134:- [ ] Build quiz interface with timer
+PHASES.md:135:- [ ] Create question card component
+PHASES.md:138:- [ ] Show quiz summary and analytics
+PHASES.md:139:- [ ] Build question bank browser
+PHASES.md:142:- Can generate NBME-style questions from content
+PHASES.md:287:- Voice interaction with AI coach
+QUESTION_GENERATION_IMPLEMENTATION.md:12:The question generation feature is **40% complete**. Basic Codex integration exists, but the full system is missing:
+QUESTION_GENERATION_IMPLEMENTATION.md:13:- ✅ Codex CLI integration (`generate_questions` method in `codex_llm.py`)
+QUESTION_GENERATION_IMPLEMENTATION.md:14:- ❌ Database models for questions and user attempts
+QUESTION_GENERATION_IMPLEMENTATION.md:16:- ❌ API endpoints for question generation
+QUESTION_GENERATION_IMPLEMENTATION.md:47:async def generate_questions(
+QUESTION_GENERATION_IMPLEMENTATION.md:51:    num_questions: int = 5,
+QUESTION_GENERATION_IMPLEMENTATION.md:53:    """Generate NBME-style medical questions using Codex."""
+QUESTION_GENERATION_IMPLEMENTATION.md:54:    prompt = f"""Generate {num_questions} NBME-style USMLE Step 1 multiple choice questions about {topic}.
+QUESTION_GENERATION_IMPLEMENTATION.md:56:Format: Return JSON array with objects containing: question, options (array of 4), correct_index, explanation.
+QUESTION_GENERATION_IMPLEMENTATION.md:72:        raise ValueError(f"Failed to parse questions from Codex response: {response}")
+QUESTION_GENERATION_IMPLEMENTATION.md:90:- ✅ Ready for question generation integration
+QUESTION_GENERATION_IMPLEMENTATION.md:105:- `Question` model (store generated questions)
+QUESTION_GENERATION_IMPLEMENTATION.md:107:- `QuestionBank` model (optional: curated question collections)
+QUESTION_GENERATION_IMPLEMENTATION.md:118:- Create `questions` table
+QUESTION_GENERATION_IMPLEMENTATION.md:127:POST   /api/questions/generate          # Generate questions from material
+QUESTION_GENERATION_IMPLEMENTATION.md:128:GET    /api/questions                   # List questions (with filters)
+QUESTION_GENERATION_IMPLEMENTATION.md:129:GET    /api/questions/:id               # Get single question
+QUESTION_GENERATION_IMPLEMENTATION.md:130:POST   /api/questions/:id/answer        # Submit answer
+QUESTION_GENERATION_IMPLEMENTATION.md:131:GET    /api/questions/due               # Get due reviews (SM-2)
+QUESTION_GENERATION_IMPLEMENTATION.md:132:POST   /api/questions/:id/flag          # Flag question as incorrect
+QUESTION_GENERATION_IMPLEMENTATION.md:166:- List questions by topic/difficulty
+QUESTION_GENERATION_IMPLEMENTATION.md:168:- Search questions by content
+QUESTION_GENERATION_IMPLEMENTATION.md:169:- Update question quality scores
+QUESTION_GENERATION_IMPLEMENTATION.md:170:- Delete or archive questions
+QUESTION_GENERATION_IMPLEMENTATION.md:189:CREATE TABLE questions (
+QUESTION_GENERATION_IMPLEMENTATION.md:248:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+QUESTION_GENERATION_IMPLEMENTATION.md:308:5. Explanation with teaching points
+QUESTION_GENERATION_IMPLEMENTATION.md:317:    num_questions: int,
+QUESTION_GENERATION_IMPLEMENTATION.md:321:    Build NBME-style question generation prompt with RAG context.
+QUESTION_GENERATION_IMPLEMENTATION.md:327:        num_questions: Number of questions to generate
+QUESTION_GENERATION_IMPLEMENTATION.md:344:    prompt = f"""You are an expert medical educator creating USMLE Step 1 practice questions.
+QUESTION_GENERATION_IMPLEMENTATION.md:349:**Task**: Generate {num_questions} high-quality multiple choice questions about **{topic}**.
+QUESTION_GENERATION_IMPLEMENTATION.md:363:2. **Question Stem**: Clear, specific question
+QUESTION_GENERATION_IMPLEMENTATION.md:367:   - Avoid "All of the following EXCEPT" (poor question design)
+QUESTION_GENERATION_IMPLEMENTATION.md:376:4. **Explanation**: Comprehensive teaching explanation
+QUESTION_GENERATION_IMPLEMENTATION.md:379:   - Key teaching points (2-3 bullet points)
+QUESTION_GENERATION_IMPLEMENTATION.md:393:    "question": "What is the most likely diagnosis?",
+QUESTION_GENERATION_IMPLEMENTATION.md:402:    "teaching_points": [
+QUESTION_GENERATION_IMPLEMENTATION.md:415:- Base questions on the provided study material context
+QUESTION_GENERATION_IMPLEMENTATION.md:418:- Avoid trivial or overly obscure questions
+QUESTION_GENERATION_IMPLEMENTATION.md:421:Generate {num_questions} questions now:"""
+QUESTION_GENERATION_IMPLEMENTATION.md:433:**File**: `backend/app/models/question.py`
+QUESTION_GENERATION_IMPLEMENTATION.md:453:    """Question model for generated MCQs."""
+QUESTION_GENERATION_IMPLEMENTATION.md:455:    __tablename__ = "questions"
+QUESTION_GENERATION_IMPLEMENTATION.md:520:    material = relationship("Material", backref="questions")
+QUESTION_GENERATION_IMPLEMENTATION.md:521:    user = relationship("User", backref="questions")
+QUESTION_GENERATION_IMPLEMENTATION.md:524:        back_populates="question",
+QUESTION_GENERATION_IMPLEMENTATION.md:589:    """User attempt on a question (spaced repetition tracking)."""
+QUESTION_GENERATION_IMPLEMENTATION.md:608:        ForeignKey("questions.id", ondelete="CASCADE"),
+QUESTION_GENERATION_IMPLEMENTATION.md:649:    question = relationship("Question", back_populates="attempts")
+QUESTION_GENERATION_IMPLEMENTATION.md:727:from app.models.question import Question
+QUESTION_GENERATION_IMPLEMENTATION.md:757:**File**: `backend/alembic/versions/006_create_questions.py`
+QUESTION_GENERATION_IMPLEMENTATION.md:760:"""Create questions and user_attempts tables
+QUESTION_GENERATION_IMPLEMENTATION.md:781:    # Create questions table
+QUESTION_GENERATION_IMPLEMENTATION.md:783:        'questions',
+QUESTION_GENERATION_IMPLEMENTATION.md:818:    # Indexes for questions
+QUESTION_GENERATION_IMPLEMENTATION.md:819:    op.create_index('ix_questions_user_id', 'questions', ['user_id'])
+QUESTION_GENERATION_IMPLEMENTATION.md:820:    op.create_index('ix_questions_material_id', 'questions', ['material_id'])
+QUESTION_GENERATION_IMPLEMENTATION.md:821:    op.create_index('ix_questions_topic', 'questions', ['topic'])
+QUESTION_GENERATION_IMPLEMENTATION.md:822:    op.create_index('ix_questions_difficulty', 'questions', ['difficulty'])
+QUESTION_GENERATION_IMPLEMENTATION.md:823:    op.create_index('ix_questions_created_at', 'questions', ['created_at'], postgresql_ops={'created_at': 'DESC'})
+QUESTION_GENERATION_IMPLEMENTATION.md:845:            FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
+QUESTION_GENERATION_IMPLEMENTATION.md:880:    # Drop questions indexes
+QUESTION_GENERATION_IMPLEMENTATION.md:881:    op.drop_index('ix_questions_created_at', table_name='questions')
+QUESTION_GENERATION_IMPLEMENTATION.md:882:    op.drop_index('ix_questions_difficulty', table_name='questions')
+QUESTION_GENERATION_IMPLEMENTATION.md:883:    op.drop_index('ix_questions_topic', table_name='questions')
+QUESTION_GENERATION_IMPLEMENTATION.md:884:    op.drop_index('ix_questions_material_id', table_name='questions')
+QUESTION_GENERATION_IMPLEMENTATION.md:885:    op.drop_index('ix_questions_user_id', table_name='questions')
+QUESTION_GENERATION_IMPLEMENTATION.md:887:    # Drop questions table
+QUESTION_GENERATION_IMPLEMENTATION.md:888:    op.drop_table('questions')
+QUESTION_GENERATION_IMPLEMENTATION.md:916:from app.models.question import Question
+QUESTION_GENERATION_IMPLEMENTATION.md:926:    """Request parameters for question generation."""
+QUESTION_GENERATION_IMPLEMENTATION.md:931:    num_questions: int = 5
+QUESTION_GENERATION_IMPLEMENTATION.md:939:    """Single generated question."""
+QUESTION_GENERATION_IMPLEMENTATION.md:942:    question: str
+QUESTION_GENERATION_IMPLEMENTATION.md:946:    teaching_points: Optional[List[str]] = None
+QUESTION_GENERATION_IMPLEMENTATION.md:953:    """Generate NBME-style questions using Codex + RAG."""
+QUESTION_GENERATION_IMPLEMENTATION.md:959:    async def generate_questions(
+QUESTION_GENERATION_IMPLEMENTATION.md:966:        Generate questions from material using RAG context.
+QUESTION_GENERATION_IMPLEMENTATION.md:976:            ValueError: If generation fails or produces invalid questions
+QUESTION_GENERATION_IMPLEMENTATION.md:984:                "num_questions": request.num_questions,
+QUESTION_GENERATION_IMPLEMENTATION.md:998:                top_k=6,  # Get more context for question generation
+QUESTION_GENERATION_IMPLEMENTATION.md:1028:            num_questions=request.num_questions,
+QUESTION_GENERATION_IMPLEMENTATION.md:1032:        # Step 3: Generate questions via Codex
+QUESTION_GENERATION_IMPLEMENTATION.md:1034:            raw_questions = await self.codex.generate_questions(
+QUESTION_GENERATION_IMPLEMENTATION.md:1037:                num_questions=request.num_questions,
+QUESTION_GENERATION_IMPLEMENTATION.md:1047:            raise ValueError(f"Failed to generate questions: {e}")
+QUESTION_GENERATION_IMPLEMENTATION.md:1049:        # Step 4: Validate and parse questions
+QUESTION_GENERATION_IMPLEMENTATION.md:1050:        validated_questions = []
+QUESTION_GENERATION_IMPLEMENTATION.md:1051:        for idx, raw_q in enumerate(raw_questions):
+QUESTION_GENERATION_IMPLEMENTATION.md:1053:                generated_q = self._parse_question(raw_q)
+QUESTION_GENERATION_IMPLEMENTATION.md:1054:                validated_questions.append(generated_q)
+QUESTION_GENERATION_IMPLEMENTATION.md:1064:                # Skip invalid questions
+QUESTION_GENERATION_IMPLEMENTATION.md:1066:        if not validated_questions:
+QUESTION_GENERATION_IMPLEMENTATION.md:1067:            raise ValueError("No valid questions generated")
+QUESTION_GENERATION_IMPLEMENTATION.md:1071:        for generated_q in validated_questions:
+QUESTION_GENERATION_IMPLEMENTATION.md:1072:            question = Question(
+QUESTION_GENERATION_IMPLEMENTATION.md:1075:                vignette=f"{generated_q.vignette}\n\n{generated_q.question}",
+QUESTION_GENERATION_IMPLEMENTATION.md:1088:                    "teaching_points": generated_q.teaching_points,
+QUESTION_GENERATION_IMPLEMENTATION.md:1091:            question_models.append(question)
+QUESTION_GENERATION_IMPLEMENTATION.md:1108:        num_questions: int,
+QUESTION_GENERATION_IMPLEMENTATION.md:1111:        """Build the question generation prompt."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1122:        prompt = f"""You are an expert medical educator creating USMLE Step 1 practice questions.
+QUESTION_GENERATION_IMPLEMENTATION.md:1127:**Task**: Generate {num_questions} high-quality multiple choice questions about **{topic}**.
+QUESTION_GENERATION_IMPLEMENTATION.md:1141:2. **Question Stem**: Clear, specific question
+QUESTION_GENERATION_IMPLEMENTATION.md:1151:4. **Explanation**: Comprehensive teaching explanation
+QUESTION_GENERATION_IMPLEMENTATION.md:1154:   - Key teaching points (2-3 bullet points)
+QUESTION_GENERATION_IMPLEMENTATION.md:1161:    "question": "What is the most likely diagnosis?",
+QUESTION_GENERATION_IMPLEMENTATION.md:1170:    "teaching_points": [
+QUESTION_GENERATION_IMPLEMENTATION.md:1181:Generate {num_questions} questions now:"""
+QUESTION_GENERATION_IMPLEMENTATION.md:1185:    def _parse_question(self, raw_question: dict) -> GeneratedQuestion:
+QUESTION_GENERATION_IMPLEMENTATION.md:1186:        """Parse and validate a generated question."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1188:        required_fields = ["vignette", "question", "options", "correct_index", "explanation"]
+QUESTION_GENERATION_IMPLEMENTATION.md:1190:            if field not in raw_question:
+QUESTION_GENERATION_IMPLEMENTATION.md:1194:        options = raw_question["options"]
+QUESTION_GENERATION_IMPLEMENTATION.md:1199:        correct_index = raw_question["correct_index"]
+QUESTION_GENERATION_IMPLEMENTATION.md:1204:            vignette=raw_question["vignette"],
+QUESTION_GENERATION_IMPLEMENTATION.md:1205:            question=raw_question["question"],
+QUESTION_GENERATION_IMPLEMENTATION.md:1208:            explanation=raw_question["explanation"],
+QUESTION_GENERATION_IMPLEMENTATION.md:1209:            teaching_points=raw_question.get("teaching_points"),
+QUESTION_GENERATION_IMPLEMENTATION.md:1210:            topic=raw_question.get("topic"),
+QUESTION_GENERATION_IMPLEMENTATION.md:1211:            subtopic=raw_question.get("subtopic"),
+QUESTION_GENERATION_IMPLEMENTATION.md:1212:            difficulty=raw_question.get("difficulty"),
+QUESTION_GENERATION_IMPLEMENTATION.md:1228:    """Get question generator service instance."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1396:**File**: `backend/app/api/questions.py`
+QUESTION_GENERATION_IMPLEMENTATION.md:1399:"""Question generation and quiz API endpoints."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1413:from app.models.question import Question
+QUESTION_GENERATION_IMPLEMENTATION.md:1425:router = APIRouter(prefix="/api/questions", tags=["questions"])
+QUESTION_GENERATION_IMPLEMENTATION.md:1433:    """Request to generate questions."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1437:    num_questions: int = Field(5, ge=1, le=20)
+QUESTION_GENERATION_IMPLEMENTATION.md:1444:    """Single question response (without answer)."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1465:    """Request to answer a question."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1473:    """Response after answering a question."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1488:async def generate_questions(
+QUESTION_GENERATION_IMPLEMENTATION.md:1495:    Generate NBME-style questions from a material.
+QUESTION_GENERATION_IMPLEMENTATION.md:1498:    - Generates questions using Codex CLI
+QUESTION_GENERATION_IMPLEMENTATION.md:1499:    - Stores questions in database
+QUESTION_GENERATION_IMPLEMENTATION.md:1500:    - Returns questions WITHOUT answers
+QUESTION_GENERATION_IMPLEMENTATION.md:1512:        num_questions=request.num_questions,
+QUESTION_GENERATION_IMPLEMENTATION.md:1518:    # Generate questions
+QUESTION_GENERATION_IMPLEMENTATION.md:1520:        questions = await generator.generate_questions(
+QUESTION_GENERATION_IMPLEMENTATION.md:1531:    # Save questions to database
+QUESTION_GENERATION_IMPLEMENTATION.md:1532:    for question in questions:
+QUESTION_GENERATION_IMPLEMENTATION.md:1533:        session.add(question)
+QUESTION_GENERATION_IMPLEMENTATION.md:1538:    for question in questions:
+QUESTION_GENERATION_IMPLEMENTATION.md:1539:        await session.refresh(question)
+QUESTION_GENERATION_IMPLEMENTATION.md:1546:            "count": len(questions),
+QUESTION_GENERATION_IMPLEMENTATION.md:1550:    # Return questions without answers
+QUESTION_GENERATION_IMPLEMENTATION.md:1563:        for q in questions
+QUESTION_GENERATION_IMPLEMENTATION.md:1568:async def list_questions(
+QUESTION_GENERATION_IMPLEMENTATION.md:1577:    List questions for current user.
+QUESTION_GENERATION_IMPLEMENTATION.md:1596:    questions = result.scalars().all()
+QUESTION_GENERATION_IMPLEMENTATION.md:1610:        for q in questions
+QUESTION_GENERATION_IMPLEMENTATION.md:1615:async def get_question(
+QUESTION_GENERATION_IMPLEMENTATION.md:1620:    """Get a single question by ID (without answer)."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1632:    question = result.scalar_one_or_none()
+QUESTION_GENERATION_IMPLEMENTATION.md:1634:    if not question:
+QUESTION_GENERATION_IMPLEMENTATION.md:1638:        id=str(question.id),
+QUESTION_GENERATION_IMPLEMENTATION.md:1639:        vignette=question.vignette,
+QUESTION_GENERATION_IMPLEMENTATION.md:1640:        options=question.options,
+QUESTION_GENERATION_IMPLEMENTATION.md:1641:        topic=question.topic,
+QUESTION_GENERATION_IMPLEMENTATION.md:1642:        subtopic=question.subtopic,
+QUESTION_GENERATION_IMPLEMENTATION.md:1643:        difficulty=question.difficulty,
+QUESTION_GENERATION_IMPLEMENTATION.md:1644:        times_answered=question.times_answered,
+QUESTION_GENERATION_IMPLEMENTATION.md:1645:        success_rate=question.success_rate,
+QUESTION_GENERATION_IMPLEMENTATION.md:1646:        created_at=question.created_at.isoformat(),
+QUESTION_GENERATION_IMPLEMENTATION.md:1651:async def answer_question(
+QUESTION_GENERATION_IMPLEMENTATION.md:1658:    Submit an answer to a question.
+QUESTION_GENERATION_IMPLEMENTATION.md:1663:    - Updates question statistics
+QUESTION_GENERATION_IMPLEMENTATION.md:1671:    # Get question
+QUESTION_GENERATION_IMPLEMENTATION.md:1678:    question = result.scalar_one_or_none()
+QUESTION_GENERATION_IMPLEMENTATION.md:1680:    if not question:
+QUESTION_GENERATION_IMPLEMENTATION.md:1696:    is_correct = request.selected_index == question.correct_index
+QUESTION_GENERATION_IMPLEMENTATION.md:1705:    base_xp = 10  # Base XP per question
+QUESTION_GENERATION_IMPLEMENTATION.md:1706:    xp_earned = int(base_xp * difficulty_multipliers.get(question.difficulty, 1.0))
+QUESTION_GENERATION_IMPLEMENTATION.md:1764:    # Update question statistics
+QUESTION_GENERATION_IMPLEMENTATION.md:1765:    question.times_answered += 1
+QUESTION_GENERATION_IMPLEMENTATION.md:1767:        question.times_correct += 1
+QUESTION_GENERATION_IMPLEMENTATION.md:1788:        correct_index=question.correct_index,
+QUESTION_GENERATION_IMPLEMENTATION.md:1789:        explanation=question.explanation,
+QUESTION_GENERATION_IMPLEMENTATION.md:1803:    Get questions due for review (spaced repetition).
+QUESTION_GENERATION_IMPLEMENTATION.md:1805:    Returns questions where:
+QUESTION_GENERATION_IMPLEMENTATION.md:1810:    # Subquery to get latest attempt for each question
+QUESTION_GENERATION_IMPLEMENTATION.md:1821:    # Get questions due for review
+QUESTION_GENERATION_IMPLEMENTATION.md:1844:    questions = result.scalars().all()
+QUESTION_GENERATION_IMPLEMENTATION.md:1858:        for q in questions
+QUESTION_GENERATION_IMPLEMENTATION.md:1863:async def delete_question(
+QUESTION_GENERATION_IMPLEMENTATION.md:1868:    """Delete a question (and all associated attempts)."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1880:    question = result.scalar_one_or_none()
+QUESTION_GENERATION_IMPLEMENTATION.md:1882:    if not question:
+QUESTION_GENERATION_IMPLEMENTATION.md:1885:    await session.delete(question)
+QUESTION_GENERATION_IMPLEMENTATION.md:1902:from app.api import questions as questions_routes
+QUESTION_GENERATION_IMPLEMENTATION.md:1917:"""Tests for question generation feature."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1930:    """Test question generation service."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1934:        """Test question generation with RAG context."""
+QUESTION_GENERATION_IMPLEMENTATION.md:1942:            with patch.object(generator.codex, 'generate_questions') as mock_codex:
+QUESTION_GENERATION_IMPLEMENTATION.md:1946:                        "question": "What is the most likely diagnosis?",
+QUESTION_GENERATION_IMPLEMENTATION.md:1958:                    num_questions=1,
+QUESTION_GENERATION_IMPLEMENTATION.md:1962:                questions = await generator.generate_questions(
+QUESTION_GENERATION_IMPLEMENTATION.md:1967:                assert len(questions) == 1
+QUESTION_GENERATION_IMPLEMENTATION.md:1968:                assert questions[0].topic == "Cardiology"
+QUESTION_GENERATION_IMPLEMENTATION.md:1969:                assert questions[0].user_id == test_user.id
+QUESTION_GENERATION_IMPLEMENTATION.md:2050:// Generate questions from material
+QUESTION_GENERATION_IMPLEMENTATION.md:2052:  const response = await apiClient.post('/api/questions/generate', {
+QUESTION_GENERATION_IMPLEMENTATION.md:2055:    num_questions: 10,
+QUESTION_GENERATION_IMPLEMENTATION.md:2063:// Get a question to answer
+QUESTION_GENERATION_IMPLEMENTATION.md:2065:  const response = await apiClient.get(`/api/questions/${questionId}`);
+QUESTION_GENERATION_IMPLEMENTATION.md:2076:  const response = await apiClient.post(`/api/questions/${questionId}/answer`, {
+QUESTION_GENERATION_IMPLEMENTATION.md:2086:  const response = await apiClient.get('/api/questions/due/reviews');
+QUESTION_GENERATION_IMPLEMENTATION.md:2107:  - [ ] Add question validation
+QUESTION_GENERATION_IMPLEMENTATION.md:2108:  - [ ] Test question generation
+QUESTION_GENERATION_IMPLEMENTATION.md:2117:  - [ ] POST /api/questions/generate
+QUESTION_GENERATION_IMPLEMENTATION.md:2118:  - [ ] GET /api/questions
+QUESTION_GENERATION_IMPLEMENTATION.md:2119:  - [ ] GET /api/questions/:id
+QUESTION_GENERATION_IMPLEMENTATION.md:2120:  - [ ] POST /api/questions/:id/answer
+QUESTION_GENERATION_IMPLEMENTATION.md:2121:  - [ ] GET /api/questions/due/reviews
+QUESTION_GENERATION_IMPLEMENTATION.md:2122:  - [ ] DELETE /api/questions/:id
+QUESTION_GENERATION_IMPLEMENTATION.md:2127:  - [ ] Test question generation flow
+QUESTION_GENERATION_IMPLEMENTATION.md:2141:4. **Monitor performance** in production (question generation can be slow)
+QUESTION_GENERATION_IMPLEMENTATION.md:2149:- **Cache generated questions** to avoid regenerating identical topics
+QUESTION_GENERATION_IMPLEMENTATION.md:2150:- **Background job** for question generation (don't block API request)
+QUESTION_GENERATION_IMPLEMENTATION.md:2151:- **Batch generation** - generate 20 questions at once, serve them over time
+QUESTION_GENERATION_IMPLEMENTATION.md:2152:- **Pre-generate questions** for popular topics
+QUESTION_GENERATION_IMPLEMENTATION.md:2155:- **Human review** of generated questions (admin interface)
+QUESTION_GENERATION_IMPLEMENTATION.md:2156:- **Flag mechanism** for poor quality questions
+QUESTION_GENERATION_IMPLEMENTATION.md:2158:- **Track question statistics** (success rate, time taken) to identify bad questions
+QUESTION_GENERATION_IMPLEMENTATION.md:2164:- **Rate limit** question generation (expensive LLM calls)
+PROJECT_STRUCTURE.md:55:│   │   │   │   ├── questions.py
+PROJECT_STRUCTURE.md:75:│   │   │   ├── question.py
+PROJECT_STRUCTURE.md:85:│   │   │   ├── question.py
+PROJECT_STRUCTURE.md:109:│   │   │   ├── ai_coach/
+PROJECT_STRUCTURE.md:199:│   │   │   ├── questions/
+PROJECT_STRUCTURE.md:241:│   │   │   ├── questions/
+LEARNING_SCIENCE_ARCHITECTURE.md:158:    card_id UUID NOT NULL REFERENCES cards(id), -- Base card from question bank
+LEARNING_SCIENCE_ARCHITECTURE.md:1020:      <div className="question">
+LEARNING_SCIENCE_ARCHITECTURE.md:1021:        {card.content.question}
+LEARNING_SCIENCE_ARCHITECTURE.md:1106:# backend/app/models/questions.py
+LEARNING_SCIENCE_ARCHITECTURE.md:1137:# Map question types to retrieval strength
+LEARNING_SCIENCE_ARCHITECTURE.md:1154:-- Cards (questions/items to review)
+LEARNING_SCIENCE_ARCHITECTURE.md:1161:    -- MCQ: {question, options: [{text, is_correct, explanation}], explanation, tags}
+LEARNING_SCIENCE_ARCHITECTURE.md:1162:    -- Short answer: {question, answer, explanation, keywords}
+LEARNING_SCIENCE_ARCHITECTURE.md:1163:    -- Clinical vignette: {case, question, options, clinical_pearl, tags}
+LEARNING_SCIENCE_ARCHITECTURE.md:1235:    user_answer JSONB, -- Format depends on question type
+LEARNING_SCIENCE_ARCHITECTURE.md:1237:    partial_credit FLOAT, -- For questions with multiple parts
+LEARNING_SCIENCE_ARCHITECTURE.md:1288:    Selects questions based on:
+LEARNING_SCIENCE_ARCHITECTURE.md:1362:        - Start with lower retrieval strength (MCQ)
+LEARNING_SCIENCE_ARCHITECTURE.md:1512:        # Stability range -> appropriate question types
+LEARNING_SCIENCE_ARCHITECTURE.md:1522:        Get appropriate question types based on card stability
+LEARNING_SCIENCE_ARCHITECTURE.md:1535:        Suggest next question type for a card based on current stability
+LEARNING_SCIENCE_ARCHITECTURE.md:1726:    Grade answer based on question type
+LEARNING_SCIENCE_ARCHITECTURE.md:1746:            question=card_content['question'],
+LEARNING_SCIENCE_ARCHITECTURE.md:1755:        # Clinical vignette - MCQ format
+LEARNING_SCIENCE_ARCHITECTURE.md:1774:    return False, 0.0, "Unable to grade this question type"
+LEARNING_SCIENCE_ARCHITECTURE.md:1781:- **Retrieval strength progression**: Tracking question type difficulty over time
+LEARNING_SCIENCE_ARCHITECTURE.md:1783:- **Transfer performance**: Ability to answer different question types on same content
+LEARNING_SCIENCE_ARCHITECTURE.md:1789:- Cross-question-type transfer: >70% success on new format for mastered content
+LEARNING_SCIENCE_ARCHITECTURE.md:1832:    -- "How difficult was this question?" after answering
+LEARNING_SCIENCE_ARCHITECTURE.md:2166:                We've noticed a pattern: you're often highly confident on questions you get wrong.
+LEARNING_SCIENCE_ARCHITECTURE.md:2228:                - Challenge yourself with harder question types
+LEARNING_SCIENCE_ARCHITECTURE.md:2232:                    "Try harder question types",
+LEARNING_SCIENCE_ARCHITECTURE.md:2371:            For each question:
+LEARNING_SCIENCE_ARCHITECTURE.md:2372:            1. Read the question
+LEARNING_SCIENCE_ARCHITECTURE.md:2374:            3. Answer the question
+PROFILE_SYSTEM_COMPLETE.md:127:  - "Study (Balanced teaching)" → `studyin_study`
+PROFILE_SYSTEM_COMPLETE.md:143:    <option value="studyin_study">Study (Balanced teaching)</option>
+PROFILE_SYSTEM_COMPLETE.md:203:- Socratic teaching approach (asking follow-up questions)
+PROFILE_SYSTEM_COMPLETE.md:287:2. ✅ WebSocket chat with AI coach
+PROFILE_SYSTEM_COMPLETE.md:305:   - Try "Study" for balanced teaching
+PROFILE_SYSTEM_COMPLETE.md:308:4. **Ask real study questions**:
+PROFILE_SYSTEM_COMPLETE.md:314:   - Ask same question with different profiles
+PROFILE_SYSTEM_COMPLETE.md:358:Track which profiles users prefer for different types of questions:
+PROFILE_SYSTEM_COMPLETE.md:363:    question TEXT,
+PROFILE_SYSTEM_COMPLETE.md:378:- Profile recommendations based on question complexity
+SYSTEM_FLOWS.md:69:│  │  - Quiz state (questions, answers)                             │ │
+SYSTEM_FLOWS.md:142:│  │  - Parse PDF    │  │  - Generate     │  │  - LLM MCQs     │   │
+SYSTEM_FLOWS.md:313:     │ 1. Type question: "What causes myocardial infarction?"
+SYSTEM_FLOWS.md:364:│     Student question:                                 │
+SYSTEM_FLOWS.md:365:│     {question}                                        │
+SYSTEM_FLOWS.md:368:│     - Ask probing questions                           │
+SYSTEM_FLOWS.md:416:│     "Generating 20 questions..."   │
+SYSTEM_FLOWS.md:419:         │ 3. POST /api/questions/generate
+SYSTEM_FLOWS.md:434:│     - job_type: generate_questions                   │
+SYSTEM_FLOWS.md:455:       │ 12. For each batch of 5 questions:            │
+SYSTEM_FLOWS.md:460:       │        Generate 5 NBME-style MCQs             │
+SYSTEM_FLOWS.md:501:              │     quiz       │
+SYSTEM_FLOWS.md:515:     │ 1. Start quiz (20 questions)
+SYSTEM_FLOWS.md:521:│  2. POST /api/quiz/session            │
+SYSTEM_FLOWS.md:534:│  3. Create quiz session record                   │
+SYSTEM_FLOWS.md:539:│  4. Select questions:                            │
+SYSTEM_FLOWS.md:542:│     b. Fill remaining with new questions         │
+SYSTEM_FLOWS.md:548:│  5. Return session + questions                   │
+SYSTEM_FLOWS.md:551:│       questions: [...]                           │
+SYSTEM_FLOWS.md:560:│  7. Load questions into state          │
+SYSTEM_FLOWS.md:563:│  9. Display first question             │
+SYSTEM_FLOWS.md:566:    User answers questions...
+SYSTEM_FLOWS.md:575:│ 13. POST /api/questions/:id/answer     │
+SYSTEM_FLOWS.md:660:│ 25. After last question:               │
+SYSTEM_FLOWS.md:661:│     POST /api/quiz/session/:id/submit  │
+SYSTEM_FLOWS.md:663:│ 26. Show quiz summary:                 │
+SYSTEM_FLOWS.md:721:                   │  │  - Start quiz       │  │
+SYSTEM_FLOWS.md:1167:- Data flow diagrams (registration, document upload, AI chat, questions, quiz)
+frontend/src/pages/ChatView.tsx:45:          Ask questions about your study materials and get personalized explanations
+FILE_INDEX.md:39:**Purpose:** Detailed answers to your 7 specific questions
+FILE_INDEX.md:136:async def get_context_for_question(question) -> str
+FILE_INDEX.md:154:adaptive_teaching(concept, user_level, style) -> str
+FILE_INDEX.md:176:async def generate_question(session, user) -> Dict
+FILE_INDEX.md:177:async def process_answer(session, user, question, answer) -> Dict
+FILE_INDEX.md:399:| Answer "why?" questions | ANSWERS_TO_KEY_QUESTIONS.md |
+CHANGELOG.md:41:- AI determines best teaching method
+CHANGELOG.md:43:- Personalized learning pathway with AI coach
+CHANGELOG.md:44:- Practice MCQs representative of Step 1
+CHANGELOG.md:331:- Pixel art mascot/coach
+MVP_SPECIFICATION.md:5:A psychology-first, gamified learning platform for USMLE Step 1 preparation that combines evidence-based learning science with an engaging Soft Kawaii UI aesthetic. The platform uses AI to create personalized learning pathways, generate representative practice questions, and provide adaptive coaching.
+MVP_SPECIFICATION.md:14:Create an interactive, personalized learning experience that prepares medical students for USMLE Step 1 through adaptive teaching methods and representative practice questions.
+MVP_SPECIFICATION.md:17:- **Learning Effectiveness**: 70-80% target accuracy on practice questions
+MVP_SPECIFICATION.md:36:- MCQs, fill-in-the-blanks, case studies
+MVP_SPECIFICATION.md:37:- Higher-order thinking questions (not just memorization)
+MVP_SPECIFICATION.md:46:- AI coach guides users to build their own understanding
+MVP_SPECIFICATION.md:90:  - Personified learning coach
+MVP_SPECIFICATION.md:124:  - "Complete 1 practice quiz"
+MVP_SPECIFICATION.md:141:     - Quick recall questions
+MVP_SPECIFICATION.md:149:     - Socratic questions to guide understanding
+MVP_SPECIFICATION.md:153:     - Struggles → more explanations, easier questions
+MVP_SPECIFICATION.md:163:1. **Quiz Introduction**: Number of questions, topic coverage
+MVP_SPECIFICATION.md:166:   - Second/third-order questions
+MVP_SPECIFICATION.md:171:   - Read vignette and question
+MVP_SPECIFICATION.md:277:  - User data, progress, questions
+MVP_SPECIFICATION.md:287:  - Medical reasoning and Socratic teaching
+MVP_SPECIFICATION.md:291:  - MCQ generation (cost-effective)
+MVP_SPECIFICATION.md:359:│  │ • Path Gen      │  │ • MCQ Gen       │                  │
+MVP_SPECIFICATION.md:392:6. **Question**: MCQs with explanations, difficulty, topics
+MVP_SPECIFICATION.md:420:GET    /api/v1/questions
+MVP_SPECIFICATION.md:421:POST   /api/v1/questions/generate
+MVP_SPECIFICATION.md:422:POST   /api/v1/questions/{id}/answer
+MVP_SPECIFICATION.md:445:- **Target**: $10-15/month for 100 questions/day (76% cost reduction)
+MVP_SPECIFICATION.md:506:- Mixed content delivery (text, diagrams, questions)
+MVP_SPECIFICATION.md:512:#### F5: Practice Questions (MCQs)
+MVP_SPECIFICATION.md:513:- NBME/USMLE Step 1 style questions
+MVP_SPECIFICATION.md:552:- Animated mascot/coach character
+MVP_SPECIFICATION.md:562:- Bookmark/flag questions
+MVP_SPECIFICATION.md:563:- Create custom quizzes
+MVP_SPECIFICATION.md:582:- Voice interaction with AI coach
+MVP_SPECIFICATION.md:662:- [ ] MCQ generation system (LLM-powered)
+MVP_SPECIFICATION.md:671:- Working quiz system
+MVP_SPECIFICATION.md:672:- NBME-style questions generated
+MVP_SPECIFICATION.md:743:✅ NBME-style MCQs are generated with quality explanations
+MVP_SPECIFICATION.md:750:✅ **Accuracy**: AI-generated questions are medically accurate
+MVP_SPECIFICATION.md:755:✅ **Cost**: <$15/month for personal use (100 questions/day)
+MVP_SPECIFICATION.md:830:- **LLM APIs** (100 questions/day, optimized): $10-15
+MVP_SPECIFICATION.md:855:| Poor question quality | High | Medium | Human review system, quality scoring, feedback loop |
+MVP_SPECIFICATION.md:946:- UWorld (question quality benchmark)
+MVP_SPECIFICATION.md:961:- **MCQ**: Multiple Choice Question
+frontend/src/pages/CosmicDashboard.tsx:162:    description: 'Complete 50 questions in one day',
+DESIGN_SYSTEM.md:1200:- Created example screens (dashboard, quiz)
+VISION.md.archive:60:Competitors: Same format (flashcards or MCQs)
+VISION.md.archive:62:     Review = practice questions
+VISION.md.archive:69:Competitors: Hardcoded topics, prerequisites, questions
+VISION.md.archive:72:     LLM generates questions from YOUR PDFs
+VISION.md.archive:77:2. ✅ Prefer conversation over flashcards/MCQs
+VISION.md.archive:96:- Which teaching styles work for which subjects
+VISION.md.archive:109:- Item Response Theory (IRT) - measures question difficulty + your ability
+VISION.md.archive:112:- Adaptive difficulty (harder questions as you improve)
+VISION.md.archive:143:- Every question I ask (with extracted topics)
+VISION.md.archive:146:- Follow-up questions (indicates confusion)
+VISION.md.archive:147:- Quiz performance (when I add practice questions)
+VISION.md.archive:171:- Practice question performance → predicted score
+VISION.md.archive:186:   - question, extracted_topics, context_chunks_used
+VISION.md.archive:187:   - timestamp, session_duration, teaching_mode
+VISION.md.archive:192:   - quiz_performance (accuracy per topic)
+VISION.md.archive:281:- Every question asked (with LLM-extracted topics)
+VISION.md.archive:307:topics = llm.extract_topics(question, context)
+VISION.md.archive:333:- **UWorld:** Best USMLE question bank (IRT + performance tracking)
+PERFORMANCE_ANALYSIS_REPORT.md:177:- **Database load:** -80% queries for repeated/similar questions
+PERFORMANCE_ANALYSIS_REPORT.md:235:- **Cache hit rate estimate:** 60-80% (users ask similar questions)
+README.md:5:A comprehensive medical learning platform featuring real-time AI coaching, adaptive question generation, gamification, and advanced analytics. Built with modern web technologies and a Soft Kawaii Brutalist Minimal Pixelated design aesthetic.
+README.md:47:- **AI Coach** - Real-time Socratic teaching with streaming responses
+README.md:49:- **Smart Question Generation** - USMLE-style MCQ creation
+README.md:326:| GET | `/api/questions/generate` | Generate MCQ questions |
+README.md:327:| POST | `/api/questions/answer` | Submit answer |
+README.md:578:- **Anthropic Claude** - AI coaching and content generation
+frontend/PHASE1_ANALYTICS_IMPLEMENTATION.md:44:- `getQuestionMastery()` - GET `/api/analytics/mastery/question-types`
+frontend/PHASE1_ANALYTICS_IMPLEMENTATION.md:50:**Purpose:** Radar/spider chart showing mastery across 8 question types
+frontend/PHASE1_ANALYTICS_IMPLEMENTATION.md:54:  - 8-axis radar chart (one per topic/question type)
+frontend/PHASE1_ANALYTICS_IMPLEMENTATION.md:117:- Detailed tooltips with questions & response time
+frontend/PHASE1_ANALYTICS_IMPLEMENTATION.md:377:- **Topic Deep Dive:** Click topic to see question history
+frontend/PHASE1_ANALYTICS_IMPLEMENTATION.md:378:- **Heatmap Filters:** Filter by question difficulty/type
+frontend/PHASE1_ANALYTICS_IMPLEMENTATION.md:448:- `GET /api/analytics/mastery/question-types`
+frontend/src/pages/Dashboard.tsx:143:            Open AI coach
+frontend/src/pages/Dashboard.tsx:193:            <p className="mt-1 text-xs text-muted-foreground">Aim for digestible file sizes per study block.</p>
+frontend/src/pages/Dashboard.tsx:295:                Start with one concise resource. Small, consistent additions make the AI coach smarter without
+STRATEGIC_ROADMAP_2025-10-12.md:278:2. **Learning Session**: Login → Select material → Ask questions → View analytics
+STRATEGIC_ROADMAP_2025-10-12.md:320:    <Route path="/coach" element={<AICoach />} />
+frontend/src/pages/AdvancedAnalyticsView.tsx:361:              Answer questions across different topics and study throughout the week to unlock
+archive/old_root_files/rag_pipeline.py:530:    async def get_context_for_question(
+archive/old_root_files/rag_pipeline.py:532:        question: str,
+archive/old_root_files/rag_pipeline.py:535:        """Get formatted context for a question"""
+archive/old_root_files/rag_pipeline.py:539:            query=question,
+AGENTS_GUIDE.md:101:- **When**: Building AI coach and learning path generation
+AGENTS_GUIDE.md:114:  - NBME-style question generation prompts
+AGENTS_GUIDE.md:115:  - Context-aware teaching strategies
+AGENTS_GUIDE.md:137:- **When**: Building MCQ generation system
+AGENTS_GUIDE.md:144:- **When**: Implementing quiz logic
+AGENTS_GUIDE.md:404:1. **ai-engineer** - RAG & AI coach
+AGENTS_GUIDE.md:447:2. **prompt-engineer** - Create teaching prompts
+archive/old_root_files/cost_optimizer.py:574:        "prompt": "Generate a question about cardiac physiology"
+backend/ANALYTICS_SYSTEM.md:133:- `ai_coach_metrics` - AI interaction metrics
+backend/ANALYTICS_SYSTEM.md:308:For issues or questions about the analytics system, please refer to:
+frontend/INTEGRATION_GUIDE.md:219:curl http://localhost:8000/api/analytics/mastery/question-types \
+archive/old_root_files/llm_integration.py:52:    MODERATE = 2    # MCQ generation, simple reasoning
+archive/old_root_files/llm_integration.py:53:    COMPLEX = 3     # Socratic teaching, complex analysis
+archive/old_root_files/llm_integration.py:67:        use_cases=["medical_reasoning", "socratic_teaching", "complex_analysis"]
+archive/old_root_files/llm_integration.py:169:            "socratic_teaching": ModelType.CLAUDE_35_SONNET,
+archive/old_root_files/llm_integration.py:369:            content="I'm currently experiencing high demand. Please try again in a moment or try a simpler question.",
+archive/old_root_files/llm_integration.py:442:    # Example: Generate MCQ
+archive/old_root_files/llm_integration.py:445:        prompt="Generate a USMLE Step 1 question about cardiac physiology",
+TEST_WEBSOCKET_FIX.sh:94:echo "   ${GREEN}✅ Connected to the AI coach.${NC}"
+archive/old_root_files/learning_engine.py:24:    TEACHING = "teaching"
+archive/old_root_files/learning_engine.py:43:    average_time_per_question: float = 90.0  # seconds
+archive/old_root_files/learning_engine.py:74:    target_questions: int = 20
+archive/old_root_files/learning_engine.py:95:        self.difficulty_window = 5  # questions to consider for adjustment
+archive/old_root_files/learning_engine.py:168:        """Adaptive teaching of a medical concept"""
+archive/old_root_files/learning_engine.py:180:        # Format context for teaching
+archive/old_root_files/learning_engine.py:192:        # Generate adaptive teaching content
+archive/old_root_files/learning_engine.py:197:        prompt = PromptTemplates.adaptive_teaching(
+archive/old_root_files/learning_engine.py:206:            task_type="socratic_teaching",
+archive/old_root_files/learning_engine.py:211:            temperature=0.8  # More creative for teaching
+archive/old_root_files/learning_engine.py:232:    async def generate_question(
+archive/old_root_files/learning_engine.py:238:        """Generate adaptive USMLE-style question"""
+archive/old_root_files/learning_engine.py:248:        # Get context for question generation
+archive/old_root_files/learning_engine.py:249:        rag_context = await self.rag.get_context_for_question(
+archive/old_root_files/learning_engine.py:250:            question=f"Generate question about {topic}",
+archive/old_root_files/learning_engine.py:254:        # Generate question using specialized prompt
+archive/old_root_files/learning_engine.py:276:        # Parse question
+archive/old_root_files/learning_engine.py:284:            # Fallback: create structured question from text
+archive/old_root_files/learning_engine.py:286:                "vignette": "Error generating question",
+archive/old_root_files/learning_engine.py:287:                "question": response.content[:200],
+archive/old_root_files/learning_engine.py:297:        question: Dict[str, Any],
+archive/old_root_files/learning_engine.py:303:        is_correct = user_answer == question["correct_answer"]
+archive/old_root_files/learning_engine.py:305:        # Record question performance
+archive/old_root_files/learning_engine.py:308:            "topic": question.get("topic", session.current_topic),
+archive/old_root_files/learning_engine.py:309:            "difficulty": question.get("generated_difficulty", session.current_difficulty),
+archive/old_root_files/learning_engine.py:311:            "correct_answer": question["correct_answer"],
+archive/old_root_files/learning_engine.py:324:            question=question,
+archive/old_root_files/learning_engine.py:334:                question=question,
+archive/old_root_files/learning_engine.py:350:            "explanations": question.get("explanations", {}),
+archive/old_root_files/learning_engine.py:361:        """Calculate appropriate difficulty for next question"""
+archive/old_root_files/learning_engine.py:368:        recent_questions = session.questions_this_session[-self.difficulty_window:]
+archive/old_root_files/learning_engine.py:369:        recent_correct = sum(1 for q in recent_questions if q["is_correct"])
+archive/old_root_files/learning_engine.py:370:        recent_accuracy = recent_correct / len(recent_questions)
+archive/old_root_files/learning_engine.py:395:        recent_questions = session.questions_this_session[-self.difficulty_window:]
+archive/old_root_files/learning_engine.py:396:        recent_correct = sum(1 for q in recent_questions if q["is_correct"])
+archive/old_root_files/learning_engine.py:397:        recent_accuracy = recent_correct / len(recent_questions)
+archive/old_root_files/learning_engine.py:424:        question: Dict[str, Any],
+archive/old_root_files/learning_engine.py:432:            feedback = f"✓ Correct! {question['explanations']['correct_answer']['why_correct']}\n\n"
+archive/old_root_files/learning_engine.py:434:            for pearl in question['explanations']['correct_answer'].get('clinical_pearls', []):
+archive/old_root_files/learning_engine.py:437:            correct_answer = question['correct_answer']
+archive/old_root_files/learning_engine.py:439:            feedback += f"Why you were wrong:\n{question['explanations']['distractors'].get(user_answer, 'Explanation unavailable')}\n\n"
+archive/old_root_files/learning_engine.py:440:            feedback += f"Why {correct_answer} is correct:\n{question['explanations']['correct_answer']['why_correct']}\n"
+archive/old_root_files/learning_engine.py:447:        question: Dict[str, Any],
+archive/old_root_files/learning_engine.py:453:            "topic": question.get("topic"),
+archive/old_root_files/learning_engine.py:454:            "difficulty": question.get("generated_difficulty"),
+archive/old_root_files/learning_engine.py:456:            "correct_answer": question["correct_answer"],
+archive/old_root_files/learning_engine.py:457:            "concepts_tested": question.get("concepts_tested", []),
+archive/old_root_files/learning_engine.py:468:        topic = question.get("topic")
+archive/old_root_files/learning_engine.py:505:            return {"error": "No questions answered in session"}
+archive/old_root_files/learning_engine.py:507:        # Prepare question history for analysis
+archive/old_root_files/learning_engine.py:608:    teaching = await engine.teach_concept(
+archive/old_root_files/learning_engine.py:611:    print("Teaching:", teaching[:200])
+archive/old_root_files/learning_engine.py:613:    # Generate practice question
+archive/old_root_files/learning_engine.py:614:    question = await engine.generate_question(session, user)
+archive/old_root_files/learning_engine.py:615:    print("\nQuestion:", question.get("question"))
+archive/old_root_files/learning_engine.py:619:        session, user, question, "C", time_spent=75.0
+frontend/src/lib/api/analytics.ts:50: * Fetch question type mastery radar data
+frontend/src/lib/api/analytics.ts:51: * GET /api/analytics/mastery/question-types
+frontend/src/lib/api/analytics.ts:55:    '/api/analytics/mastery/question-types'
+archive/old_root_files/medical_prompts.py:31:    """Types of medical questions"""
+archive/old_root_files/medical_prompts.py:118:    def adaptive_teaching(
+archive/old_root_files/medical_prompts.py:125:        """Generate adaptive teaching content"""
+archive/old_root_files/medical_prompts.py:150:        return f"""You are an expert medical educator teaching a student preparing for USMLE Step 1.
+archive/old_root_files/medical_prompts.py:168:7. Check understanding with targeted questions
+archive/old_root_files/medical_prompts.py:171:1. **Hook**: Start with an engaging clinical scenario or question
+archive/old_root_files/medical_prompts.py:175:5. **Active Recall**: Ask 2-3 questions to check understanding
+archive/old_root_files/medical_prompts.py:188:        """Generate Socratic questions to guide learning"""
+archive/old_root_files/medical_prompts.py:190:        return f"""You are conducting Socratic teaching for medical education.
+archive/old_root_files/medical_prompts.py:199:2. Ask guiding questions that help them discover the answer
+archive/old_root_files/medical_prompts.py:204:Generate {depth_level} Socratic questions that:
+archive/old_root_files/medical_prompts.py:213:    "questions": [
+archive/old_root_files/medical_prompts.py:215:            "question": "The guiding question",
+archive/old_root_files/medical_prompts.py:216:            "purpose": "What this question aims to reveal",
+archive/old_root_files/medical_prompts.py:220:    "teaching_points": [
+archive/old_root_files/medical_prompts.py:234:        """Generate NBME/USMLE Step 1 style questions"""
+archive/old_root_files/medical_prompts.py:255:        return f"""Generate a high-quality USMLE Step 1 style question.
+archive/old_root_files/medical_prompts.py:268:2. **Question Stem**: Clear, direct question
+archive/old_root_files/medical_prompts.py:284:   - Teaches beyond the specific question
+archive/old_root_files/medical_prompts.py:290:    "question": "What is the most likely diagnosis/mechanism/next step?",
+archive/old_root_files/medical_prompts.py:304:            "clinical_pearls": ["Key teaching point 1", "Key teaching point 2"]
+archive/old_root_files/medical_prompts.py:319:    "nbme_relevance": "How this relates to NBME question style"
+archive/old_root_files/medical_prompts.py:337:        return f"""Analyze this student's performance on recent USMLE-style questions.
+archive/old_root_files/medical_prompts.py:340:Number of questions: {len(question_history)}
+archive/old_root_files/medical_prompts.py:350:        "average_time_per_question": "X seconds",
+archive/old_root_files/medical_prompts.py:357:            "evidence": "What questions/errors indicate this gap",
+archive/old_root_files/medical_prompts.py:396:            "method": "How to study (active recall, practice questions, etc.)",
+archive/old_root_files/medical_prompts.py:404:        "estimated_questions": X,
+archive/old_root_files/medical_prompts.py:420:        return f"""Analyze whether to adjust question difficulty for this student.
+archive/old_root_files/medical_prompts.py:436:2. Time spent per question
+archive/old_root_files/medical_prompts.py:507:            "practice_questions": X,
+archive/old_root_files/medical_prompts.py:515:            "practice_questions": "X questions",
+archive/old_root_files/medical_prompts.py:614:    "example_usage": "How this appears in a test question"
+archive/old_root_files/medical_prompts.py:703:    # Example: Generate adaptive teaching prompt
+archive/old_root_files/medical_prompts.py:704:    prompt = PromptTemplates.adaptive_teaching(
+frontend/src/constants/index.ts:42:/** Default WebSocket URL for AI coach */
+SESSION_HANDOFF_2025-10-12_v2.md:126:- **GPT-5**: Optimal for medical MCQ generation with proper prompting
+SESSION_HANDOFF_2025-10-12_v2.md:169:- Real-time AI coach chat
+SESSION_HANDOFF_2025-10-12_v2.md:477:- **Database Migration**: Need to run migration 006 for question tables
+SESSION_HANDOFF_2025-10-12_v2.md:478:- **Testing**: Auth tests passing, can add question generation tests
+SESSION_HANDOFF_2025-10-12_v2.md:494:   - Ask questions
+SESSION_HANDOFF_2025-10-12_v2.md:508:   - `app/models/question.py`
+SESSION_HANDOFF_2025-10-12_v2.md:522:   - `POST /api/questions/generate`
+SESSION_HANDOFF_2025-10-12_v2.md:523:   - `POST /api/questions/{id}/attempt`
+SESSION_HANDOFF_2025-10-12_v2.md:524:   - `GET /api/questions/due`
+SESSION_HANDOFF_2025-10-12_v2.md:689:CREATE TABLE questions (
+SESSION_HANDOFF_2025-10-12_v2.md:720:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+SESSION_HANDOFF_2025-10-12_v2.md:734:    question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+SESSION_HANDOFF_2025-10-12_v2.md:867:- [x] AI coach chat with streaming
+SESSION_HANDOFF_2025-10-12_v2.md:878:- [ ] API endpoints built (generate, attempt, due questions)
+SESSION_HANDOFF_2025-10-12_v2.md:919:2. **Short-term**: Implement question generation (Phase 4)
+SESSION_HANDOFF_2025-10-12_v2.md:998:ef775d0 fix: WebSocket streaming + production hardening for AI coach
+SESSION_HANDOFF_2025-10-12_v2.md:1018:5. Verify questions with the quality pipeline
+SESSION_HANDOFF_2025-10-12_v2.md:1048:- ✅ AI coach with RAG (20x faster with caching)
+SESSION_HANDOFF_2025-10-12_v2.md:1056:- 📋 Fixed question generation plan (removed partitioning bug)
+SESSION_HANDOFF_2025-10-12_v2.md:1061:- 💬 Implement question generation (10-11 hours)
+SESSION_HANDOFF_2025-10-12_v2.md:1083:**Ready to ship**? Almost! Just need question generation implemented.
+backend/app/services/analytics_service.py:1:"""Analytics Service for question mastery radar and performance windows.
+backend/app/services/analytics_service.py:61:        """Get topic-level question mastery for radar chart.
+backend/app/services/analytics_service.py:63:        Returns top N topics by question volume with performance metrics.
+backend/app/services/analytics_service.py:69:            min_attempts: Minimum question attempts required (default 5)
+backend/app/services/analytics_service.py:220:                    func.sum(DailyUserStats.questions_attempted).label("total_questions"),
+backend/app/services/analytics_service.py:239:            if not row or row.total_questions is None or row.total_questions == 0:
+backend/app/services/analytics_service.py:245:                row.total_correct / row.total_questions
+backend/app/services/analytics_service.py:246:                if row.total_questions > 0 else 0.0
+backend/app/services/analytics_service.py:254:                "questions_attempted": int(row.total_questions or 0),
+backend/app/services/analytics_service.py:556:                "total_questions": 450,
+backend/app/services/analytics_service.py:569:                func.sum(TopicMastery.questions_attempted).label("total_questions"),
+backend/app/services/analytics_service.py:592:        if row and row.total_questions and row.total_questions > 0:
+backend/app/services/analytics_service.py:593:            overall_accuracy = row.total_correct / row.total_questions
+backend/app/services/analytics_service.py:599:            "total_questions": int(row.total_questions or 0) if row else 0,
+backend/app/services/analytics_tracker.py:231:        """Track question attempt with full metadata.
+backend/app/models/fsrs.py:8:- Cards: Individual study items (material chunks, questions)
+backend/app/models/fsrs.py:17:- Integration with question performance and topic mastery
+backend/app/models/fsrs.py:46:    Each card represents one item to be reviewed (chunk, question, flashcard).
+MIGRATION_GUIDE.md:379:   - Connect to AI coach
+backend/app/services/analytics/tracker.py:360:    async def track_ai_coach_interaction(
+backend/app/services/analytics/tracker.py:370:        """Track AI coach interactions.
+backend/app/services/analytics/tracker.py:400:        # Update AI coach metrics
+backend/app/services/analytics/tracker.py:401:        await self._update_ai_coach_metrics(
+backend/app/services/analytics/tracker.py:416:        logger.debug(f"Tracked AI coach interaction: {event_type}")
+backend/app/services/analytics/tracker.py:620:    async def _update_ai_coach_metrics(
+backend/app/services/analytics/tracker.py:628:        """Update AI coach metrics.
+backend/app/services/analytics/tracker.py:641:            FROM ai_coach_metrics
+backend/app/services/analytics/tracker.py:675:                update("ai_coach_metrics")
+backend/app/services/analytics/tracker.py:678:                        self.db.get_bind().dialect.ai_coach_metrics.c.id == metrics.id
+backend/app/services/analytics/tracker.py:687:                INSERT INTO ai_coach_metrics
+backend/app/models/analytics.py:31:    # AI coach events
+backend/app/models/analytics.py:83:    material_type: str  # 'pdf', 'video', 'quiz', etc.
+backend/app/models/analytics.py:123:    """AI coach interaction tracking."""
+backend/app/models/analytics.py:125:    user_id: UUID  # Required for AI coach events
+backend/app/models/analytics.py:142:            raise ValueError("Invalid event type for AI coach")
+docs/auth/AUTH_MIGRATION_CHECKLIST.md:507:- [ ] `questions`
+backend/alembic/versions/002_partition_user_attempts.py.disabled:29:            FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+frontend/src/hooks/useChatSession.ts:256:          const message = payload.message || 'The AI coach encountered a problem.';
+frontend/src/hooks/useChatSession.ts:283:      setLastError('You appear to be offline. Connect to the internet to chat with the AI coach.');
+frontend/src/hooks/useChatSession.ts:314:          toast.success('Connection to the AI coach restored.');
+frontend/src/hooks/useChatSession.ts:316:          toast.success('Connected to the AI coach.');
+frontend/src/hooks/useChatSession.ts:365:          const message = 'Unable to reconnect to the AI coach. Please refresh and try again.';
+frontend/src/hooks/useChatSession.ts:423:        const offlineMessage = 'You are offline. Reconnect to send a new question.';
+frontend/src/hooks/useChatSession.ts:483:      toast.error('You are offline. Reconnect to retry your last question.');
+backend/app/models/analytics_aggregates.py:86:    # AI coach
+frontend/src/components/analytics/QuestionMasteryRadar.tsx:218:            Answer questions across different topics to build your mastery profile!
+frontend/src/components/analytics/QuestionMasteryRadar.tsx:241:          Your mastery across different question types compared to the 75% benchmark.
+frontend/src/components/analytics/QuestionMasteryRadar.tsx:307:                  {topic.questions_answered} questions • {(topic.correct_rate * 100).toFixed(1)}% correct
+backend/app/models/topics.py:115:    Computed from question attempts, material interactions, and AI coach sessions.
+docs/security/SECURITY_ARCHITECTURE_REVIEW.md:5:**Scope**: Complete AI coach WebSocket chat system
+docs/security/SECURITY_ARCHITECTURE_REVIEW.md:11:The AI coach chat system demonstrates **solid MVP architecture** with good observability patterns and reasonable error handling. However, several **critical security gaps** and **production readiness concerns** require immediate attention before deployment.
+backend/app/services/rag_service_cached.py:5:Use this during development for faster feedback loops when testing AI coach.
+backend/app/api/analytics.py:420:            # Track chat interactions (AI coach)
+backend/app/api/analytics.py:421:            # Store basic event info (could be expanded to track_ai_coach_interaction)
+backend/app/api/analytics.py:488:            await tracker.track_ai_coach_interaction(
+SESSION_HANDOFF_2025-10-11.md:36:- **Moat Features:** Deep personalization, longitudinal relationship, adaptive teaching
+SESSION_HANDOFF_2025-10-11.md:98:  - Adaptive multi-modal teaching (changes format per mastery level)
+SESSION_HANDOFF_2025-10-11.md:385:   - Ask real questions
+SESSION_HANDOFF_2025-10-11.md:389:     - Is Socratic method frustrating on first pass?
+SESSION_HANDOFF_2025-10-11.md:408:       question TEXT,
+SESSION_HANDOFF_2025-10-11.md:417:   - After each question, use LLM to extract topics
+SESSION_HANDOFF_2025-10-11.md:434:**Goal:** Implement the 3 teaching modes from VISION.md
+SESSION_HANDOFF_2025-10-11.md:461:- Addresses "How can I answer Socratic questions when I don't know it yet?"
+SESSION_HANDOFF_2025-10-11.md:597:- **Low:** Fast responses for quick questions
+SESSION_HANDOFF_2025-10-11.md:684:- [x] Core philosophy documented (adaptive multi-modal teaching)
+SESSION_HANDOFF_2025-10-11.md:718:5. Begin implementing adaptive teaching modes
+SESSION_HANDOFF_2025-10-11.md:821:- **Key Question:** "How can I answer Socratic questions when I don't even know it?"
+SESSION_HANDOFF_2025-10-11.md:822:- **Solution:** Adaptive Multi-Modal Teaching (NOT Socratic-only on first pass)
+config.yaml:111:  difficulty_adjustment_window: 5  # questions
+config.yaml:115:  default_session_length: 20  # questions
+config.yaml:116:  warmup_questions: 3
+config.yaml:120:  enable_socratic_teaching: true
+config.yaml:179:  enable_image_questions: false
+config.yaml:182:  enable_ai_coach: true
+config.yaml:223:  time_per_question: 90  # seconds
+backend/app/services/cache_rag.py:5:Perfect for iterating on AI coach responses without waiting for vector search every time.
+backend/app/api/chat.py:47:    question: str,
+backend/app/api/chat.py:64:    # Customize teaching style based on learning mode
+backend/app/api/chat.py:66:        teaching_style = (
+backend/app/api/chat.py:71:        teaching_style = (
+backend/app/api/chat.py:72:            "Use the Socratic method extensively, guiding with probing questions. "
+backend/app/api/chat.py:74:            "Encourage reflection and critical thinking with multiple follow-up questions."
+backend/app/api/chat.py:77:        teaching_style = (
+backend/app/api/chat.py:78:            "Use the Socratic method, guiding the student with questions and hints. "
+backend/app/api/chat.py:80:            "Ask at least one probing question and suggest a next step if appropriate."
+backend/app/api/chat.py:92:        f"You are StudyIn's AI medical coach. {teaching_style} {length_guidance} "
+backend/app/api/chat.py:100:        "Current student question:\n"
+backend/app/api/chat.py:101:        f"{question}\n\n"
+backend/app/api/chat.py:112:    WebSocket endpoint for the AI coaching chat interface.
+backend/app/api/chat.py:155:                "message": "Connected to StudyIn AI coach.",
+backend/app/api/chat.py:190:                    {"type": "error", "message": "Your message was empty. Please ask a question."}
+backend/app/api/chat.py:259:                question=content,
+backend/app/api/chat.py:333:                        "message": "Connection to the AI tutor was interrupted. Ask your question again.",
+SESSION_HANDOFF_2025-10-12_v3.md:21:8. ✅ **Verified End-to-End** - AI coach WebSocket successfully tested with real message
+SESSION_HANDOFF_2025-10-12_v3.md:46:- ✅ Complete end-to-end AI coach functionality operational
+SESSION_HANDOFF_2025-10-12_v3.md:342:   - Build question generator with GPT-5
+SESSION_HANDOFF_2025-10-12_v3.md:528:- ✅ **End-to-end AI coach verified working**
+SESSION_HANDOFF_2025-10-12_v3.md:548:- 🟢 LLM generating teaching responses
+SESSION_HANDOFF_2025-10-12_v3.md:554:- 💬 Implement question generation (10-11 hours)
+SESSION_HANDOFF_2025-10-12_v3.md:563:# 4. Watch the AI coach respond with RAG context!
+docs/security/SECURITY_AUDIT_CODEX_CLI.md:51:malicious_prompt = "Normal question; rm -rf / #"
+docs/security/SECURITY_AUDIT_CODEX_CLI.md:54:/opt/homebrew/bin/codex exec "Normal question; rm -rf / #"
+backend/app/services/codex_llm.py:678:    async def generate_questions(
+backend/app/services/codex_llm.py:682:        num_questions: int = 5,
+backend/app/services/codex_llm.py:685:        Generate NBME-style medical questions using Codex.
+backend/app/services/codex_llm.py:690:            num_questions: Number of questions to generate
+backend/app/services/codex_llm.py:693:            List of question dictionaries
+backend/app/services/codex_llm.py:695:        prompt = f"""Generate {num_questions} NBME-style USMLE Step 1 multiple choice questions about {topic}.
+backend/app/services/codex_llm.py:697:Format: Return JSON array with objects containing: question, options (array of 4), correct_index, explanation.
+backend/app/services/codex_llm.py:716:            raise ValueError(f"Failed to parse questions from Codex response: {response}")
+backend/app/services/codex_llm.py:718:    async def generate_teaching_response(
+backend/app/services/codex_llm.py:721:        question: str,
+backend/app/services/codex_llm.py:725:        Generate a Socratic teaching response using Codex.
+backend/app/services/codex_llm.py:729:            question: Student's question
+backend/app/services/codex_llm.py:740:Student question: {question}
+backend/app/services/codex_llm.py:743:Provide a teaching response that:
+backend/app/services/codex_llm.py:745:2. Asks clarifying questions
+SESSION_HANDOFF.md:32:- **Chat UI:** `src/components/chat/ChatPanel.tsx` - Real-time chat with AI coach
+SESSION_HANDOFF.md:257:User asks question
+backend/app/models/analytics_events.py:54:    # Question/quiz events
+backend/app/models/analytics_events.py:59:    QUIZ_START = "quiz_start"
+backend/app/models/analytics_events.py:60:    QUIZ_COMPLETE = "quiz_complete"
+backend/app/models/analytics_events.py:62:    # AI coach events
+backend/app/models/analytics_events.py:122:    )  # FK to questions table (not created yet)
+backend/app/models/analytics_events.py:245:    Each row represents one attempt at answering a question.
+backend/app/models/analytics_events.py:266:    )  # FK to questions table
+backend/app/models/analytics_events.py:295:    )  # nth attempt at this question
+docs/security/SECURITY_QUICK_FIXES.md:516:@app.post("/api/questions/generate")
+docs/security/SECURITY_QUICK_FIXES.md:518:async def generate_questions():
+QUICKSTART.md:124:    # Test 2: MCQ generation (should use GPT-4o-mini)
+QUICKSTART.md:125:    print("Test 2: MCQ Generation")
+QUICKSTART.md:130:        prompt="""Generate a USMLE Step 1 question about myocardial infarction.
+QUICKSTART.md:131:        Include: vignette, question, 5 options (A-E), correct answer.""",
+QUICKSTART.md:181:Test 2: MCQ Generation
+QUICKSTART.md:348:    # Generate a question
+QUICKSTART.md:349:    print("Generating practice question...")
+QUICKSTART.md:350:    question = await engine.generate_question(session, user)
+QUICKSTART.md:353:    print(f"  Vignette: {question.get('vignette', 'N/A')[:150]}...")
+QUICKSTART.md:354:    print(f"  Question: {question.get('question', 'N/A')[:100]}...")
+QUICKSTART.md:355:    print(f"  Options: {len(question.get('options', {}))} choices\n")
+QUICKSTART.md:359:    correct_answer = question.get('correct_answer', 'A')
+QUICKSTART.md:362:        session, user, question,
+QUICKSTART.md:425:        "prompt": "Generate a question about cardiac physiology"
+QUICKSTART.md:479:- [x] Learning engine generating questions and adaptive teaching
+QUICKSTART.md:612:| Cost per question | $0.003-0.015 |
+QUICKSTART.md:652:4. **Cache Aggressively**: Most questions are variations of common patterns
+backend/app/services/fsrs_service.py:16:- Integration with question attempts for better predictions
+docs/security/CODEX_CLI_SECURITY_FIX_SUMMARY.md:387:**Before**: `"Normal question; rm -rf / #"`
+frontend/src/components/upload/UploadPanel.tsx:343:          Add one focused PDF at a time. Smaller, intentional uploads help the AI coach personalize faster.
+docs/security/SECURITY_AUDIT_REPORT.md:75:1. Attacker finds XSS vulnerability (e.g., in quiz explanations, chat messages)
+docs/security/SECURITY_AUDIT_REPORT.md:514:    // Steal user's private AI coach conversations
+docs/security/SECURITY_AUDIT_REPORT.md:816:@app.post("/api/questions/generate")
+docs/security/SECURITY_AUDIT_REPORT.md:818:async def generate_questions():
+docs/security/SECURITY_AUDIT_REPORT.md:1012:<!-- Attacker injects script via quiz explanation -->
+backend/app/api/endpoints/analytics.py:345:@router.get("/questions/performance")
+backend/app/api/endpoints/analytics.py:352:    """Get question attempt statistics.
+backend/app/constants.py:230:"""Analytics event for question answered."""
+FRONTEND_SECURITY_AUDIT.md:117:const MAX_MESSAGE_LENGTH = 10000; // Reasonable limit for medical questions
+backend/migrations/versions/004_analytics.py:148:    # Create ai_coach_metrics table
+backend/migrations/versions/004_analytics.py:150:        "ai_coach_metrics",
+backend/migrations/versions/005_performance_indexes.py:13:    # Add indexes to ai_coach_metrics and gamification_stats
+backend/migrations/versions/005_performance_indexes.py:14:    op.create_index('idx_ai_metrics_user_id', 'ai_coach_metrics', ['user_id'])
+backend/migrations/versions/005_performance_indexes.py:15:    op.create_index('idx_ai_metrics_conversation_id', 'ai_coach_metrics', ['conversation_id'])
+backend/migrations/versions/005_performance_indexes.py:16:    op.create_index('idx_ai_metrics_user_conversation', 'ai_coach_metrics', ['user_id', 'conversation_id'])
+backend/migrations/versions/005_performance_indexes.py:29:    # Drop ai_coach_metrics indexes
+backend/migrations/versions/005_performance_indexes.py:30:    op.drop_index('idx_ai_metrics_user_conversation', 'ai_coach_metrics')
+backend/migrations/versions/005_performance_indexes.py:31:    op.drop_index('idx_ai_metrics_conversation_id', 'ai_coach_metrics')
+backend/migrations/versions/005_performance_indexes.py:32:    op.drop_index('idx_ai_metrics_user_id', 'ai_coach_metrics')
+ai_architecture_overview.md:17:- MCQ generation (high volume, lower complexity tasks)
+ai_architecture_overview.md:133:5. Incorporate active recall questions
+ai_architecture_overview.md:141:MCQ_GENERATION_PROMPT = """
+ai_architecture_overview.md:142:Create an NBME/USMLE Step 1 style question:
+ai_architecture_overview.md:158:    "question": "...",
+ai_architecture_overview.md:353:2. Basic MCQ generation
+ai_architecture_overview.md:380:- 100 questions/day × 30 days = 3,000 interactions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1:# Medical MCQ Generation Research Report
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:4:**Purpose**: Research optimal approaches for generating high-quality NBME-style medical MCQ questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:13:1. **GPT-5 is optimal for medical MCQ generation** - Achieves 91.8% accuracy on medical diagnosis, with structured prompting achieving 88.1% NBME compliance
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:16:4. **Human-in-the-loop validation is essential** - All studies show AI-generated questions require expert review
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:17:5. **Batch processing with prompt caching** can reduce costs by 35-50% for question generation
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:29:- Generation time: 30-60 seconds per question (5 questions in ~3-5 minutes)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:30:- Cost: ~$0.10-0.15 per question with caching
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:31:- Quality: 75-80% "High Quality" questions requiring minimal edits
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:49:Input tokens (per question):
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:53:Total input: ~2,800 tokens ≈ $0.0035 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:55:Output tokens (per question):
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:60:Total output: ~500 tokens ≈ $0.005 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:62:Total cost per question: ~$0.0085 (without caching)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:63:With 90% prompt caching: ~$0.004 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:67:- Use Batch API for 50% discount: ~$0.004 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:68:- Combined with prompt caching: ~$0.002 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:69:- Generate 5 questions at once: Better token efficiency
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:79:- Requires 1,000+ expert-validated questions for training data
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:90:Based on analysis of 6+ studies generating NBME-style questions:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:96:   "You are a medical educator developing USMLE Step 1 examination questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:102:   "Generate [N] multiple-choice questions that:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:111:   "Base questions on the following medical content:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:117:   "Format each question as:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:126:   "Ensure questions:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:161:NBME_QUESTION_PROMPT = """You are a medical educator developing USMLE Step 1 examination questions for the National Board of Medical Examiners (NBME).
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:163:Your task: Generate {num_questions} high-quality multiple-choice questions based on the medical content provided below.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:174:   - End with a specific question stem
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:192:   - Avoid trick questions or trivial details
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:204:    "question": "Full clinical vignette with question stem",
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:221:Generate the questions now:"""
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:294:**Easy questions (difficulty 1-2):**
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:298:**Medium questions (difficulty 3 - NBME standard):**
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:302:**Hard questions (difficulty 4-5):**
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:314:async def validate_question_structure(question: Dict) -> Tuple[bool, List[str]]:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:316:    Validate basic question structure and format.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:323:    required_fields = ["question", "options", "correct_index", "explanation"]
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:325:        if field not in question:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:329:    if len(question.get("options", [])) < 4:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:333:    correct_idx = question.get("correct_index", -1)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:334:    if correct_idx < 0 or correct_idx >= len(question.get("options", [])):
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:338:    question_text = question.get("question", "")
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:350:async def validate_medical_accuracy(question: Dict, rag_context: str) -> Tuple[bool, str]:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:356:Evaluate this USMLE question for medical accuracy and clinical plausibility:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:359:{json.dumps(question, indent=2)}
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:393:async def classify_bloom_level(question: Dict) -> int:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:395:    Automatically classify question cognitive level using Bloom's taxonomy.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:399:    classification_prompt = f"""Classify this medical question's cognitive level using Bloom's taxonomy:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:401:QUESTION: {question['question']}
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:409:6. Create: Synthesize new solutions (rare in MCQ)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:428:def detect_bias(question: Dict) -> Tuple[bool, List[str]]:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:430:    Detect potential bias in question wording.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:435:    text = question["question"].lower()
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:440:        # Check if it's part of clinical vignette (acceptable) vs. question stem (not acceptable)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:466:Based on research showing 78% of AI-generated questions rated "High Quality":
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:471:    """Comprehensive quality assessment for generated questions."""
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:533:    """Track question review state."""
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:551:1. Auto-generate questions with quality scores
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:556:6. Approved questions added to question bank
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:561:- A/B test: Compare GPT-5 vs. GPT-5-mini vs. Claude for question quality
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:570:- **Dataset**: 12,723 USMLE-style questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:579:- Expect 15-25% of generated questions to need expert revision
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:580:- Use MedQA dataset structure as benchmark for our questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:583:- **Dataset**: Medical QA with multiple explanations per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:585:- **Finding**: Explanations significantly improve question quality
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:588:- Always generate explanations with questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:593:- **Dataset**: 1,000 expert-annotated biomedical questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:594:- **Format**: Research question + abstract + yes/no/maybe answer
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:600:- Could inform question generation for basic science topics
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:605:- **Finding**: GPT-4 variants achieve 75-85% accuracy on USMLE questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:614:#### 3. "AI-generated multiple-choice questions in health science education"
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:615:- **Finding**: 78% of AI-generated questions rated "High Quality" by experts
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:633:- User requests questions on specific topic
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:644:    num_questions: int = 5,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:648:    Generate questions on-demand based on user's study materials.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:650:    Performance: 30-60 seconds for 5 questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:656:    # 2. Generate questions with GPT-5
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:657:    questions = await codex_llm.generate_questions(
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:660:        num_questions=num_questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:666:    validated_questions = []
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:667:    for q in questions:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:668:        is_valid, quality_score = await validate_question(q, rag_context)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:670:            validated_questions.append({**q, "quality_score": quality_score})
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:672:    # 4. If not enough high-quality questions, regenerate poor ones
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:673:    if len(validated_questions) < num_questions:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:674:        additional = await regenerate_failed_questions(
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:675:            topic, difficulty, num_questions - len(validated_questions), rag_context
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:677:        validated_questions.extend(additional)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:679:    return validated_questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:683:- ✅ Fresh, personalized questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:690:- ❌ Higher per-question cost
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:696:- Pre-generate question banks for common topics
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:709:    Pre-generate question bank for common topics.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:711:    Performance: 5-10 minutes for 100 questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:712:    Cost: ~$0.20-0.30 for 100 questions (with batch API discount)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:721:                "num_questions": questions_per_topic,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:735:        questions = result["questions"]
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:738:        validated = [q for q in questions if validate_structure(q)[0]]
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:764:    """Intelligent strategy for question generation."""
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:771:        num_questions: int = 5,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:774:        Use cached questions if available, otherwise generate on-demand.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:776:        # 1. Check if we have pre-generated questions for this topic
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:777:        cached_questions = await self.get_cached_questions(
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:780:            limit=num_questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:783:        # 2. If enough high-quality cached questions, return them
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:784:        if len(cached_questions) >= num_questions:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:785:            logger.info(f"Using {num_questions} cached questions for {topic}")
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:786:            return random.sample(cached_questions, num_questions)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:789:        logger.info(f"Generating {num_questions} questions on-demand for {topic}")
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:794:            num_questions=num_questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:810:BASE_PROMPT = """You are a medical educator developing USMLE questions...
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:820:    prompt += f"\n\nCONTENT:\n{context}\n\nGenerate questions about {topic}:"
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:831:**Store generated questions with metadata:**
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:852:- Keep questions used in last 30 days
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:853:- Prioritize expert-reviewed questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:854:- Remove low-quality (<70) questions after 7 days
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:855:- Update questions if underlying content changes
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:870:- Batch generation for Phase 5 (pre-validated question banks)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:887:Total: 10-18 seconds per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:895:Total: 35-70 seconds for 5 questions (7-14s per question)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:899:1. **Parallel generation**: Generate 5 questions in parallel (if needed faster)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:900:   - Time: ~15 seconds for 5 questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:904:   - Time: 30-60 seconds for 5 questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:905:   - Cost: 1x (same as single question + extra output tokens)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:906:   - Quality: More consistent difficulty/style across questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:910:**Per-Question Costs (5 questions at once):**
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:919:Output Tokens (5 questions):
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:926:Total per 5-question generation: $0.0285 (~$0.006 per question)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:935:└─ Effective cost: ~$0.005 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:940:└─ Total: $0.01425 (~$0.003 per question)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:943:└─ ~$0.002 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:964:└─ Total: 5-8 seconds per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:967:├─ Input (question + prompt): 600 tokens × $0.00000125 = $0.00075
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:969:└─ Total: ~$0.003 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:971:Including validation: ~$0.009 per question (with all optimizations)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:980:**Scope:** Basic question generation with automated validation
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:994:    """Request parameters for question generation."""
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:998:    num_questions: int = 5
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1003:    """Generate NBME-style medical questions using GPT-5."""
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1009:    async def generate_questions(
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1015:        Generate questions based on user's study materials.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1017:        Returns list of validated questions with quality scores.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1023:            query=f"Generate questions about {request.topic}",
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1036:            num_questions=request.num_questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1053:        questions = self._parse_questions(response_text)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1054:        validated = await self._validate_questions(questions, rag_context)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1056:        # 5. Return only high-quality questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1062:        if len(high_quality) < request.num_questions:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1064:                f"Generated {len(high_quality)}/{request.num_questions} "
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1065:                f"high-quality questions for {request.topic}"
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1074:        num_questions: int,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1079:            num_questions=num_questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1084:    def _parse_questions(self, response: str) -> List[Dict]:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1093:            questions = json.loads(json_str)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1095:            if not isinstance(questions, list):
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1096:                questions = [questions]
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1098:            return questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1100:            logger.error(f"Failed to parse questions: {e}")
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1101:            raise ValueError(f"Invalid question format from GPT-5: {response[:200]}")
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1103:    async def _validate_questions(
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1105:        questions: List[Dict],
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1108:        """Run automated validation pipeline on generated questions."""
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1111:        for q in questions:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1171:# backend/app/api/questions.py
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1182:router = APIRouter(prefix="/api/questions", tags=["questions"])
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1185:async def generate_questions(
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1188:    num_questions: int = 5,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1193:    Generate NBME-style questions based on user's study materials.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1198:        num_questions: Number of questions to generate (default 5)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1201:        List of generated questions with quality scores
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1206:    if num_questions < 1 or num_questions > 10:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1207:        raise HTTPException(400, "Number of questions must be 1-10")
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1215:        num_questions=num_questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1219:        questions = await generator.generate_questions(request, session)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1225:            "questions": questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1226:            "count": len(questions),
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1244:  question: string;
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1261:  const [questions, setQuestions] = useState<Question[]>([]);
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1273:      const response = await apiClient.post('/questions/generate', {
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1276:        num_questions: numQuestions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1279:      setQuestions(response.data.questions);
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1280:      return response.data.questions;
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1282:      const errorMsg = err.response?.data?.detail || 'Failed to generate questions';
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1292:    questions,
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1331:   - **Use case**: Identify key concepts for question generation
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1342:   - **Purpose**: Automatically classify question difficulty
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1343:   - **Use case**: Ensure questions match target cognitive level
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1373:   codex exec --profile studyin_study "Generate a sample USMLE question about cardiac physiology"
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1384:- ✅ Add API endpoint `/api/questions/generate` (1 hour)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1395:- ✅ Build question display component (2 hours)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1402:- Batch question generation
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1416:- ✅ Generate 5 questions in <60 seconds
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1417:- ✅ 70%+ questions rated "High Quality" (automated score ≥70)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1418:- ✅ Cost <$0.01 per question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1422:- ✅ 80%+ questions approved by expert reviewers
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1423:- ✅ <30 seconds for 5 questions (with caching)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1424:- ✅ Cost <$0.005 per question (with optimizations)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1439:- ✅ Human expert review before adding to question bank
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1440:- ✅ User reporting mechanism for incorrect questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1441:- ✅ Regular audit of flagged questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1458:- ✅ Regular bias audits on generated questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1475:- ✅ Set user expectation: "Generating questions... 30-60 seconds"
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1478:- ✅ Pre-generated question banks for common topics (Phase 5)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1479:- ✅ Caching of validated questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1482:**Risk**: Generated questions violate medical education standards
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1487:- ✅ Disclaimer: "These questions are for study purposes only"
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1497:1. **"ChatGPT prompts for generating medical MCQs: systematic review"** (2024)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1504:   - Provides validated prompt template for NBME questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1514:   - 78% high-quality questions, 65.56% correct Bloom's level
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1518:   - 12,723 USMLE questions, top models 86-96% accuracy
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1524:   - Official standards for USMLE questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1638:STANDARD_NBME_PROMPT = """You are a medical educator developing USMLE Step 1 examination questions.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1640:Generate {num_questions} multiple-choice questions based on this medical content:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1651:OUTPUT: JSON array of question objects
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1658:BASIC_SCIENCE_PROMPT = """You are a medical educator developing basic science questions for USMLE Step 1.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1660:Generate {num_questions} questions testing understanding of {topic}.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1676:Format: Clinical vignette with basic science question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1683:CLINICAL_REASONING_PROMPT = """You are a medical educator developing complex clinical reasoning questions.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1685:Generate {num_questions} ADVANCED questions requiring multi-step clinical reasoning.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1696:These questions should challenge students to synthesize information and make clinical judgments.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1703:IMAGE_BASED_PROMPT = """You are a medical educator developing image-based USMLE questions.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1705:Generate {num_questions} questions that would include medical images.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1709:For each question:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1712:3. Ask interpretation question
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1715:Note: Actual image generation is not included, but question should clearly describe what the image shows.
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1725:1. **GPT-5 via Codex CLI is optimal** for medical MCQ generation
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1726:   - High quality (75-80% "High Quality" questions)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1727:   - Cost-effective ($0.002-0.008 per question with caching)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1742:   - 15-25% of questions need expert edits
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1743:   - Implement review workflow for question bank
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1747:   - $0.002-0.008 per question with optimizations
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1748:   - Monthly cost <$20 even for 10,000 questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1749:   - Much cheaper than manual question writing
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1762:3. Batch generation for question banks
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1767:2. Fine-tuning on validated questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1769:4. Multi-modal questions (images, videos)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1775:The research clearly shows this approach will deliver high-quality NBME-style questions with:
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1777:- ✅ Low cost (<$0.01 per question)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1778:- ✅ Reasonable generation time (30-60s for 5 questions)
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1789:**Expected Quality**: 75-80% "High Quality" questions
+docs/research/MEDICAL_MCQ_GENERATION_RESEARCH.md:1790:**Expected Cost**: <$0.01 per question
+frontend/src/components/dashboard/FlowStateCard.tsx:39:    guidance: 'Too easy! Try harder questions or new topics to stay engaged.'
+COMPREHENSIVE_TEST_REPORT.md:468:- Cannot test any of the core features (RAG, AI coach, document processing)
+backend/ANALYTICS_IMPLEMENTATION_SUMMARY.md:25:- **ai_coach_metrics**: AI conversation metrics
+backend/ANALYTICS_IMPLEMENTATION_SUMMARY.md:49:- AI coach metrics
+backend/tests/integration/test_partitioning.py:53:                    'quiz',
+backend/app/schemas/api_contract.py:25:    context is found for a user's question.
+backend/app/schemas/api_contract.py:64:                "message": "Connected to AI coach",
+backend/app/schemas/api_contract.py:134:                "message": "Failed to process question",
+backend/app/schemas/api_contract.py:151:    """User message sent to AI coach."""
+backend/app/schemas/api_contract.py:154:    content: str = Field(..., description="User's question/message")
+SESSION_HANDOFF_2025-10-13.md:65:  - `ai_coach_metrics`
+SESSION_HANDOFF_2025-10-13.md:373:   - [ ] AI coach chat interface (Phase 3)
+SESSION_HANDOFF_2025-10-13.md:481:- [ ] AI coach chat (backend exists, needs WebSocket fix)
+SESSION_HANDOFF_2025-10-13.md:558:\d ai_coach_metrics
+ANALYTICS_IMPLEMENTATION_PLAN.md:63:- NBME question type breakdown
+ANALYTICS_IMPLEMENTATION_PLAN.md:78:**API:** `GET /api/analytics/learning/question-mastery-radar`
+ANALYTICS_IMPLEMENTATION_PLAN.md:150:  - Practice questions
+backend/docs/ANALYTICS_SCHEMA_SUMMARY.md:32:- `study_events` - All user events (sessions, materials, AI coach, search)
+backend/docs/ANALYTICS_SCHEMA_SUMMARY.md:123:- AI coach event tracking
+backend/docs/ANALYTICS_SCHEMA_SUMMARY.md:133:- AI coach interactions (ask, response, feedback)
+backend/docs/ANALYTICS_SCHEMA_SUMMARY.md:214:# Track question attempt
+backend/docs/ANALYTICS_SCHEMA_SUMMARY.md:220:    topic_id=question.topic_id,
+backend/FSRS_IMPLEMENTATION_SUMMARY.md:185:- Question integration ready (link cards to question attempts)
+backend/FSRS_IMPLEMENTATION_SUMMARY.md:469:2. **Question Integration**: Cards can link to topics, but automatic creation from question attempts not yet implemented
+backend/docs/ANALYTICS_QUICK_REFERENCE.md:184:User Action (e.g., answer question)
+backend/docs/ANALYTICS_QUICK_REFERENCE.md:227:@app.post("/api/questions/{question_id}/submit")
+backend/docs/ANALYTICS_QUICK_REFERENCE.md:241:        topic_id=question.topic_id,
+backend/docs/ANALYTICS_QUICK_REFERENCE.md:243:        correct_answer=question.correct_answer,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:15:- **Mastery scores** → `topic_mastery` (updated after questions/materials)
+backend/docs/ANALYTICS_EVENT_TRACKING.md:245:**When**: User views a practice question
+backend/docs/ANALYTICS_EVENT_TRACKING.md:247:**Where**: `GET /api/questions/{question_id}`
+backend/docs/ANALYTICS_EVENT_TRACKING.md:256:    topic_id=question.topic_id,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:259:        "difficulty": question.difficulty,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:266:**When**: User submits answer to question
+backend/docs/ANALYTICS_EVENT_TRACKING.md:268:**Where**: `POST /api/questions/{question_id}/submit`
+backend/docs/ANALYTICS_EVENT_TRACKING.md:282:    topic_id=question.topic_id,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:285:        "correct_answer": question.correct_answer,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:286:        "is_correct": answer == question.correct_answer,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:300:    topic_id=question.topic_id,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:306:    correct_answer=question.correct_answer,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:325:await update_topic_mastery(user_id, question.topic_id)
+backend/docs/ANALYTICS_EVENT_TRACKING.md:329:**When**: User starts/completes a quiz (multiple questions)
+backend/docs/ANALYTICS_EVENT_TRACKING.md:331:**Where**: `POST /api/quizzes/{quiz_id}/start|complete`
+backend/docs/ANALYTICS_EVENT_TRACKING.md:338:    event_type="quiz_complete",
+backend/docs/ANALYTICS_EVENT_TRACKING.md:340:        "quiz_id": quiz_id,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:341:        "total_questions": quiz.question_count,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:343:        "accuracy": correct_count / quiz.question_count,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:344:        "total_time_seconds": quiz_duration,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:345:        "quiz_type": "practice",  # or "mock_exam", "flashcards"
+backend/docs/ANALYTICS_EVENT_TRACKING.md:355:**When**: User sends message to AI coach
+backend/docs/ANALYTICS_EVENT_TRACKING.md:357:**Where**: `POST /api/ai-coach/ask` (WebSocket: on message send)
+backend/docs/ANALYTICS_EVENT_TRACKING.md:367:        "question_length": len(question),
+backend/docs/ANALYTICS_EVENT_TRACKING.md:379:**When**: AI coach responds
+backend/docs/ANALYTICS_EVENT_TRACKING.md:401:**Where**: `POST /api/ai-coach/feedback`
+backend/docs/ANALYTICS_EVENT_TRACKING.md:418:**When**: User asks for hint or explanation (question context)
+backend/docs/ANALYTICS_EVENT_TRACKING.md:420:**Where**: `POST /api/questions/{question_id}/hint|explanation`
+backend/docs/ANALYTICS_EVENT_TRACKING.md:429:    topic_id=question.topic_id,
+backend/docs/ANALYTICS_EVENT_TRACKING.md:447:**Where**: After material complete, question correct, streak, etc.
+backend/docs/ANALYTICS_EVENT_TRACKING.md:493:**When**: User unlocks achievement (first question, 7-day streak, etc.)
+backend/docs/ANALYTICS_EVENT_TRACKING.md:654:- `topic_mastery` - Update after question attempt (async) + nightly recalc
+backend/docs/ANALYTICS_EVENT_TRACKING.md:686:    """Test question attempt creates all necessary records."""
+backend/docs/ANALYTICS_EVENT_TRACKING.md:687:    response = await client.post(f"/api/questions/{question_id}/submit", json={
+backend/docs/ANALYTICS_EVENT_TRACKING.md:711:        topic_id=question.topic_id
+frontend/src/components/chat/ContextSidebar.tsx:12:        <p>No passages retrieved yet. Ask a question to see highlights.</p>
+backend/docs/FSRS_INTEGRATION.md:584:Link FSRS cards to question attempts:
+backend/docs/FSRS_INTEGRATION.md:587:- Integrate question performance into card scheduling
+backend/docs/FSRS_INTEGRATION.md:776:   - Use LLM to generate questions
+backend/docs/ANALYTICS_ARCHITECTURE.md:59:│  │ (current session)│  │ (after questions)│                   │
+backend/docs/ANALYTICS_ARCHITECTURE.md:64:│  - After question attempts (async)                             │
+backend/docs/ANALYTICS_ARCHITECTURE.md:114:1. **study_events** - All user events (session, material, AI coach)
+backend/docs/ANALYTICS_ARCHITECTURE.md:329:- Material preferences (video vs text vs questions)
+backend/docs/ANALYTICS_ARCHITECTURE.md:470:        f"/api/questions/{question_id}/submit",
+backend/docs/ANALYTICS_ARCHITECTURE.md:488:        topic_id=question.topic_id
+backend/docs/ANALYTICS_QUERY_OPTIMIZATION.md:276:**Use**: `question_attempts` (for specific question)
+backend/docs/ANALYTICS_QUERY_OPTIMIZATION.md:279:# Fast - Composite index on question + user
+backend/docs/ANALYTICS_QUERY_OPTIMIZATION.md:319:**Use**: `question_attempts` JOIN `questions`
+backend/docs/ANALYTICS_QUERY_OPTIMIZATION.md:322:# Complex - Requires question metadata JOIN
+backend/docs/ANALYTICS_QUERY_OPTIMIZATION.md:331:JOIN questions q ON qa.question_id = q.id
+backend/docs/ANALYTICS_QUERY_OPTIMIZATION.md:340:# Optimization: Add index on questions(question_type, difficulty)

@@ -1,0 +1,1219 @@
+import { useEffect } from 'react';
+import { RefreshCw, TrendingUp } from 'lucide-react';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { LearningOverview } from '@/components/analytics/LearningOverview';
+import { StudyHeatmap } from '@/components/analytics/StudyHeatmap';
+import { XPTrendChart } from '@/components/analytics/XPTrendChart';
+import { Button } from '@/components/ui/button';
+import { trackNavigation } from '@/lib/analytics/tracker';
+import type { View } from '@/components/NavBar';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface AnalyticsViewProps {
+  onNavigate: (view: View) => void;
+}
+
+// ============================================================================
+// Component
+// ============================================================================
+
+export function AnalyticsView({ onNavigate }: AnalyticsViewProps) {
+  const {
+    learningOverview,
+    activityHeatmap,
+    gamificationProgress,
+    isLoading,
+    isRefreshing,
+    error,
+    refresh,
+  } = useAnalytics({
+    autoFetch: true,
+    pollingInterval: 0, // Disable polling, use manual refresh
+  });
+
+  // Track page view
+  useEffect(() => {
+    trackNavigation('unknown', 'analytics');
+  }, []);
+
+  const handleRefresh = () => {
+    refresh();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-screen">
+        <div className="soft-card pixel-border px-12 py-10 text-center">
+          <div className="animate-spin mb-4 inline-block">
+            <span className="kawaii-icon text-4xl" aria-hidden="true">
+              🔄
+            </span>
+          </div>
+          <p className="text-brutalist text-lg text-foreground">Loading your analytics...</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Crunching numbers and preparing insights
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !learningOverview) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-screen px-6">
+        <div className="soft-card pixel-border max-w-md px-8 py-10 text-center">
+          <span className="kawaii-icon text-5xl mb-4" aria-hidden="true">
+            😢
+          </span>
+          <p className="text-brutalist text-xl text-foreground mb-3">Oops! Something went wrong</p>
+          <p className="text-sm text-muted-foreground mb-6">
+            {error}
+          </p>
+          <Button onClick={handleRefresh} size="lg" className="shadow-soft-button">
+            <RefreshCw className="size-4" aria-hidden="true" />
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Extract achievement data from recent achievements
+  const achievements = gamificationProgress?.recent_achievements ?? [];
+  const unlockedCount = achievements.length; // Recent achievements are already unlocked
+  const totalCount = gamificationProgress?.total_achievements ?? 0;
+
+  return (
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-10">
+      {/* Header */}
+      <header className="soft-card pixel-border bg-gradient-to-br from-white/90 via-white/70 to-primary/10 px-8 py-10">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span className="kawaii-icon size-16 text-4xl" aria-hidden="true">
+              📊
+            </span>
+            <div>
+              <h1 className="text-brutalist text-foreground">Your Learning Analytics</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Track your progress, identify patterns, and optimize your study strategy with data-driven insights.
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="gap-2"
+          >
+            <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} aria-hidden="true" />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+        </div>
+      </header>
+
+      {/* Learning Overview Metrics */}
+      {learningOverview && (
+        <LearningOverview
+          data={learningOverview}
+        />
+      )}
+
+      {/* XP Trend Chart */}
+      {gamificationProgress && gamificationProgress.xp_history.length > 0 && (
+        <XPTrendChart data={gamificationProgress} />
+      )}
+
+      {/* Study Activity Heatmap */}
+      {activityHeatmap && activityHeatmap.length > 0 && (
+        <StudyHeatmap data={activityHeatmap} />
+      )}
+
+      {/* Achievements Section */}
+      {achievements.length > 0 && (
+        <section className="soft-card pixel-border px-8 py-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <span className="kawaii-icon text-3xl" aria-hidden="true">
+                🏆
+              </span>
+              <div>
+                <h2 className="text-brutalist text-xl text-foreground">Achievement Gallery</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {unlockedCount} of {totalCount} achievements unlocked
+                </p>
+              </div>
+            </div>
+            <div className="h-2 w-32 overflow-hidden rounded-full bg-muted/70">
+              <div
+                className="h-full bg-gradient-to-r from-accent via-primary to-secondary transition-all duration-500 ease-soft-bounce"
+                style={{ width: `${totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0}%` }}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {achievements.map((achievement) => {
+              return (
+                <div
+                  key={achievement.id}
+                  className="group relative overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-soft hover:-translate-y-1 hover:shadow-elevated transition-all duration-300 px-5 py-6"
+                >
+                  <div className="absolute -right-3 -top-3 h-16 w-16 rotate-12 rounded-xl bg-primary/15 blur-2xl" />
+
+                  <div className="relative">
+                    <div className="flex items-start justify-between mb-4">
+                      <span className="kawaii-icon text-3xl" aria-hidden="true">
+                        🏅
+                      </span>
+                      <span className="rounded-full bg-primary/20 px-3 py-1 font-pixel text-[0.5rem] tracking-[0.18em] text-primary">
+                        UNLOCKED
+                      </span>
+                    </div>
+
+                    <h3 className="text-brutalist text-base text-foreground mb-2">
+                      Achievement #{achievement.id}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Unlocked {new Date(achievement.earned_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Quick Actions */}
+      <section className="soft-card pixel-border px-8 py-8">
+        <div className="flex items-start gap-4">
+          <span className="kawaii-icon text-3xl" aria-hidden="true">
+            🚀
+          </span>
+          <div className="flex-1">
+            <h3 className="text-brutalist text-lg text-foreground mb-3">Keep Building Momentum</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Analytics show patterns, but action creates progress. Choose your next step:
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                size="lg"
+                onClick={() => onNavigate('dashboard')}
+                className="shadow-soft-button"
+              >
+                <TrendingUp className="size-4" aria-hidden="true" />
+                Back to Dashboard
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => onNavigate('chat')}
+                className="shadow-soft-button"
+              >
+import { useEffect, useMemo, useState, type SVGProps } from 'react';
+import DOMPurify from 'dompurify';
+import { ArrowRight, BookOpen, Sparkles, Target, Trophy } from 'lucide-react';
+
+import type { View } from '@/components/NavBar';
+import { apiClient } from '@/lib/api/client';
+import { Button } from '@/components/ui/button';
+import { XPBar } from '@/components/gamification/XPBar';
+import { StreakCounter } from '@/components/gamification/StreakCounter';
+import { LevelBadge } from '@/components/gamification/LevelBadge';
+import { trackMaterialView } from '@/lib/analytics/tracker';
+
+interface Material {
+  id: string;
+  filename: string;
+  content_type: string;
+  file_size: number;
+  created_at: string;
+  chunk_count: number;
+}
+
+interface GamificationSnapshot {
+  level: number;
+  currentXP: number;
+  targetXP: number;
+  streak: number;
+  bestStreak?: number;
+  lastCheckIn?: string | null;
+  masteryPercent?: number;
+  goalMinutes?: number;
+}
+
+interface DashboardProps {
+  onNavigate: (view: View) => void;
+  stats: GamificationSnapshot;
+}
+
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  unlocked: boolean;
+}
+
+export function Dashboard({ onNavigate, stats }: DashboardProps) {
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMaterials() {
+      try {
+        const response = await apiClient.get<Material[]>('/api/materials/');
+        setMaterials(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch materials:', err);
+        setError('We could not load your materials. Please try again soon.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchMaterials();
+  }, []);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes <= 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const index = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+    const value = bytes / Math.pow(1024, index);
+    return `${value.toFixed(value < 10 && index > 0 ? 1 : 0)} ${units[index]}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.valueOf())) {
+      return 'Unknown';
+    }
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const totalChunks = materials.reduce((sum, material) => sum + (material.chunk_count ?? 0), 0);
+  const totalSize = materials.reduce((sum, material) => sum + material.file_size, 0);
+  const xpProgress = Math.min(stats.currentXP / Math.max(stats.targetXP, 1), 1);
+  const dailyMinutesLogged = Math.round((stats.goalMinutes ?? 45) * xpProgress);
+
+  const achievements = useMemo<Achievement[]>(() => {
+    return [
+      {
+        id: 'spaced-recall',
+        title: 'Spaced Recall',
+        description: 'Review materials on 3 separate days',
+        unlocked: stats.streak >= 3,
+      },
+      {
+        id: 'mindful-minute',
+        title: 'Mindful Minute',
+        description: 'Log 30 focused minutes in one day',
+        unlocked: dailyMinutesLogged >= 30,
+      },
+      {
+        id: 'chunk-master',
+        title: 'Chunk Master',
+        description: 'Process 100 knowledge chunks',
+        unlocked: totalChunks >= 100,
+      },
+    ];
+  }, [stats.streak, dailyMinutesLogged, totalChunks]);
+
+  return (
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-10">
+      <header className="soft-card pixel-border bg-gradient-to-br from-white/90 via-white/70 to-primary/10 px-8 py-10">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <span className="badge-soft text-[0.65rem] font-semibold tracking-[0.18em] text-primary-foreground">
+            Welcome back
+          </span>
+          <span className="font-pixel text-[0.55rem] tracking-[0.3em] text-muted-foreground">
+            GENTLE · PROGRESS
+          </span>
+        </div>
+        <h1 className="mt-6 text-brutalist text-foreground">Focus on Gentle Mastery</h1>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+          Today’s plan leans on cognitive science—soft encouragement, spaced review, and playful feedback to build
+          lasting medical expertise.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button size="lg" className="shadow-soft-button" onClick={() => onNavigate('upload')}>
+            <BookOpen className="size-4" aria-hidden="true" />
+            Upload new material
+          </Button>
+          <Button
+            size="lg"
+            variant="secondary"
+            className="shadow-soft-button"
+            onClick={() => onNavigate('chat')}
+          >
+            <Sparkles className="size-4" aria-hidden="true" />
+            Open AI coach
+          </Button>
+        </div>
+      </header>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <XPBar
+          level={stats.level}
+          currentXP={stats.currentXP}
+          targetXP={stats.targetXP}
+          label="Earn XP through focused study bursts"
+          className="px-6 py-6"
+        />
+        <StreakCounter
+          streak={stats.streak}
+          bestStreak={stats.bestStreak}
+          lastCheckIn={stats.lastCheckIn}
+          goalMinutes={stats.goalMinutes}
+          className="px-6 py-6"
+        />
+      </section>
+
+      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="soft-card pixel-border flex flex-col gap-4 px-6 py-6">
+          <span className="kawaii-icon" aria-hidden="true">
+            📚
+          </span>
+          <div>
+            <p className="text-brutalist text-base text-foreground">Study Materials</p>
+            <p className="mt-1 text-2xl font-semibold text-primary">{materials.length}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Balanced library beats binge-learning.</p>
+          </div>
+        </div>
+        <div className="soft-card pixel-border flex flex-col gap-4 px-6 py-6">
+          <span className="kawaii-icon" aria-hidden="true">
+            🧠
+          </span>
+          <div>
+            <p className="text-brutalist text-base text-foreground">Knowledge Chunks</p>
+            <p className="mt-1 text-2xl font-semibold text-secondary">{totalChunks}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Chunking improves retention. Keep indexing.</p>
+          </div>
+        </div>
+        <div className="soft-card pixel-border flex flex-col gap-4 px-6 py-6">
+          <span className="kawaii-icon" aria-hidden="true">
+            💾
+          </span>
+          <div>
+            <p className="text-brutalist text-base text-foreground">Total Content</p>
+            <p className="mt-1 text-2xl font-semibold text-accent">{formatFileSize(totalSize)}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Aim for digestible file sizes per study block.</p>
+          </div>
+        </div>
+        <div className="soft-card pixel-border flex flex-col gap-4 px-6 py-6">
+          <span className="kawaii-icon" aria-hidden="true">
+            🎯
+          </span>
+          <div>
+            <p className="text-brutalist text-base text-foreground">Daily Focus</p>
+            <p className="mt-1 text-2xl font-semibold text-foreground">
+              {dailyMinutesLogged} / {stats.goalMinutes ?? 45} min
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Gentle reminder: micro-sessions beat cramming for long-term recall.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-3">
+        <LevelBadge
+          level={stats.level}
+          masteryPercent={stats.masteryPercent ?? xpProgress * 100}
+          title="Resident"
+          className="px-6 py-6"
+        />
+
+        <div className="soft-card pixel-border flex flex-col gap-4 px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="kawaii-icon size-12 text-xl" aria-hidden="true">
+                🌈
+              </span>
+              <p className="text-brutalist text-base text-foreground">Daily Goal</p>
+            </div>
+            <Target className="size-5 text-accent-foreground" aria-hidden="true" />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            You’re {Math.round(xpProgress * 100)}% toward today’s flow target. Short breaks keep momentum without
+            fatigue.
+          </p>
+          <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-muted/70">
+            <div
+              className="h-full bg-gradient-to-r from-accent via-primary to-secondary transition-all duration-500 ease-soft-bounce"
+              style={{ width: `${Math.round(xpProgress * 100)}%` }}
+              aria-hidden="true"
+            />
+          </div>
+        </div>
+
+        <div className="soft-card pixel-border flex flex-col gap-4 px-6 py-6">
+          <div className="flex items-center justify-between">
+            <p className="text-brutalist text-base text-foreground">Achievements</p>
+            <Trophy className="size-5 text-primary" aria-hidden="true" />
+          </div>
+          <div className="flex flex-col gap-3">
+            {achievements.map((achievement) => (
+              <div
+                key={achievement.id}
+                className="flex items-center justify-between rounded-xl border border-white/60 bg-white/70 px-4 py-3 shadow-soft-button"
+                aria-live="polite"
+              >
+                <div>
+                  <p className="font-semibold text-foreground">{achievement.title}</p>
+                  <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                </div>
+                <span
+                  className={`font-pixel text-[0.6rem] tracking-[0.18em] ${
+import type { LearningOverview as LearningOverviewData } from '@/hooks/useAnalytics';
+import { BookOpen, Target, CheckCircle, TrendingUp, Brain, Sparkles } from 'lucide-react';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface LearningOverviewProps {
+  data: LearningOverviewData;
+  className?: string;
+}
+
+interface MetricCardProps {
+  icon: React.ReactNode;
+  emoji: string;
+  title: string;
+  value: string | number;
+  subtitle: string;
+  color: 'primary' | 'secondary' | 'accent' | 'foreground';
+}
+
+// ============================================================================
+// Metric Card Component
+// ============================================================================
+
+function MetricCard({ icon, emoji, title, value, subtitle, color }: MetricCardProps) {
+  const colorClasses = {
+    primary: 'text-primary',
+    secondary: 'text-secondary',
+    accent: 'text-accent',
+    foreground: 'text-foreground',
+  };
+
+  return (
+    <div className="soft-card pixel-border group relative overflow-hidden px-6 py-6 transition-transform duration-300 ease-soft-bounce hover:-translate-y-1">
+      {/* Gradient glow effect */}
+      <div className={`absolute -right-4 -top-4 h-20 w-20 rotate-12 rounded-xl ${color === 'primary' ? 'bg-primary/15' : color === 'secondary' ? 'bg-secondary/15' : color === 'accent' ? 'bg-accent/15' : 'bg-foreground/10'} blur-2xl`} />
+
+      <div className="relative">
+        <div className="flex items-start justify-between">
+          <span className="kawaii-icon text-3xl" aria-hidden="true">
+            {emoji}
+          </span>
+          <div className={`rounded-xl bg-white/80 p-2 ${colorClasses[color]}`}>
+            {icon}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <p className="text-brutalist text-sm text-muted-foreground">{title}</p>
+          <p className={`mt-2 text-3xl font-bold ${colorClasses[color]}`}>{value}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{subtitle}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Main Component
+// ============================================================================
+
+export function LearningOverview({ data, className = '' }: LearningOverviewProps) {
+  // Format values from backend data
+  const totalHours = data.total_duration_hours;
+  const timeDisplay = totalHours >= 1
+    ? `${totalHours.toFixed(1)}h`
+    : `${Math.round(totalHours * 60)}m`;
+
+  const avgSessionDisplay = data.avg_session_duration_minutes >= 60
+    ? `${Math.floor(data.avg_session_duration_minutes / 60)}h ${Math.round(data.avg_session_duration_minutes % 60)}m`
+    : `${Math.round(data.avg_session_duration_minutes)}m`;
+
+  const completionRateDisplay = `${Math.round(data.completion_rate)}%`;
+
+  return (
+    <div className={className}>
+      <div className="soft-card pixel-border mb-6 bg-gradient-to-br from-white/90 via-white/70 to-primary/10 px-8 py-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="kawaii-icon text-3xl" aria-hidden="true">
+                🎓
+              </span>
+              <div>
+                <h2 className="text-brutalist text-2xl text-foreground">Learning Overview</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Your progress over the last 30 days
+                </p>
+              </div>
+            </div>
+          </div>
+          <span className="badge-soft text-[0.65rem] font-semibold tracking-[0.18em] text-primary-foreground">
+            30-DAY SNAPSHOT
+          </span>
+        </div>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <MetricCard
+          icon={<BookOpen className="size-5" />}
+          emoji="📚"
+          title="Study Sessions"
+          value={data.total_sessions}
+          subtitle={`Avg ${avgSessionDisplay} per session`}
+          color="primary"
+        />
+
+        <MetricCard
+          icon={<TrendingUp className="size-5" />}
+          emoji="⏱️"
+          title="Total Study Time"
+          value={timeDisplay}
+          subtitle="Building lasting expertise"
+          color="secondary"
+        />
+
+        <MetricCard
+          icon={<Target className="size-5" />}
+          emoji="🎯"
+          title="XP Earned"
+          value={data.total_xp_earned}
+          subtitle={`Level ${data.current_level} • ${data.current_streak} day streak`}
+          color="accent"
+        />
+
+        <MetricCard
+          icon={<CheckCircle className="size-5" />}
+          emoji="✅"
+          title="Completion Rate"
+          value={completionRateDisplay}
+          subtitle="Materials completed vs viewed"
+          color="primary"
+        />
+
+        <MetricCard
+          icon={<Brain className="size-5" />}
+          emoji="🧠"
+          title="Materials Viewed"
+          value={data.materials_viewed}
+          subtitle={`${data.materials_completed} completed`}
+          color="secondary"
+        />
+
+        <MetricCard
+          icon={<Sparkles className="size-5" />}
+          emoji="✨"
+          title="Active Days"
+          value={data.daily_active_days}
+          subtitle="Consistency builds mastery"
+          color="accent"
+        />
+      </div>
+
+      {/* Insights Section */}
+      <div className="soft-card pixel-border mt-6 px-8 py-6">
+        <div className="flex items-start gap-4">
+          <span className="kawaii-icon text-3xl" aria-hidden="true">
+            💡
+          </span>
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: calc(var(--radius-lg) - 2px);
+    background:
+      linear-gradient(90deg, var(--pixel-border-light) 8px, transparent 8px) top / 16px 8px repeat-x,
+      linear-gradient(90deg, var(--pixel-border-dark) 8px, transparent 8px) bottom / 16px 8px repeat-x,
+      linear-gradient(180deg, var(--pixel-border-light) 8px, transparent 8px) left / 8px 16px repeat-y,
+      linear-gradient(180deg, var(--pixel-border-shadow) 8px, transparent 8px) right / 8px 16px repeat-y;
+    pointer-events: none;
+    z-index: var(--z-behind);
+    image-rendering: pixelated;
+  }
+
+  .pixel-border::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 4px 4px 0 0 rgba(255, 255, 255, 0.65), inset -4px -4px 0 0 rgba(99, 92, 240, 0.12);
+    pointer-events: none;
+  }
+
+  .soft-glow {
+    position: relative;
+  }
+
+  .soft-glow::after {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background: radial-gradient(circle, rgba(110, 108, 246, 0.12), transparent 65%);
+    filter: blur(32px);
+    pointer-events: none;
+    z-index: var(--z-behind);
+  }
+
+  .kawaii-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-round);
+    background: linear-gradient(145deg, rgba(255, 220, 228, 0.8), rgba(255, 240, 248, 0.95));
+    box-shadow:
+      inset 3px 3px 0 rgba(255, 255, 255, 0.95),
+      inset -4px -6px 12px rgba(244, 167, 196, 0.35);
+    border: 1px solid rgba(255, 182, 205, 0.55);
+    font-size: 1.5rem;
+  }
+
+  .badge-soft {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs) var(--space-sm);
+    border-radius: var(--radius-round);
+    background: linear-gradient(135deg, rgba(110, 108, 246, 0.16), rgba(234, 216, 255, 0.45));
+    color: hsl(var(--foreground));
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .empty-state-illustration {
+    width: 160px;
+    height: 160px;
+    position: relative;
+  }
+
+  .empty-state-illustration::before,
+  .empty-state-illustration::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(110, 108, 246, 0.85) 50%, transparent 0) top / 8px 8px repeat-x,
+      linear-gradient(90deg, rgba(245, 143, 181, 0.8) 50%, transparent 0) bottom / 8px 8px repeat-x,
+      linear-gradient(0deg, rgba(146, 227, 169, 0.8) 50%, transparent 0) left / 8px 8px repeat-y,
+      linear-gradient(0deg, rgba(255, 220, 228, 0.8) 50%, transparent 0) right / 8px 8px repeat-y;
+    image-rendering: pixelated;
+    border-radius: 24px;
+  }
+
+  .empty-state-illustration::after {
+    inset: 12px;
+    border-radius: 18px;
+    background:
+      repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.8) 0 12px,
+        rgba(235, 232, 255, 0.8) 12px 24px
+      );
+    box-shadow:
+      inset 4px 4px 0 rgba(255, 255, 255, 0.9),
+      inset -6px -8px 0 rgba(110, 108, 246, 0.08);
+  }
+
+  .page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    border-radius: var(--radius-lg);
+    background: var(--surface-soft);
+    backdrop-filter: blur(22px);
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-lg);
+  }
+
+  .chat-wrapper {
+    display: grid;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .chat-wrapper {
+      grid-template-columns: minmax(0, 2.3fr) minmax(0, 1fr);
+    }
+  }
+
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-lg);
+    backdrop-filter: blur(18px);
+  }
+
+  .chat-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(110, 108, 246, 0.18);
+    background: rgba(255, 255, 255, 0.8);
+    padding: var(--space-sm) var(--space-md);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+  }
+
+  .status-indicator {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+    background: rgba(99, 102, 241, 0.25);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  }
+
+  .status-connecting {
+    background: rgba(246, 199, 97, 0.9);
+  }
+
+  .status-ready {
+    background: rgba(46, 189, 133, 0.95);
+  }
+
+  .status-error {
+    background: rgba(239, 68, 68, 0.95);
+  }
+
+  .status-offline {
+    background: rgba(148, 163, 184, 0.6);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    border-radius: var(--radius-round);
+    padding: var(--space-3xs) var(--space-sm);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .status-pill-warn {
+    color: #7c4d00;
+    background: rgba(246, 199, 97, 0.35);
+  }
+
+  .status-pill-offline {
+    color: #334155;
+    background: rgba(148, 163, 184, 0.25);
+  }
+
+  .chat-status-controls {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .chat-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .chat-level-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .chat-control-group input[type='range'] {
+    accent-color: hsl(var(--primary));
+  }
+
+  .chat-select {
+    border-radius: var(--radius);
+    border: 1px solid rgba(110, 108, 246, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+    padding: var(--space-3xs) var(--space-sm);
+    font-size: 0.85rem;
+    color: hsl(var(--foreground));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .chat-select:focus-visible {
+    outline: 2px solid rgba(110, 108, 246, 0.35);
+    outline-offset: 2px;
+  }
+
+  .chat-reconnect-btn {
+    border: none;
+    border-radius: var(--radius-round);
+    padding: var(--space-3xs) var(--space-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: rgba(110, 108, 246, 0.16);
+    color: hsl(var(--primary));
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .chat-reconnect-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-soft-button);
+  }
+
+  .chat-reconnect-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .chat-error-banner {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    justify-content: space-between;
+    border-radius: var(--radius);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.12);
+    padding: var(--space-sm) var(--space-md);
+    color: rgba(127, 29, 29, 0.95);
+    font-size: 0.85rem;
+  }
+
+  .chat-error-retry {
+    border: none;
+    background: rgba(239, 68, 68, 0.25);
+    color: rgba(127, 29, 29, 1);
+    border-radius: var(--radius-round);
+    padding: var(--space-3xs) var(--space-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .typing-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    border-radius: var(--radius-round);
+    border: 1px solid rgba(110, 108, 246, 0.25);
+    background: rgba(110, 108, 246, 0.12);
+    padding: var(--space-3xs) var(--space-sm);
+    font-size: 0.75rem;
+    color: hsl(var(--primary));
+  }
+
+  .typing-ellipsis {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  .typing-ellipsis span {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    animation: typingPulse 1s infinite ease-in-out;
+  }
+
+  .typing-ellipsis span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .typing-ellipsis span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-height: clamp(320px, 60vh, 540px);
+    overflow-y: auto;
+    padding-right: var(--space-sm);
+    scroll-behavior: smooth;
+  }
+
+  .chat-message-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    border: 1px solid rgba(110, 108, 246, 0.12);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  .chat-message-user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, rgba(110, 108, 246, 0.2), rgba(245, 143, 181, 0.25));
+    border-color: rgba(110, 108, 246, 0.3);
+  }
+
+  .chat-message-assistant {
+    align-self: flex-start;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(227, 242, 255, 0.75));
+    border-color: rgba(146, 227, 169, 0.22);
+  }
+
+  .message-meta {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .message-meta-success {
+    color: hsl(var(--primary));
+  }
+
+  .message-meta-pending {
+    color: hsl(var(--accent-foreground));
+  }
+
+  .message-meta-queued {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .chat-input {
+    display: grid;
+    gap: var(--space-sm);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--surface-border);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-md);
+  }
+
+  .chat-input textarea {
+    width: 100%;
+    min-height: 120px;
+    border: none;
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+    resize: vertical;
+    background: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: hsl(var(--foreground));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .chat-input textarea:focus-visible {
+    outline: 2px solid rgba(110, 108, 246, 0.35);
+    outline-offset: 4px;
+  }
+
+  .chat-input button {
+    justify-self: end;
+    border: none;
+    border-radius: var(--radius-round);
+    padding: var(--space-3xs) var(--space-md);
+    background: linear-gradient(135deg, rgba(110, 108, 246, 0.65), rgba(245, 143, 181, 0.7));
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft-button);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .chat-input button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .chat-input button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .context-panel {
+    position: relative;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-height: clamp(320px, 60vh, 540px);
+    overflow-y: auto;
+  }
+
+  .context-panel h3 {
+    font-size: 0.9rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .context-item {
+    border-radius: var(--radius);
+    border: 1px solid rgba(146, 227, 169, 0.3);
+    background: rgba(146, 227, 169, 0.12);
+    padding: var(--space-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    font-size: 0.85rem;
+    color: hsl(var(--foreground));
+  }
+
+  .context-item h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: hsl(var(--primary));
+  }
+
+  .context-item p {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .citation-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-round);
+    background: rgba(110, 108, 246, 0.12);
+    color: hsl(var(--primary));
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+}
+
+@layer utilities {
+  .text-brutalist {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+
+  .shadow-soft-ui {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-soft-button {
+    box-shadow: var(--shadow-button);
+  }
+
+  .glass-blur {
+    backdrop-filter: blur(18px);
+    background-color: var(--surface-soft);
+  }
+
+  .grid-auto-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .text-accent-strong {
+    color: hsl(var(--accent-foreground));
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold tracking-wide transition-transform transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ease-soft-bounce",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-gradient-to-br from-primary via-secondary/80 to-primary/80 text-primary-foreground shadow-soft-button hover:-translate-y-0.5 hover:shadow-elevated active:translate-y-0 focus-visible:-translate-y-0.5 focus-visible:shadow-elevated",
+        destructive:
+          "bg-destructive text-destructive-foreground shadow-soft hover:bg-destructive/90 hover:-translate-y-0.5",
+        outline:
+          "border border-border bg-background/80 text-foreground shadow-soft hover:-translate-y-0.5 hover:bg-background focus-visible:bg-background",
+        secondary:
+          "bg-secondary/90 text-secondary-foreground shadow-soft-button hover:-translate-y-0.5 hover:bg-secondary",
+        ghost:
+          "text-foreground hover:bg-muted/60 hover:-translate-y-0.5 focus-visible:bg-muted/70",
+        link: "text-primary underline-offset-4 hover:underline hover:-translate-y-0.5",
+      },
+      size: {
+        default: "h-10 px-5",
+        sm: "h-8 rounded-full px-3 text-xs",
+        lg: "h-12 rounded-full px-6 text-sm",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }

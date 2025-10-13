@@ -1,4 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { ChatControls } from '@/components/chat/ChatControls';
+import { createInsight } from '@/lib/api/insights';
 
 import { MessageDisplay } from '@/components/AICoach/MessageDisplay';
 import type {
@@ -130,94 +132,44 @@ export function ChatPanel({
     return (
       <div className="chat-message-block chat-message-assistant">
         <MessageDisplay content={pendingAssistant} role="assistant" />
+        <div className="mt-2 text-right">
+          <button
+            type="button"
+            className="chat-reconnect-btn"
+            onClick={async () => {
+              try { await createInsight({ source: 'chat', content: pendingAssistant }); } catch {}
+            }}
+          >
+            Save as Insight
+          </button>
+        </div>
       </div>
     );
   }, [pendingAssistant]);
 
   return (
-    <div className="chat-panel">
+    <div className="chat-panel" data-testid="chat-panel">
       <div className="chat-status">
         <span className={STATUS_CLASS[status]} />
         <span>{STATUS_LABEL[status]}</span>
         {status === 'reconnecting' && <span className="status-pill status-pill-warn">Attempting to reconnect…</span>}
         {!isOnline && <span className="status-pill status-pill-offline">Offline</span>}
-        <div className="chat-status-controls">
-          <div className="chat-control-group">
-            <label htmlFor="student-level" className="chat-level-label">
-              Level {level}
-            </label>
-            <input
-              id="student-level"
-              type="range"
-              min="1"
-              max="5"
-              value={level}
-              onChange={(event) => setLevel(Number(event.target.value))}
-            />
-          </div>
-
-          <div className="chat-control-group">
-            <label htmlFor="ai-profile" className="chat-level-label" title="Preset combinations of verbosity and reasoning">
-              Learning Mode
-            </label>
-            <select
-              id="ai-profile"
-              value={profile}
-              onChange={(event) => handleLearningModeChange(event.target.value)}
-              className="chat-select"
-              title="Sets defaults for Verbosity and Reasoning Speed"
-            >
-              <option value="studyin_fast">Fast</option>
-              <option value="studyin_study">Study</option>
-              <option value="studyin_deep">Deep</option>
-            </select>
-          </div>
-
-          <div className="chat-control-group">
-            <label htmlFor="verbosity" className="chat-level-label" title="Controls response length">
-              Verbosity
-            </label>
-            <select
-              id="verbosity"
-              value={verbosity}
-              onChange={(e) => setVerbosityState(e.target.value as 'concise' | 'balanced' | 'detailed')}
-              className="chat-select"
-              title="Concise: Brief • Balanced: Moderate • Detailed: Comprehensive"
-            >
-              <option value="concise">Concise</option>
-              <option value="balanced">Balanced</option>
-              <option value="detailed">Detailed</option>
-            </select>
-          </div>
-
-          <div className="chat-control-group">
-            <label htmlFor="reasoning-effort" className="chat-level-label" title="Controls response speed (higher = slower but more thorough)">
-              Reasoning Speed
-            </label>
-            <select
-              id="reasoning-effort"
-              value={effort}
-              onChange={(e) => setEffortState(e.target.value as 'minimal' | 'low' | 'medium' | 'high')}
-              className="chat-select"
-              title="Lower = faster responses • Higher = more deliberate thinking"
-            >
-              <option value="minimal">Minimal</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-
-          {showReconnect && (
-            <button
-              type="button"
-              className="chat-reconnect-btn"
-              onClick={onReconnect}
-              disabled={reconnectDisabled}
-            >
-              {reconnectLabel}
-            </button>
-          )}
+        <div className="w-full">
+          <ChatControls
+            level={level}
+            profile={profile}
+            verbosity={verbosity}
+            effort={effort}
+            onLevel={setLevel}
+            onProfile={handleLearningModeChange}
+            onVerbosity={(v) => setVerbosityState(v)}
+            onEffort={(e) => setEffortState(e)}
+            showReconnect={showReconnect}
+            reconnectDisabled={reconnectDisabled}
+            onReconnect={onReconnect}
+            reconnectLabel={reconnectLabel}
+            className="mt-2"
+          />
         </div>
       </div>
 

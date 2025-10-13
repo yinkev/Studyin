@@ -46,7 +46,7 @@ export function StreakCounter({
     return (
       <section
         className={cn(
-          'soft-card pixel-border flex flex-col gap-4 bg-gradient-to-br from-white/85 via-white/70 to-primary/5 px-4 py-4',
+          'soft-card pixel-border flex flex-col gap-4 glass px-4 py-4',
           className
         )}
         aria-label="Study streak summary"
@@ -97,8 +97,7 @@ export function StreakCounter({
   return (
     <section
       className={cn(
-        'soft-card pixel-border backdrop-blur-xl',
-        'bg-gradient-to-br from-white/85 via-white/70 to-secondary/10',
+        'soft-card pixel-border backdrop-blur-xl glass',
         className
       )}
       aria-label="Study streak summary"

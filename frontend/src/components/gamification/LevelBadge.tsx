@@ -13,7 +13,7 @@ export function LevelBadge({ level, title = 'Scholar', masteryPercent = 0, class
   return (
     <div
       className={cn(
-        'soft-card pixel-border flex items-center gap-4 bg-gradient-to-br from-white/90 via-white/70 to-primary/10',
+        'soft-card pixel-border flex items-center gap-4 glass',
         'px-5 py-4',
         className
       )}
@@ -31,7 +31,7 @@ export function LevelBadge({ level, title = 'Scholar', masteryPercent = 0, class
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
           <div
-            className="h-full bg-gradient-to-r from-primary via-secondary to-accent transition-all duration-500 ease-soft-bounce"
+            className="h-full bg-accent transition-all duration-500 ease-soft-bounce"
             style={{ width: `${sanitizedPercent}%` }}
             aria-hidden="true"
           />

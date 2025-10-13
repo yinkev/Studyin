@@ -199,6 +199,14 @@ Logs:
 - Frontend: `/tmp/studyin-frontend.log`
 - ChatMock: `~/.chatmock_server.log`
 
+### End‑to‑End (Playwright)
+
+- Config: `frontend/playwright.config.ts` (baseURL `http://localhost:5173`)
+- Tests: `frontend/e2e/`
+- Run:
+  - `cd frontend && npm run e2e`
+  - `npx playwright show-report`
+
 ---
 
 ## ☁️ Deploy (GitHub → Vercel)

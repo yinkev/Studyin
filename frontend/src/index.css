@@ -4,8 +4,8 @@
 /* Import Tailwind CSS v4 */
 @import "tailwindcss";
 
-/* Import design tokens */
-@import './styles/tokens.css';
+/* Import design tokens - NEW 2025 SYSTEM (NO GRADIENTS) */
+@import './styles/tokens-2025.css';
 
 /* Tailwind CSS v4 theme extensions using @theme directive */
 @theme {
@@ -58,17 +58,8 @@
   body {
     margin: 0;
     min-height: 100vh;
-    background:
-      radial-gradient(circle at 12% 18%, rgba(248, 240, 255, 0.75), transparent 60%),
-      radial-gradient(circle at 88% 14%, rgba(227, 242, 255, 0.85), transparent 60%),
-      radial-gradient(circle at 50% 80%, rgba(255, 220, 228, 0.45), transparent 65%),
-      linear-gradient(
-        180deg,
-        hsl(var(--surface-gradient-start)) 0%,
-        hsl(var(--surface-gradient-end)) 60%,
-        hsl(var(--background)) 100%
-      );
-    background-attachment: fixed;
+    /* NO GRADIENTS: solid background only */
+    background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

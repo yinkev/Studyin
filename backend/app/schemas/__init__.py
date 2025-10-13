@@ -37,6 +37,19 @@ from app.schemas.api_contract import (
     WSTokenMessage,
     WSUserMessage,
 )
+from app.schemas.insight import (
+    InsightCreate,
+    InsightUpdate,
+    InsightResponse,
+)
+from app.schemas.questions import (
+    MCQOption,
+    QuestionResponse,
+    GenerateQuestionsRequest,
+    GenerateQuestionsResponse,
+    AnswerQuestionRequest,
+    AnswerQuestionResponse,
+)
 
 __all__ = [
     # Common
@@ -58,4 +71,15 @@ __all__ = [
     "WSInfoMessage",
     "WSTokenMessage",
     "WSUserMessage",
+    # Insights
+    "InsightCreate",
+    "InsightUpdate",
+    "InsightResponse",
+    # Questions
+    "MCQOption",
+    "QuestionResponse",
+    "GenerateQuestionsRequest",
+    "GenerateQuestionsResponse",
+    "AnswerQuestionRequest",
+    "AnswerQuestionResponse",
 ]

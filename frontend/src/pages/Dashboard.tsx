@@ -114,7 +114,7 @@ export function Dashboard({ onNavigate, stats }: DashboardProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-10">
-      <header className="soft-card pixel-border bg-gradient-to-br from-white/90 via-white/70 to-primary/10 px-8 py-10">
+      <header className="soft-card pixel-border glass px-8 py-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <span className="badge-soft text-[0.65rem] font-semibold tracking-[0.18em] text-primary-foreground">
             Welcome back
