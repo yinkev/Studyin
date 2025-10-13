@@ -4,7 +4,7 @@ import { ModernXPBar } from '@/components/dashboard/ModernXPBar';
 import { ModernStreakCard } from '@/components/dashboard/ModernStreakCard';
 import { LevelCard } from '@/components/dashboard/LevelCard';
 
-export type View = 'dashboard' | 'upload' | 'chat' | 'analytics' | 'quiz' | 'settings';
+export type View = 'dashboard' | 'upload' | 'chat' | 'analytics' | 'quiz' | 'firstpass' | 'settings';
 
 interface NavBarProps {
   currentView: View;

@@ -16,7 +16,7 @@ type MCQ = {
 };
 
 export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
-  const [topic, setTopic] = useState('Cardiac Physiology');
+  const [topic, setTopic] = useState('');
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<MCQ[]>([]);
   const [index, setIndex] = useState(0);
@@ -68,7 +68,7 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
 
       <div className="flex items-center gap-2 mb-4">
         <Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic" />
-        <Button onClick={startQuick5} disabled={loading} className="gap-2">
+        <Button onClick={startQuick5} disabled={loading || !topic.trim()} className="gap-2">
           {loading && <Loader2 className="w-4 h-4 animate-spin" />} Start 5
         </Button>
       </div>

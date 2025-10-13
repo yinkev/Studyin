@@ -235,7 +235,7 @@ export function CosmicDashboard({ onNavigate, stats, currentView }: CosmicDashbo
                 <p className="text-sm text-muted-foreground">First Pass</p>
                 <h3 className="text-lg font-semibold">Guided Teaching</h3>
               </div>
-              <button className="border rounded-full px-4 py-2 text-sm font-semibold" onClick={() => onNavigate('chat')}>
+              <button className="border rounded-full px-4 py-2 text-sm font-semibold" onClick={() => onNavigate('firstpass' as any)}>
                 Begin
               </button>
             </div>

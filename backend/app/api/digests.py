@@ -39,19 +39,32 @@ Output in JSON with keys: title, bullets (array of 3 concise items), mini_case (
     text_chunks = []
     async for chunk in codex.generate_completion(prompt, model="gpt-5", temperature=0.5):
         text_chunks.append(chunk)
-    text = "".join(text_chunks)
-    # naive parse
-    import json
-    try:
-        if "```json" in text:
-            text = text.split("```json")[1].split("```", 1)[0]
-        data = json.loads(text)
-    except Exception:
-        data = {
-            "title": "Today’s Digest",
-            "bullets": ["Review core mechanisms", "Practice 2 MCQs", "Reflect with a 2‑sentence summary"],
-            "mini_case": text[:400],
-            "mnemonic": "FOCUS: Facts, Organize, Curate, Understand, Summarize",
-        }
-    return data
+    text = "".join(text_chunks).strip()
+    # Parse JSON if present; otherwise derive deterministically from text (no static placeholders)
+    import json, re
+    if "{" in text and "}" in text:
+        try:
+            if "```json" in text:
+                text = text.split("```json")[1].split("```", 1)[0]
+            data = json.loads(text)
+            return data
+        except Exception:
+            pass
 
+    # Derive bullets and sections from plain text
+    # 1) Split into sentences
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    bullets = [s.strip() for s in sentences if len(s.strip()) > 0][:3]
+    # 2) Mini-case: take next ~3 sentences
+    mini_case = " ".join(sentences[3:6]).strip()[:600]
+    # 3) Mnemonic: pick capitalized initials of first bullet’s words up to 6 letters
+    words = re.findall(r"[A-Za-z]+", bullets[0] if bullets else "Study Focus")
+    initials = "".join(w[0].upper() for w in words[:6]) or "FOCUS"
+    mnemonic = initials
+
+    return {
+        "title": f"Digest: {topic}",
+        "bullets": bullets,
+        "mini_case": mini_case,
+        "mnemonic": mnemonic,
+    }

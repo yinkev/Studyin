@@ -16,7 +16,8 @@ type TeachFlow = {
 };
 
 export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void }) {
-  const [topic, setTopic] = useState('Cardiac Physiology');
+  const [topic, setTopic] = useState('');
+  const [minutes, setMinutes] = useState(10);
   const [busy, setBusy] = useState(false);
   const [flow, setFlow] = useState<TeachFlow | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -25,7 +26,7 @@ export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void
   const start = async () => {
     setBusy(true);
     try {
-      const resp = await apiClient.post('/api/teach/first-pass', null, { params: { topic, minutes: 10 } });
+      const resp = await apiClient.post('/api/teach/first-pass', null, { params: { topic, minutes } });
       setFlow(resp.data);
       setAnswers({});
       setShowExplain(false);
@@ -48,7 +49,8 @@ export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void
 
       <div className="flex items-center gap-2">
         <Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic" />
-        <Button onClick={start} disabled={busy}>{busy ? 'Preparing…' : 'Start'}</Button>
+        <Input type="number" min={5} max={20} value={minutes} onChange={(e)=> setMinutes(Number(e.target.value)||10)} className="w-24" />
+        <Button onClick={start} disabled={busy || !topic.trim()}>{busy ? 'Preparing…' : 'Start'}</Button>
       </div>
 
       {!flow && <p className="text-sm text-muted-foreground">Enter a topic and click Start to get a 10‑minute guided pass.</p>}
@@ -118,4 +120,3 @@ export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void
 }
 
 export default FirstPassView;
-
