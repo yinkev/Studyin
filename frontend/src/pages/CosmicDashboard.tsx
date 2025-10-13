@@ -229,6 +229,22 @@ export function CosmicDashboard({ onNavigate, stats, currentView }: CosmicDashbo
               <button className="bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold" onClick={() => onNavigate('quiz')}>
                 Start
               </button>
+              <button className="border rounded-full px-4 py-2 text-sm font-semibold ml-2" onClick={() => {
+                try {
+                  const t = localStorage.getItem('studyin_last_topic');
+                  if (t) {
+                    const qs = new URLSearchParams(window.location.search);
+                    qs.set('view', 'quiz');
+                    qs.set('topic', t);
+                    qs.set('mode', 'next');
+                    window.location.search = qs.toString();
+                  } else {
+                    onNavigate('quiz');
+                  }
+                } catch { onNavigate('quiz'); }
+              }}>
+                Continue
+              </button>
             </div>
             <div className="glass border p-4 rounded-xl flex items-center justify-between">
               <div>

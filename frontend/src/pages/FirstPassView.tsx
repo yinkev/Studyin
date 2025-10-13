@@ -6,12 +6,13 @@ import { apiClient } from '@/lib/api/client';
 import type { View } from '@/components/NavBar';
 import { createInsight } from '@/lib/api/insights';
 
+type FirstPassMCQ = { id: string; stem: string; options: string[]; correct_index: number; explanation: string };
 type TeachFlow = {
   minutes: number;
   topic: string;
   skim_bullets: string[];
   key_points: string;
-  mcqs: { question: string; options: string[]; correct_index: number; explanation: string }[];
+  mcqs: FirstPassMCQ[];
   reflection_prompt: string;
 };
 
@@ -21,7 +22,7 @@ export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void
   const [busy, setBusy] = useState(false);
   const [flow, setFlow] = useState<TeachFlow | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [showExplain, setShowExplain] = useState(false);
+  const [results, setResults] = useState<Record<number, { correct: boolean; explanation: string }>>({});
 
   const start = async () => {
     setBusy(true);
@@ -29,7 +30,7 @@ export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void
       const resp = await apiClient.post('/api/teach/first-pass', null, { params: { topic, minutes } });
       setFlow(resp.data);
       setAnswers({});
-      setShowExplain(false);
+      setResults({});
     } finally {
       setBusy(false);
     }
@@ -83,7 +84,7 @@ export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void
               <h2 className="text-lg font-semibold">3) Quick Checks</h2>
               {flow.mcqs.map((q, qi) => (
                 <div key={qi} className="border rounded-lg p-4 bg-white/80">
-                  <p className="font-medium">{q.question}</p>
+                  <p className="font-medium">{q.stem}</p>
                   <div className="mt-2 grid gap-2">
                     {q.options.map((opt, oi) => (
                       <button
@@ -95,14 +96,24 @@ export function FirstPassView({ onNavigate }: { onNavigate: (view: View) => void
                       </button>
                     ))}
                   </div>
-                  {showExplain && (
-                    <div className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">{q.explanation}</div>
+                  {results[qi] && (
+                    <div className="mt-2 text-sm whitespace-pre-wrap">
+                      <span className={results[qi].correct ? 'text-green-700' : 'text-red-700'}>
+                        {results[qi].correct ? 'Correct!' : 'Not quite.'}
+                      </span>
+                      <div className="text-muted-foreground mt-1">{results[qi].explanation}</div>
+                    </div>
                   )}
+                  <div className="mt-2">
+                    <Button size="sm" disabled={answers[qi] == null} onClick={async ()=>{
+                      try {
+                        const resp = await apiClient.post(`/api/questions/${q.id}/answer`, { chosen_index: answers[qi] });
+                        setResults((r) => ({ ...r, [qi]: { correct: !!resp.data.correct, explanation: resp.data.explanation } }));
+                      } catch {}
+                    }}>Submit</Button>
+                  </div>
                 </div>
               ))}
-              <div className="flex gap-2">
-                <Button onClick={() => setShowExplain(true)} variant="secondary">Show Explanations</Button>
-              </div>
             </CardContent>
           </Card>
 

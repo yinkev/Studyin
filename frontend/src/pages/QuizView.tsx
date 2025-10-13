@@ -37,6 +37,7 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
     try {
       const resp = await apiClient.post('/api/questions/generate', { topic, difficulty, num_questions: count, use_context: true });
       setQuestions(resp.data.questions || []);
+      try { localStorage.setItem('studyin_last_topic', topic); } catch {}
     } finally {
       setLoading(false);
     }
@@ -57,6 +58,7 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
       } else {
         setQuestions(data);
       }
+      try { localStorage.setItem('studyin_last_topic', topic); } catch {}
     } finally {
       setLoading(false);
     }
