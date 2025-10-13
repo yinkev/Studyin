@@ -17,14 +17,15 @@ NC='\033[0m' # No Color
 
 # ChatMock configuration (local OpenAI-compatible API)
 # You can override these via env before running this script, e.g.:
-#   CHATMOCK_PORT=8802 ./START_SERVERS.sh
+#   CHATMOCK_PORT=8802 CHATMOCK_REASONING=low ./START_SERVERS.sh
 CHATMOCK_PORT=${CHATMOCK_PORT:-8801}
 CHATMOCK_HOST=${CHATMOCK_HOST:-127.0.0.1}
+CHATMOCK_REASONING=${CHATMOCK_REASONING:-low}  # Default to 'low' for faster responses
 CHATMOCK_LOG=${CHATMOCK_LOG:-$HOME/.chatmock_server.log}
 CHATMOCK_FLAGS=(
   --host "$CHATMOCK_HOST"
   --port "$CHATMOCK_PORT"
-  --reasoning-effort high
+  --reasoning-effort "$CHATMOCK_REASONING"
   --reasoning-compat o3
   --reasoning-summary none
   --expose-reasoning-models

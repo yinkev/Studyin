@@ -12,7 +12,7 @@ from datetime import date, datetime, timedelta
 from typing import Any, Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import and_, func, select, update
+from sqlalchemy import and_, func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 
@@ -87,10 +87,10 @@ class AnalyticsTracker:
 
         # Store in database
         await self.db.execute(
-            """
+            text("""
             INSERT INTO learning_sessions (id, user_id, started_at, materials_viewed, is_active)
             VALUES (:id, :user_id, :started_at, :materials_viewed, true)
-            """,
+            """),
             {
                 "id": session_id,
                 "user_id": anonymized_user,
@@ -133,11 +133,11 @@ class AnalyticsTracker:
 
         # Get session data
         result = await self.db.execute(
-            """
+            text("""
             SELECT started_at, materials_viewed, materials_completed
             FROM learning_sessions
             WHERE id = :id AND user_id = :user_id AND is_active = true
-            """,
+            """),
             {"id": session_id, "user_id": anonymized_user},
         )
         session_data = result.first()
@@ -166,7 +166,7 @@ class AnalyticsTracker:
 
         # Update session in database
         await self.db.execute(
-            """
+            text("""
             UPDATE learning_sessions
             SET ended_at = :ended_at,
                 duration_seconds = :duration,
@@ -174,7 +174,7 @@ class AnalyticsTracker:
                 is_active = false,
                 updated_at = :updated_at
             WHERE id = :id
-            """,
+            """),
             {
                 "id": session_id,
                 "ended_at": now,
@@ -257,7 +257,7 @@ class AnalyticsTracker:
         if session_id:
             if interaction_type == "view":
                 await self.db.execute(
-                    """
+                    text("""
                     UPDATE learning_sessions
                     SET materials_viewed = array_append(
                         COALESCE(materials_viewed, ARRAY[]::uuid[]),
@@ -265,12 +265,12 @@ class AnalyticsTracker:
                     )
                     WHERE id = :session_id
                     AND NOT (:material_id = ANY(COALESCE(materials_viewed, ARRAY[]::uuid[])))
-                    """,
+                    """),
                     {"session_id": session_id, "material_id": material_id},
                 )
             elif interaction_type == "complete":
                 await self.db.execute(
-                    """
+                    text("""
                     UPDATE learning_sessions
                     SET materials_completed = array_append(
                         COALESCE(materials_completed, ARRAY[]::uuid[]),
@@ -278,7 +278,7 @@ class AnalyticsTracker:
                     )
                     WHERE id = :session_id
                     AND NOT (:material_id = ANY(COALESCE(materials_completed, ARRAY[]::uuid[])))
-                    """,
+                    """),
                     {"session_id": session_id, "material_id": material_id},
                 )
 
@@ -310,11 +310,11 @@ class AnalyticsTracker:
 
         # Get current gamification stats
         result = await self.db.execute(
-            """
+            text("""
             SELECT total_xp, current_level, current_streak
             FROM gamification_stats
             WHERE user_id = :user_id
-            """,
+            """),
             {"user_id": anonymized_user},
         )
         current_stats = result.first()
@@ -459,11 +459,11 @@ class AnalyticsTracker:
 
         # Store in system metrics table
         await self.db.execute(
-            """
+            text("""
             INSERT INTO system_metrics
             (id, timestamp, endpoint, method, status_code, response_time_ms, error_type, user_id)
             VALUES (:id, :timestamp, :endpoint, :method, :status_code, :response_time_ms, :error_type, :user_id)
-            """,
+            """),
             {
                 "id": event.event_id,
                 "timestamp": event.timestamp,
@@ -584,12 +584,12 @@ class AnalyticsTracker:
             achievement_id: Achievement ID to add
         """
         await self.db.execute(
-            """
+            text("""
             UPDATE gamification_stats
             SET achievements = achievements || :achievement::jsonb,
                 updated_at = NOW()
             WHERE user_id = :user_id
-            """,
+            """),
             {
                 "user_id": user_id,
                 "achievement": json.dumps(
@@ -606,14 +606,14 @@ class AnalyticsTracker:
             streak_days: New streak value
         """
         await self.db.execute(
-            """
+            text("""
             UPDATE gamification_stats
             SET current_streak = :streak_days,
                 longest_streak = GREATEST(longest_streak, :streak_days),
                 last_activity_date = :today,
                 updated_at = NOW()
             WHERE user_id = :user_id
-            """,
+            """),
             {"user_id": user_id, "streak_days": streak_days, "today": date.today()},
         )
 
@@ -636,11 +636,11 @@ class AnalyticsTracker:
         """
         # Check if metrics exist
         result = await self.db.execute(
-            """
+            text("""
             SELECT id, message_count, avg_response_time_ms, avg_rating, total_ratings
             FROM ai_coach_metrics
             WHERE user_id = :user_id AND conversation_id = :conversation_id
-            """,
+            """),
             {"user_id": user_id, "conversation_id": conversation_id},
         )
         metrics = result.first()
@@ -683,11 +683,11 @@ class AnalyticsTracker:
         else:
             # Insert new metrics
             await self.db.execute(
-                """
+                text("""
                 INSERT INTO ai_coach_metrics
                 (id, user_id, conversation_id, message_count, avg_response_time_ms, avg_rating, total_ratings)
                 VALUES (:id, :user_id, :conversation_id, :message_count, :avg_response_time_ms, :avg_rating, :total_ratings)
-                """,
+                """),
                 {
                     "id": uuid4(),
                     "user_id": user_id,

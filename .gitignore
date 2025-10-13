@@ -65,3 +65,5 @@ htmlcov/
 *.crt
 secrets/
 
+# Vercel local project link
+.vercel/

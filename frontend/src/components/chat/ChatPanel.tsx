@@ -19,6 +19,7 @@ interface ChatPanelProps {
   setUserLevel: (level: number) => void;
   setProfile: (profile: string) => void;
   setEffort: (effort: 'minimal' | 'low' | 'medium' | 'high') => void;
+  setVerbosity: (verbosity: 'concise' | 'balanced' | 'detailed') => void;
 }
 
 const STATUS_LABEL: Record<ConnectionStatus, string> = {
@@ -56,18 +57,35 @@ export function ChatPanel({
   setUserLevel,
   setProfile,
   setEffort,
+  setVerbosity,
 }: ChatPanelProps) {
   const [draft, setDraft] = useState('');
   const [level, setLevel] = useState(3);
   const [profile, setProfileState] = useState('studyin_fast');
+  const [verbosity, setVerbosityState] = useState<'concise' | 'balanced' | 'detailed'>('balanced');
   const [effort, setEffortState] = useState<'minimal' | 'low' | 'medium' | 'high'>(() => {
     try {
       const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('studyin_effort') : null;
       if (saved === 'minimal' || saved === 'low' || saved === 'medium' || saved === 'high') return saved;
     } catch {}
-    return 'high';
+    return 'low';  // Default to "Fast" for better UX
   });
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // When Learning Mode changes, set Verbosity and Reasoning Speed defaults
+  const handleLearningModeChange = (newProfile: string) => {
+    setProfileState(newProfile);
+    if (newProfile === 'studyin_fast') {
+      setVerbosityState('concise');
+      setEffortState('minimal');
+    } else if (newProfile === 'studyin_study') {
+      setVerbosityState('balanced');
+      setEffortState('low');
+    } else if (newProfile === 'studyin_deep') {
+      setVerbosityState('detailed');
+      setEffortState('medium');
+    }
+  };
 
   useEffect(() => {
     setUserLevel(level);
@@ -76,6 +94,10 @@ export function ChatPanel({
   useEffect(() => {
     setProfile(profile);
   }, [profile, setProfile]);
+
+  useEffect(() => {
+    setVerbosity(verbosity);
+  }, [verbosity, setVerbosity]);
 
   useEffect(() => {
     setEffort(effort);
@@ -135,30 +157,49 @@ export function ChatPanel({
           </div>
 
           <div className="chat-control-group">
-            <label htmlFor="ai-profile" className="chat-level-label">
+            <label htmlFor="ai-profile" className="chat-level-label" title="Preset combinations of verbosity and reasoning">
               Learning Mode
             </label>
             <select
               id="ai-profile"
               value={profile}
-              onChange={(event) => setProfileState(event.target.value)}
+              onChange={(event) => handleLearningModeChange(event.target.value)}
               className="chat-select"
+              title="Sets defaults for Verbosity and Reasoning Speed"
             >
-              <option value="studyin_fast">Fast (Quick answers)</option>
-              <option value="studyin_study">Study (Balanced teaching)</option>
-              <option value="studyin_deep">Deep (Thorough reasoning)</option>
+              <option value="studyin_fast">Fast</option>
+              <option value="studyin_study">Study</option>
+              <option value="studyin_deep">Deep</option>
             </select>
           </div>
 
           <div className="chat-control-group">
-            <label htmlFor="reasoning-effort" className="chat-level-label">
-              Reasoning
+            <label htmlFor="verbosity" className="chat-level-label" title="Controls response length">
+              Verbosity
+            </label>
+            <select
+              id="verbosity"
+              value={verbosity}
+              onChange={(e) => setVerbosityState(e.target.value as 'concise' | 'balanced' | 'detailed')}
+              className="chat-select"
+              title="Concise: Brief • Balanced: Moderate • Detailed: Comprehensive"
+            >
+              <option value="concise">Concise</option>
+              <option value="balanced">Balanced</option>
+              <option value="detailed">Detailed</option>
+            </select>
+          </div>
+
+          <div className="chat-control-group">
+            <label htmlFor="reasoning-effort" className="chat-level-label" title="Controls response speed (higher = slower but more thorough)">
+              Reasoning Speed
             </label>
             <select
               id="reasoning-effort"
               value={effort}
               onChange={(e) => setEffortState(e.target.value as 'minimal' | 'low' | 'medium' | 'high')}
               className="chat-select"
+              title="Lower = faster responses • Higher = more deliberate thinking"
             >
               <option value="minimal">Minimal</option>
               <option value="low">Low</option>

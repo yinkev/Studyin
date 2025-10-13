@@ -32,6 +32,7 @@ class WebSocketMessage(TypedDict, total=False):
     user_level: int
     profile: str  # "studyin_fast", "studyin_study", or "studyin_deep"
     effort: str   # optional: minimal | low | medium | high
+    verbosity: str  # optional: concise | balanced | detailed
 
 
 class ChatHistoryEntry(TypedDict):
@@ -45,6 +46,8 @@ def _build_prompt(
     *,
     question: str,
     user_level: int,
+    profile: str,
+    verbosity: str,
     history: Sequence[ChatHistoryEntry],
     context_block: str,
 ) -> str:
@@ -58,18 +61,45 @@ def _build_prompt(
     else:
         formatted_history = "No prior conversation."
 
+    # Customize teaching style based on learning mode
+    if profile == "studyin_fast":
+        teaching_style = (
+            "Provide concise, direct explanations with clear takeaways. "
+            "Focus on key concepts and practical applications."
+        )
+    elif profile == "studyin_deep":
+        teaching_style = (
+            "Use the Socratic method extensively, guiding with probing questions. "
+            "Explore underlying principles, edge cases, and clinical reasoning in depth. "
+            "Encourage reflection and critical thinking with multiple follow-up questions."
+        )
+    else:  # studyin_study (balanced)
+        teaching_style = (
+            "Use the Socratic method, guiding the student with questions and hints. "
+            "Balance explanation with inquiry. Encourage the student to explain their thinking. "
+            "Ask at least one probing question and suggest a next step if appropriate."
+        )
+
+    # Customize verbosity based on user preference
+    if verbosity == "concise":
+        length_guidance = "Keep responses brief (2-3 paragraphs max). Prioritize clarity and brevity."
+    elif verbosity == "detailed":
+        length_guidance = "Provide comprehensive, detailed explanations. Include examples and elaboration where helpful."
+    else:  # balanced
+        length_guidance = "Provide moderate-length responses. Balance detail with conciseness."
+
     return (
-        "You are StudyIn's AI medical coach. Use the Socratic method, guiding the student with "
-        "questions, hints, and clinical reasoning rather than giving answers outright. "
-        "Stay supportive and encourage reflection. Reference the provided study materials only.\n\n"
+        f"You are StudyIn's AI medical coach. {teaching_style} {length_guidance} "
+        "Stay supportive and reference the provided study materials only.\n\n"
         f"Student level (1 beginner - 5 expert): {user_level}\n\n"
+        f"Learning mode: {profile.replace('studyin_', '').title()}\n\n"
+        f"Verbosity: {verbosity.title()}\n\n"
         f"Relevant study materials:\n{context_block}\n\n"
         "Conversation so far:\n"
         f"{formatted_history}\n\n"
         "Current student question:\n"
         f"{question}\n\n"
-        "Respond in markdown. Encourage the student to explain their thinking. "
-        "Ask at least one probing question and suggest a next step if appropriate."
+        "Respond in markdown."
     )
 
 
@@ -179,6 +209,11 @@ async def chat_websocket(
             if profile not in ("studyin_fast", "studyin_study", "studyin_deep"):
                 profile = "studyin_fast"  # Default to fast mode
 
+            # Extract verbosity with validation
+            verbosity = (message.get("verbosity") or "").strip().lower()
+            if verbosity not in ("concise", "balanced", "detailed"):
+                verbosity = "balanced"  # Default to balanced
+
             history.append({"role": "user", "content": content})
 
             rag_start = perf_counter()
@@ -223,6 +258,8 @@ async def chat_websocket(
             prompt = _build_prompt(
                 question=content,
                 user_level=user_level,
+                profile=profile,
+                verbosity=verbosity,
                 history=history,
                 context_block=context_block,
             )
@@ -233,6 +270,19 @@ async def chat_websocket(
                 effective_model = f"gpt-5-{effort}"
             else:
                 effective_model = settings.CODEX_DEFAULT_MODEL
+
+            logger.info(
+                "llm_request_config",
+                extra={
+                    "user_id": user_id_str,
+                    "user_level": user_level,
+                    "profile": profile,
+                    "verbosity": verbosity,
+                    "effort": effort,
+                    "model": effective_model,
+                    "message_index": user_message_count,
+                },
+            )
 
             try:
                 stream = codex_llm.generate_completion(

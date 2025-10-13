@@ -17,6 +17,7 @@ interface ChatViewProps {
   setUserLevel: (level: number) => void;
   setProfile: (profile: string) => void;
   setEffort: (effort: 'minimal' | 'low' | 'medium' | 'high') => void;
+  setVerbosity: (verbosity: 'concise' | 'balanced' | 'detailed') => void;
   onNavigate: (view: View) => void;
 }
 
@@ -34,6 +35,7 @@ export function ChatView({
   setUserLevel,
   setProfile,
   setEffort,
+  setVerbosity,
 }: ChatViewProps) {
   return (
     <div className="flex-1 p-6">
@@ -58,6 +60,7 @@ export function ChatView({
           setUserLevel={setUserLevel}
           setProfile={setProfile}
           setEffort={setEffort}
+          setVerbosity={setVerbosity}
         />
         <ContextSidebar chunks={contextChunks} />
       </div>

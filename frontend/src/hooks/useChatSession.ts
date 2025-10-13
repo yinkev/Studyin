@@ -83,6 +83,7 @@ interface OutboundMessage {
   user_level: number;
   profile?: string;
   effort?: 'minimal' | 'low' | 'medium' | 'high';
+  verbosity?: 'concise' | 'balanced' | 'detailed';
 }
 
 interface QueuedOutboundMessage {
@@ -104,6 +105,7 @@ export interface ChatSessionState {
   setUserLevel: (level: number) => void;
   setProfile: (profile: string) => void;
   setEffort: (effort: 'minimal' | 'low' | 'medium' | 'high') => void;
+  setVerbosity: (verbosity: 'concise' | 'balanced' | 'detailed') => void;
 }
 
 const DEFAULT_WS_URL = 'ws://localhost:8000/api/chat/ws';
@@ -143,6 +145,7 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
   const userLevelRef = useRef(options.userLevel ?? 3);
   const profileRef = useRef(options.profile ?? 'studyin_fast');
   const effortRef = useRef<'minimal' | 'low' | 'medium' | 'high'>('high');
+  const verbosityRef = useRef<'concise' | 'balanced' | 'detailed'>('balanced');
   const pendingAssistantRef = useRef<string | null>(null);
   const isOnlineRef = useRef(isOnline);
   const lastSentMessageRef = useRef<{ id: string; content: string } | null>(null);
@@ -438,6 +441,7 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
         user_level: userLevelRef.current,
         profile: profileRef.current,
         effort: effortRef.current,
+        verbosity: verbosityRef.current,
       };
 
       const socket = wsRef.current;
@@ -492,6 +496,7 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
       user_level: userLevelRef.current,
       profile: profileRef.current,
       effort: effortRef.current,
+      verbosity: verbosityRef.current,
     };
 
     queueRef.current = queueRef.current.filter((item) => item.id !== lastMessage.id);
@@ -532,6 +537,10 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
     } catch (_) {
       // ignore storage errors
     }
+  }, []);
+
+  const setVerbosity = useCallback((verbosity: 'concise' | 'balanced' | 'detailed') => {
+    verbosityRef.current = verbosity;
   }, []);
 
   // Load persisted effort on mount
@@ -593,5 +602,6 @@ export function useChatSession(options: ChatSessionOptions = {}): ChatSessionSta
     setUserLevel,
     setProfile,
     setEffort,
+    setVerbosity,
   };
 }

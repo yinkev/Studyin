@@ -11,15 +11,16 @@ from typing import Any, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_current_user, get_current_user_or_demo, get_db
 from app.models.analytics import (
     ActivityHeatmap,
     GamificationProgress,
     LearningOverview,
 )
+from app.models.user import User
 from app.services.analytics.tracker import AnalyticsTracker
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 async def get_learning_overview(
     days: int = Query(default=30, ge=1, le=365, description="Number of days to analyze"),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_or_demo),
 ) -> LearningOverview:
     """Get learning overview metrics for the current user.
 
@@ -39,7 +40,7 @@ async def get_learning_overview(
     """
     try:
         tracker = AnalyticsTracker(db)
-        user_id = UUID(current_user["sub"])
+        user_id = current_user.id
         anonymized_user = tracker._anonymize_user_id(user_id)
 
         # Calculate date range
@@ -48,7 +49,7 @@ async def get_learning_overview(
 
         # Get learning sessions data
         sessions_query = await db.execute(
-            """
+            text("""
             SELECT
                 COUNT(*) as total_sessions,
                 COALESCE(SUM(duration_seconds), 0) as total_duration,
@@ -58,7 +59,7 @@ async def get_learning_overview(
             WHERE user_id = :user_id
                 AND started_at >= :start_date
                 AND started_at <= :end_date
-            """,
+            """),
             {
                 "user_id": anonymized_user,
                 "start_date": start_date,
@@ -69,7 +70,7 @@ async def get_learning_overview(
 
         # Get materials data
         materials_query = await db.execute(
-            """
+            text("""
             SELECT
                 COALESCE(SUM(materials_viewed), 0) as total_viewed,
                 COALESCE(SUM(materials_completed), 0) as total_completed
@@ -77,7 +78,7 @@ async def get_learning_overview(
             WHERE user_id = :user_id
                 AND date >= :start_date
                 AND date <= :end_date
-            """,
+            """),
             {
                 "user_id": anonymized_user,
                 "start_date": start_date.date(),
@@ -88,7 +89,7 @@ async def get_learning_overview(
 
         # Get gamification stats
         gamification_query = await db.execute(
-            """
+            text("""
             SELECT
                 current_level,
                 current_streak,
@@ -96,21 +97,21 @@ async def get_learning_overview(
                 COALESCE(jsonb_array_length(achievements), 0) as achievements_count
             FROM gamification_stats
             WHERE user_id = :user_id
-            """,
+            """),
             {"user_id": anonymized_user},
         )
         gamification_data = gamification_query.first()
 
         # Get daily active days
         active_days_query = await db.execute(
-            """
+            text("""
             SELECT COUNT(DISTINCT date) as active_days
             FROM daily_activity_summary
             WHERE user_id = :user_id
                 AND date >= :start_date
                 AND date <= :end_date
                 AND total_duration_seconds > 0
-            """,
+            """),
             {
                 "user_id": anonymized_user,
                 "start_date": start_date.date(),
@@ -160,7 +161,7 @@ async def get_learning_overview(
 async def get_activity_heatmap(
     days: int = Query(default=365, ge=7, le=365, description="Number of days to include"),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_or_demo),
 ) -> list[ActivityHeatmap]:
     """Get activity heatmap data for calendar visualization.
 
@@ -168,7 +169,7 @@ async def get_activity_heatmap(
     """
     try:
         tracker = AnalyticsTracker(db)
-        user_id = UUID(current_user["sub"])
+        user_id = current_user.id
         anonymized_user = tracker._anonymize_user_id(user_id)
 
         # Calculate date range
@@ -177,7 +178,7 @@ async def get_activity_heatmap(
 
         # Get daily activity data
         query = await db.execute(
-            """
+            text("""
             SELECT
                 date,
                 total_sessions as activity_count,
@@ -188,7 +189,7 @@ async def get_activity_heatmap(
                 AND date >= :start_date
                 AND date <= :end_date
             ORDER BY date
-            """,
+            """),
             {
                 "user_id": anonymized_user,
                 "start_date": start_date,
@@ -221,7 +222,7 @@ async def get_activity_heatmap(
 async def get_gamification_progress(
     days: int = Query(default=30, ge=7, le=90, description="Number of days for history"),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_or_demo),
 ) -> GamificationProgress:
     """Get gamification progress and XP trends.
 
@@ -229,19 +230,19 @@ async def get_gamification_progress(
     """
     try:
         tracker = AnalyticsTracker(db)
-        user_id = UUID(current_user["sub"])
+        user_id = current_user.id
         anonymized_user = tracker._anonymize_user_id(user_id)
 
         # Get current gamification stats
         stats_query = await db.execute(
-            """
+            text("""
             SELECT
                 total_xp,
                 current_level,
                 achievements
             FROM gamification_stats
             WHERE user_id = :user_id
-            """,
+            """),
             {"user_id": anonymized_user},
         )
         stats = stats_query.first()
@@ -285,7 +286,7 @@ async def get_gamification_progress(
         start_date = end_date - timedelta(days=days)
 
         xp_history_query = await db.execute(
-            """
+            text("""
             SELECT
                 date,
                 xp_earned
@@ -294,7 +295,7 @@ async def get_gamification_progress(
                 AND date >= :start_date
                 AND date <= :end_date
             ORDER BY date
-            """,
+            """),
             {
                 "user_id": anonymized_user,
                 "start_date": start_date,
@@ -319,7 +320,7 @@ async def get_gamification_progress(
 
         # Get streak history
         streak_history_query = await db.execute(
-            """
+            text("""
             SELECT
                 timestamp::date as date,
                 MAX((properties->>'streak_days')::int) as streak_days
@@ -329,7 +330,7 @@ async def get_gamification_progress(
                 AND timestamp >= :start_date
             GROUP BY timestamp::date
             ORDER BY date
-            """,
+            """),
             {
                 "user_id": anonymized_user,
                 "start_date": datetime.combine(start_date, datetime.min.time()),
@@ -360,20 +361,105 @@ async def get_gamification_progress(
         )
 
 
+@router.post("/events")
+async def track_frontend_event(
+    event_data: dict[str, Any],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_or_demo),
+) -> dict[str, str]:
+    """Track an analytics event from frontend.
+
+    Accepts the frontend event structure with category, action, label, value, metadata.
+    """
+    try:
+        tracker = AnalyticsTracker(db)
+        user_id = current_user.id
+
+        # Extract frontend event structure
+        category = event_data.get("category")
+        action = event_data.get("action")
+        label = event_data.get("label")
+        value = event_data.get("value")
+        metadata = event_data.get("metadata", {})
+        timestamp = event_data.get("timestamp")
+
+        # Log the event for tracking purposes (you can store this in analytics_events table)
+        logger.info(
+            f"Analytics event: category={category}, action={action}, "
+            f"label={label}, value={value}, user={user_id}"
+        )
+
+        # Map frontend events to backend tracking methods
+        if category == "session" and action == "start":
+            material_id = metadata.get("material_id")
+            session_id = await tracker.start_learning_session(user_id, material_id)
+            return {"message": "Session started", "session_id": str(session_id)}
+
+        elif category == "session" and action == "end":
+            session_id = label  # Session ID is in label
+            duration_ms = value or metadata.get("duration_ms", 0)
+            xp_earned = metadata.get("xp_earned", 0)
+            result = await tracker.end_learning_session(user_id, session_id, xp_earned)
+            return {"message": "Session ended", "summary": result}
+
+        elif category == "material":
+            material_id = metadata.get("material_id")
+            if material_id and action in ["view", "upload"]:
+                # Track material interaction
+                await tracker.track_material_interaction(
+                    user_id=user_id,
+                    material_id=UUID(material_id),
+                    material_type=metadata.get("file_type", "unknown"),
+                    interaction_type=action,
+                    progress_percentage=metadata.get("progress_percentage"),
+                    time_spent_seconds=metadata.get("time_spent_seconds"),
+                )
+                return {"message": f"Material {action} tracked"}
+
+        elif category == "chat":
+            # Track chat interactions (AI coach)
+            # Store basic event info (could be expanded to track_ai_coach_interaction)
+            logger.info(f"Chat event: {action}, value={value}, metadata={metadata}")
+            return {"message": f"Chat {action} tracked"}
+
+        elif category == "gamification":
+            # Track gamification events (XP, achievements, level ups)
+            logger.info(f"Gamification event: {action}, value={value}, metadata={metadata}")
+            return {"message": f"Gamification {action} tracked"}
+
+        elif category == "navigation":
+            # Track navigation events
+            logger.info(f"Navigation event: {action}, label={label}")
+            return {"message": "Navigation tracked"}
+
+        else:
+            # For unrecognized events, log and return success
+            logger.info(f"Generic event: category={category}, action={action}")
+            return {"message": "Event tracked"}
+
+    except Exception as e:
+        logger.error(f"Error tracking frontend event: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to track event",
+        )
+
+
 @router.post("/events/track")
 async def track_event(
     event_type: str,
     properties: dict[str, Any] = {},
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_or_demo),
 ) -> dict[str, str]:
     """Track a custom analytics event.
 
     This is a generic endpoint for tracking various events from the frontend.
+    (Legacy endpoint - use POST /events for new implementations)
     """
     try:
         tracker = AnalyticsTracker(db)
-        user_id = UUID(current_user["sub"])
+        user_id = current_user.id
 
         # Map event types to specific tracking methods
         if event_type == "session_start":
@@ -432,7 +518,7 @@ async def track_event(
 async def get_system_metrics(
     hours: int = Query(default=24, ge=1, le=168, description="Hours of data to retrieve"),
     db: AsyncSession = Depends(get_db),
-    _: dict = Depends(get_current_user),  # Require auth but don't use user ID
+    _: User = Depends(get_current_user_or_demo),  # Require auth but don't use user ID
 ) -> dict[str, Any]:
     """Get system-wide metrics for monitoring.
 
@@ -445,7 +531,7 @@ async def get_system_metrics(
 
         # Get API metrics
         api_metrics_query = await db.execute(
-            """
+            text("""
             SELECT
                 COUNT(*) as total_requests,
                 COUNT(DISTINCT endpoint) as unique_endpoints,
@@ -458,14 +544,14 @@ async def get_system_metrics(
             FROM system_metrics
             WHERE timestamp >= :start_time
                 AND timestamp <= :end_time
-            """,
+            """),
             {"start_time": start_time, "end_time": end_time},
         )
         api_metrics = api_metrics_query.first()
 
         # Get error breakdown
         error_breakdown_query = await db.execute(
-            """
+            text("""
             SELECT
                 error_type,
                 COUNT(*) as count
@@ -476,7 +562,7 @@ async def get_system_metrics(
             GROUP BY error_type
             ORDER BY count DESC
             LIMIT 10
-            """,
+            """),
             {"start_time": start_time, "end_time": end_time},
         )
         error_breakdown = [
@@ -486,7 +572,7 @@ async def get_system_metrics(
 
         # Get top endpoints by request count
         top_endpoints_query = await db.execute(
-            """
+            text("""
             SELECT
                 endpoint,
                 method,
@@ -499,7 +585,7 @@ async def get_system_metrics(
             GROUP BY endpoint, method
             ORDER BY request_count DESC
             LIMIT 10
-            """,
+            """),
             {"start_time": start_time, "end_time": end_time},
         )
         top_endpoints = [
@@ -516,12 +602,12 @@ async def get_system_metrics(
 
         # Get active users count (unique users with events)
         active_users_query = await db.execute(
-            """
+            text("""
             SELECT COUNT(DISTINCT user_id) as active_users
             FROM analytics_events
             WHERE timestamp >= :start_time
                 AND timestamp <= :end_time
-            """,
+            """),
             {"start_time": start_time, "end_time": end_time},
         )
         active_users = active_users_query.first()
