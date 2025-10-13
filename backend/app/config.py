@@ -12,6 +12,11 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: str = "development"
 
+    # Auth mode
+    # - "demo": allow unauthenticated access via demo user (MVP/local only)
+    # - "jwt": require JWT auth for protected endpoints
+    AUTH_MODE: str = "demo"
+
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://studyin_user:changeme@localhost:5432/studyin"
     DATABASE_POOL_SIZE: int = 5
@@ -91,6 +96,15 @@ class Settings(BaseSettings):
             raise ValueError("ENVIRONMENT must be one of: development, staging, production")
         return normalized
 
+    @field_validator("AUTH_MODE")
+    @classmethod
+    def _validate_auth_mode(cls, value: str) -> str:
+        normalized = (value or "").strip().lower()
+        allowed = {"demo", "jwt"}
+        if normalized not in allowed:
+            raise ValueError(f"AUTH_MODE must be one of: {', '.join(sorted(allowed))}")
+        return normalized
+
     def get_cors_origins_list(self) -> List[str]:
         """Convert CORS_ALLOW_ORIGINS string to list."""
         return [item.strip() for item in self.CORS_ALLOW_ORIGINS.split(",") if item.strip()]
@@ -123,6 +137,10 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _validate_security_sensitive(self) -> "Settings":
         if self.ENVIRONMENT in {"staging", "production"}:
+            # Disallow demo auth in staging/production
+            if self.AUTH_MODE == "demo":
+                raise ValueError("AUTH_MODE=demo is not allowed in staging/production")
+
             if self.JWT_ACCESS_SECRET == "local-access-secret" or self.JWT_REFRESH_SECRET == "local-refresh-secret":
                 raise ValueError("JWT secrets must be overridden in staging/production environments")
 

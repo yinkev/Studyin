@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 
 from fastapi import Depends, Header, HTTPException, status
+from app.config import settings
 
 from app.core.jwt import verify_access_token
 from app.core.password import hash_password
@@ -143,3 +144,18 @@ async def ensure_hardcoded_user(session: AsyncSession) -> User:
         await session.refresh(user)
 
     return user
+
+
+async def get_current_user_dynamic(
+    authorization: str | None = Header(None),
+    session: AsyncSession = Depends(get_db),
+) -> User:
+    """Select auth strategy based on settings.AUTH_MODE.
+
+    - jwt: require valid JWT via get_current_user
+    - demo: allow unauthenticated via get_current_user_or_demo
+    """
+    if settings.AUTH_MODE == "jwt":
+        return await get_current_user(authorization, session)
+    # default to demo behavior
+    return await get_current_user_or_demo(authorization, session)
