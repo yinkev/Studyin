@@ -62,6 +62,20 @@ export function QuizView({ onNavigate }: { onNavigate: (view: View) => void }) {
     }
   };
 
+  // Auto-start if URL contains topic + mode=next
+  useEffect(() => {
+    try {
+      const u = new URL(window.location.href);
+      const t = u.searchParams.get('topic');
+      const mode = u.searchParams.get('mode');
+      if (t && mode === 'next') {
+        setTopic(t);
+        startNextUnanswered();
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const submit = async () => {
     if (chosen == null || !current) return;
     const resp = await apiClient.post(`/api/questions/${current.id}/answer`, {

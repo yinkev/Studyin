@@ -12,6 +12,7 @@ const SettingsView = lazy(() => import('@/pages/SettingsView').then(m => ({ defa
 const QuizView = lazy(() => import('@/pages/QuizView').then(m => ({ default: m.QuizView })));
 const FirstPassView = lazy(() => import('@/pages/FirstPassView').then(m => ({ default: m.FirstPassView })));
 const ReviewView = lazy(() => import('@/pages/ReviewView').then(m => ({ default: m.ReviewView })));
+const QuestionBankView = lazy(() => import('@/pages/QuestionBankView').then(m => ({ default: m.QuestionBankView })));
 
 // Loading fallback component
 function ViewLoader() {
@@ -28,7 +29,7 @@ function resolveInitialView(): View {
   if (typeof window === 'undefined') return 'dashboard';
   const params = new URLSearchParams(window.location.search);
   const q = (params.get('view') || window.location.hash.replace('#', '') || '').toLowerCase();
-  if (q === 'chat' || q === 'upload' || q === 'analytics' || q === 'dashboard' || q === 'settings' || q === 'quiz' || q === 'firstpass' || q === 'review') return q as View;
+  if (q === 'chat' || q === 'upload' || q === 'analytics' || q === 'dashboard' || q === 'settings' || q === 'quiz' || q === 'firstpass' || q === 'review' || q === 'questions') return q as View;
   return 'dashboard';
 }
 
@@ -107,6 +108,7 @@ function App() {
               {currentView === 'quiz' && <QuizView onNavigate={setCurrentView} />}
               {currentView === 'firstpass' && <FirstPassView onNavigate={setCurrentView} />}
               {currentView === 'review' && <ReviewView onNavigate={setCurrentView} />}
+              {currentView === 'questions' && <QuestionBankView onNavigate={setCurrentView} />}
             </main>
           </div>
         )}

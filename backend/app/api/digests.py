@@ -31,6 +31,19 @@ async def latest_digest(
     )
     chunks = res.scalars().all()
     context = "\n\n".join(c.content for c in chunks)
+    # Derive a human-friendly title from recent filenames if available
+    title_base = "Study Digest"
+    try:
+        from app.models.material import Material
+        from sqlalchemy import select
+        if chunks:
+            # pick the first chunk's filename
+            first_chunk = chunks[0]
+            # Material is joined via relationship; fetch filename by material_id
+            # Fall back if not resolvable
+            title_base = getattr(first_chunk, 'material', None).filename if getattr(first_chunk, 'material', None) else title_base
+    except Exception:
+        pass
 
     prompt = f"""Create a bite-size medical study digest for a student.
 Context from their materials (last {days} days):\n{context}\n
@@ -63,7 +76,7 @@ Output in JSON with keys: title, bullets (array of 3 concise items), mini_case (
     mnemonic = initials
 
     return {
-        "title": f"Digest: {topic}",
+        "title": f"{title_base}",
         "bullets": bullets,
         "mini_case": mini_case,
         "mnemonic": mnemonic,

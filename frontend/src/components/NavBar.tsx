@@ -4,7 +4,7 @@ import { ModernXPBar } from '@/components/dashboard/ModernXPBar';
 import { ModernStreakCard } from '@/components/dashboard/ModernStreakCard';
 import { LevelCard } from '@/components/dashboard/LevelCard';
 
-export type View = 'dashboard' | 'upload' | 'chat' | 'analytics' | 'quiz' | 'firstpass' | 'review' | 'settings';
+export type View = 'dashboard' | 'upload' | 'chat' | 'analytics' | 'quiz' | 'firstpass' | 'review' | 'questions' | 'settings';
 
 interface NavBarProps {
   currentView: View;
@@ -59,6 +59,14 @@ export function NavBar({ currentView, onNavigate, stats, dueCount = 0 }: NavBarP
             >
               <MessageSquare className="size-4" aria-hidden="true" />
               Practice
+            </Button>
+            <Button
+              variant={currentView === 'quiz' ? 'ghost' : 'ghost'}
+              onClick={() => onNavigate('questions' as any)}
+              className="gap-2 text-sm"
+            >
+              <MessageSquare className="size-4" aria-hidden="true" />
+              Bank
             </Button>
             <Button
               variant={currentView === 'analytics' ? 'default' : 'ghost'}
