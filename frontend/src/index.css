@@ -4,8 +4,8 @@
 /* Import Tailwind CSS v4 */
 @import "tailwindcss";
 
-/* Import design tokens - NEW 2025 SYSTEM (NO GRADIENTS) */
-@import './styles/tokens-2025.css';
+/* Import design tokens - Psychology-Based Design System */
+@import './styles/tokens.css';
 
 /* Tailwind CSS v4 theme extensions using @theme directive */
 @theme {

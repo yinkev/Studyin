@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from 'react';
 import { NavBar, type View } from '@/components/NavBar';
-import { CosmicDashboard } from '@/pages/CosmicDashboard';
+import { ModernDashboard } from '@/pages/ModernDashboard';
 import { useChatSession } from '@/hooks/useChatSession';
 import { Toaster } from 'sonner';
 
@@ -91,10 +91,9 @@ function App() {
 
       <Suspense fallback={<ViewLoader />}>
         {currentView === 'dashboard' && (
-          <CosmicDashboard
+          <ModernDashboard
             onNavigate={setCurrentView}
             stats={gamificationStats}
-            currentView={currentView}
           />
         )}
         {currentView !== 'dashboard' && (
