@@ -155,7 +155,7 @@ class FSRSService:
         topic_id: Optional[UUID] = None,
         include_new: bool = True
     ) -> List[FSRSCard]:
-        """Get cards due for review.
+        """Get cards due for review with enriched content.
 
         Args:
             user_id: User ID
@@ -164,8 +164,10 @@ class FSRSService:
             include_new: Whether to include new (never reviewed) cards
 
         Returns:
-            List of cards due for review, ordered by priority
+            List of cards due for review with content populated, ordered by priority
         """
+        from sqlalchemy.orm import selectinload
+
         now = datetime.datetime.now(datetime.UTC)
 
         # Build query
@@ -180,8 +182,13 @@ class FSRSService:
         if not include_new:
             conditions.append(FSRSCard.state != "new")
 
+        # Eagerly load related content (chunk and topic)
         stmt = (
             select(FSRSCard)
+            .options(
+                selectinload(FSRSCard.chunk),
+                selectinload(FSRSCard.topic)
+            )
             .where(and_(*conditions))
             .order_by(
                 FSRSCard.due_date.asc(),  # Most overdue first
