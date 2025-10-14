@@ -80,6 +80,25 @@ class FSRSCardResponse(BaseModel):
     topic_id: Optional[UUID] = None
     flashcard_content: Optional[str] = None
 
+    # Content fields (populated from chunk/topic)
+    question: Optional[str] = Field(
+        None,
+        description="Question text for the flashcard"
+    )
+    answer: Optional[str] = Field(
+        None,
+        description="Answer text for the flashcard"
+    )
+    content_preview: Optional[str] = Field(
+        None,
+        description="Preview of the content (truncated if long)",
+        max_length=200
+    )
+    content_source: Optional[str] = Field(
+        None,
+        description="Source of content: 'chunk', 'topic', or 'custom'"
+    )
+
     # FSRS state
     difficulty: float
     stability: float

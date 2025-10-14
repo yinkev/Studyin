@@ -46,6 +46,111 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/reviews", tags=["reviews"])
 
 
+def _enrich_card_response(card) -> dict:
+    """Enrich FSRSCard with content from related chunk or topic.
+
+    Args:
+        card: FSRSCard instance with chunk/topic relationships loaded
+
+    Returns:
+        Dictionary with enriched card data including question/answer fields
+    """
+    # Start with base card data
+    card_dict = {
+        "id": card.id,
+        "user_id": card.user_id,
+        "chunk_id": card.chunk_id,
+        "topic_id": card.topic_id,
+        "flashcard_content": card.flashcard_content,
+        "difficulty": card.difficulty,
+        "stability": card.stability,
+        "retrievability": card.retrievability,
+        "state": card.state,
+        "due_date": card.due_date,
+        "last_review": card.last_review,
+        "elapsed_days": card.elapsed_days,
+        "scheduled_days": card.scheduled_days,
+        "reps": card.reps,
+        "lapses": card.lapses,
+        "consecutive_correct": card.consecutive_correct,
+        "average_response_time_seconds": card.average_response_time_seconds,
+        "created_at": card.created_at,
+        "updated_at": card.updated_at,
+    }
+
+    # Initialize content fields
+    question = None
+    answer = None
+    content_preview = None
+    content_source = None
+
+    # Populate content from chunk
+    if card.chunk_id and hasattr(card, 'chunk') and card.chunk:
+        content = card.chunk.content or ""
+        content_source = "chunk"
+
+        # For chunks, treat the entire content as the "answer"
+        # Question is implicitly "What do you know about this topic?"
+        question = "Review the following material:"
+        answer = content
+
+        # Create truncated preview
+        if len(content) > 200:
+            content_preview = content[:197] + "..."
+        else:
+            content_preview = content
+
+    # Populate content from topic
+    elif card.topic_id and hasattr(card, 'topic') and card.topic:
+        topic = card.topic
+        content_source = "topic"
+
+        # For topics, create a question about the topic
+        question = f"What do you know about {topic.name}?"
+        answer = topic.description or f"Review topic: {topic.name}"
+
+        # Create preview from description
+        desc = topic.description or topic.name
+        if len(desc) > 200:
+            content_preview = desc[:197] + "..."
+        else:
+            content_preview = desc
+
+    # Use custom flashcard content if available
+    elif card.flashcard_content:
+        content_source = "custom"
+
+        # Try to split flashcard content into Q&A if it contains separator
+        if " | " in card.flashcard_content:
+            parts = card.flashcard_content.split(" | ", 1)
+            question = parts[0]
+            answer = parts[1] if len(parts) > 1 else ""
+        elif "\n\n" in card.flashcard_content:
+            parts = card.flashcard_content.split("\n\n", 1)
+            question = parts[0]
+            answer = parts[1] if len(parts) > 1 else ""
+        else:
+            # No clear separator, treat whole thing as question
+            question = card.flashcard_content
+            answer = "(Custom flashcard - answer to be filled)"
+
+        # Create preview
+        if len(card.flashcard_content) > 200:
+            content_preview = card.flashcard_content[:197] + "..."
+        else:
+            content_preview = card.flashcard_content
+
+    # Add enriched content to response
+    card_dict.update({
+        "question": question,
+        "answer": answer,
+        "content_preview": content_preview,
+        "content_source": content_source,
+    })
+
+    return card_dict
+
+
 @router.get("/due", response_model=DueCardsResponse)
 async def get_due_cards(
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
@@ -78,8 +183,11 @@ async def get_due_cards(
         include_new=include_new,
     )
 
-    # Convert to response models
-    card_responses = [FSRSCardResponse.model_validate(card) for card in cards]
+    # Enrich cards with content and convert to response models
+    card_responses = [
+        FSRSCardResponse.model_validate(_enrich_card_response(card))
+        for card in cards
+    ]
 
     # Check if there are more cards beyond the limit
     has_more = len(cards) == limit
@@ -166,8 +274,21 @@ async def submit_review(
         # Calculate retention probability
         retention = await service.predict_retention(card_id)
 
+        # Refresh card with relationships loaded for content enrichment
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+        from app.models.fsrs import FSRSCard
+
+        stmt = (
+            select(FSRSCard)
+            .options(selectinload(FSRSCard.chunk), selectinload(FSRSCard.topic))
+            .where(FSRSCard.id == card_id)
+        )
+        result = await db.execute(stmt)
+        enriched_card = result.scalar_one()
+
         return ReviewSuccessResponse(
-            card=FSRSCardResponse.model_validate(card),
+            card=FSRSCardResponse.model_validate(_enrich_card_response(enriched_card)),
             next_review_date=card.due_date,
             interval_days=card.scheduled_days,
             retention_probability=retention,
@@ -334,7 +455,20 @@ async def create_card(
             initial_due_date=request.initial_due_date,
         )
 
-        return FSRSCardResponse.model_validate(card)
+        # Refresh card with relationships loaded for content enrichment
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+        from app.models.fsrs import FSRSCard
+
+        stmt = (
+            select(FSRSCard)
+            .options(selectinload(FSRSCard.chunk), selectinload(FSRSCard.topic))
+            .where(FSRSCard.id == card.id)
+        )
+        result = await db.execute(stmt)
+        enriched_card = result.scalar_one()
+
+        return FSRSCardResponse.model_validate(_enrich_card_response(enriched_card))
 
     except ValueError as e:
         raise HTTPException(
@@ -373,6 +507,10 @@ async def bulk_create_cards(
     created_cards = []
     skipped_count = 0
 
+    from sqlalchemy import select
+    from sqlalchemy.orm import selectinload
+    from app.models.fsrs import FSRSCard
+
     # Create cards for chunks
     for chunk_id in request.chunk_ids:
         try:
@@ -399,7 +537,23 @@ async def bulk_create_cards(
             logger.warning(f"Skipped creating card for topic {topic_id}: {e}")
             skipped_count += 1
 
-    card_responses = [FSRSCardResponse.model_validate(card) for card in created_cards]
+    # Refresh cards with relationships loaded for content enrichment
+    enriched_cards = []
+    for card in created_cards:
+        stmt = (
+            select(FSRSCard)
+            .options(selectinload(FSRSCard.chunk), selectinload(FSRSCard.topic))
+            .where(FSRSCard.id == card.id)
+        )
+        result = await db.execute(stmt)
+        enriched_card = result.scalar_one_or_none()
+        if enriched_card:
+            enriched_cards.append(enriched_card)
+
+    card_responses = [
+        FSRSCardResponse.model_validate(_enrich_card_response(card))
+        for card in enriched_cards
+    ]
 
     return BulkCreateCardsResponse(
         created_count=len(created_cards),
